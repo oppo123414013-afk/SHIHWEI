@@ -1,0 +1,151 @@
+/* Report Style - Professional & Colorful */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  background: #ffffff;
+}
+
+/* Title */
+h1 {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #e94560;
+  padding: 20px 28px;
+  border-radius: 10px;
+  font-size: 22px;
+  margin-bottom: 8px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Section headers */
+h2 {
+  color: #ffffff;
+  background: linear-gradient(90deg, #0f3460, #533483);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  color: #0f3460;
+  font-size: 14px;
+  border-left: 4px solid #e94560;
+  padding-left: 10px;
+  margin-top: 18px;
+}
+
+/* Paragraphs */
+p {
+  margin: 8px 0;
+  text-align: justify;
+}
+
+/* Bold text - emphasis */
+strong {
+  color: #e94560;
+  font-weight: 700;
+}
+
+/* Bullet list */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+ul li::before {
+  content: "▸ ";
+  color: #533483;
+  font-weight: bold;
+}
+ul li {
+  padding: 4px 0 4px 18px;
+  text-indent: -18px;
+}
+
+ol li {
+  padding: 4px 0;
+  margin-left: 20px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 12px;
+}
+th {
+  background: #0f3460;
+  color: #ffffff;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+}
+td {
+  padding: 8px 14px;
+  border-bottom: 1px solid #e0e4f0;
+}
+tr:nth-child(even) td {
+  background: #f0f4ff;
+}
+tr:hover td {
+  background: #dde6ff;
+}
+
+/* Blockquotes - highlight boxes */
+blockquote {
+  background: #fff8e1;
+  border-left: 5px solid #ffc107;
+  padding: 12px 18px;
+  margin: 14px 0;
+  border-radius: 0 8px 8px 0;
+  color: #5d4037;
+}
+
+/* Code blocks */
+code {
+  background: #f4f4f8;
+  color: #533483;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', monospace;
+  font-size: 12px;
+}
+pre {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, #e94560, #533483, #0f3460);
+  margin: 20px 0;
+  border-radius: 2px;
+}
+
+/* Status indicators */
+.positive, p:has(> strong:first-child) {
+  padding: 2px 0;
+}
+
+/* Page break hint */
+h2 {
+  page-break-before: auto;
+}
+
+/* Print tweaks */
+@media print {
+  body { padding: 10px 20px; }
+  h1 { font-size: 20px; }
+}
