@@ -139,13 +139,36 @@ hr {
   padding: 2px 0;
 }
 
-/* Page break hint */
+/* Page break control */
 h2 {
   page-break-before: auto;
+  page-break-after: avoid;
+}
+h3 {
+  page-break-after: avoid;
+}
+table {
+  page-break-inside: avoid;
+}
+tr {
+  page-break-inside: avoid;
+}
+blockquote {
+  page-break-inside: avoid;
+}
+/* Prevent orphaned headers */
+h2 + *, h3 + * {
+  page-break-before: avoid;
+}
+/* Section wrapper keeps header with content */
+.section-break {
+  page-break-before: always;
 }
 
 /* Print tweaks */
 @media print {
   body { padding: 10px 20px; }
   h1 { font-size: 20px; }
+  h2 { font-size: 14px; }
+  table { font-size: 11px; }
 }
