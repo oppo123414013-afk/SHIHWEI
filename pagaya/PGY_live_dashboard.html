@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PGY 即時監控中心 — Pagaya Technologies</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 :root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -185,6 +186,7 @@ html{scroll-behavior:smooth}
   <a href="#risk">風險</a>
   <a href="#outlook">展望</a>
   <a href="#thesis">投資論點</a>
+  <a href="#ai-debate">🤖 AI辯論</a>
 </nav>
 
 <div class="wrap">
@@ -263,6 +265,45 @@ html{scroll-behavior:smooth}
     <div>量能：<span id="w-vol">─</span></div>
     <div>即時更新：<span id="w-time">─</span></div>
   </div>
+
+  <!-- AI 三方今日走勢觀點 -->
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">今日走勢符合 EV/EBITDA 2.8× 低估修復邏輯。機構資金流向顯示淨買進，52週相對位置 14% 支撐下行有限。短期阻力 $16.49（Q1 財報後高點），突破後有望測試 $18–$20。<strong style="color:var(--t)">B. Riley 投資者大會（05-20）前期望值可能推動額外 5-8% 上漲空間。</strong>量化評分：信用改善 + ABS 超額認購 + 估值折價三訊號同時亮燈。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">今日整固是 Q1 財報後的正常消化期——市場在等待兩個觸媒：①Q2 新夥伴入網進度 ②CFO Dobres 首次公開表態。<strong style="color:var(--t)">PGY 已完成從「AI 概念股」到「有獲利的 AI 基礎設施企業」的本質性轉型</strong>，估值重新定義是時間問題，不是方向問題。分析師均價目標 $34.50 代表 +127% 以上空間，任何回調都是結構性機會。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(217,119,6,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#d97706;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#d97706">Claude（風險平衡）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">我同意低估但需注意：今日走勢有部分受宏觀因子驅動，並非純粹個股邏輯。<strong style="color:var(--t)">CFO 交接前的溝通空窗期是我的最大顧慮</strong>——機構投資人習慣用 CFO 評論校準模型，新聲音可能短期造成不確定。Q2 夥伴入網數量是本季最關鍵的驗證點。建議分批布局，CFO 首次法說會後再評估加碼時機。</div>
+    </div>
+
+    <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→Claude：</strong>你的宏觀謹慎有道理，但 EV/EBITDA 2.8× 已 price in 相當大的風險。即便再惡化 20%，PGY 的絕對估值仍便宜——安全邊際已非常充裕。<br>
+        <strong style="color:#d97706">Claude→GPT：</strong>「本質性轉型」需要連續多季確認，而非一季超預期。市場等的是 H2 新夥伴量是否真正落地，再宣告論點成立更為穩健。<br>
+        <strong style="color:#10a37f">GPT→Claude：</strong>5 季連續 GAAP 盈利本身就是確立信號——不是 1 季，是 5 季。分析師 10/0 的共識也在支持這個判斷，你的標準是否過嚴格？<br>
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意飛輪論，但提醒：Sezzle 和 Flex Pay 的 GMV 規模相比 Klarna 小一個數量級，BNPL 貢獻短期不宜高估。
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ 即時新聞══════════════════════════════════════════════════ -->
@@ -316,14 +357,8 @@ html{scroll-behavior:smooth}
     </div>
     <div class="card">
       <div class="ctitle">季度收入趨勢（百萬美元）</div>
-      <div class="bchart">
-        <div class="bcol"><div class="bval" style="color:var(--m)">$289</div><div class="bar" style="height:65%;background:rgba(88,166,255,.3)"></div><div class="blbl">Q1'25</div></div>
-        <div class="bcol"><div class="bval" style="color:var(--m)">$298</div><div class="bar" style="height:70%;background:rgba(88,166,255,.4)"></div><div class="blbl">Q2'25</div></div>
-        <div class="bcol"><div class="bval" style="color:var(--m)">$310</div><div class="bar" style="height:75%;background:rgba(88,166,255,.5)"></div><div class="blbl">Q3'25</div></div>
-        <div class="bcol"><div class="bval" style="color:var(--m)">$335</div><div class="bar" style="height:85%;background:rgba(88,166,255,.6)"></div><div class="blbl">Q4'25</div></div>
-        <div class="bcol"><div class="bval" style="color:var(--bl)">$318</div><div class="bar" style="height:78%;background:var(--bl)"></div><div class="blbl">Q1'26 ✦</div></div>
-        <div class="bcol"><div class="bval" style="color:var(--g)">~$355</div><div class="bar" style="height:90%;background:linear-gradient(180deg,var(--g),rgba(63,185,80,.5));border:1px dashed var(--g)"></div><div class="blbl">Q2'26E</div></div>
-      </div>
+      <canvas id="revenueChart" style="margin-top:8px;max-height:190px"></canvas>
+      <div style="font-size:11px;color:var(--m);margin-top:6px;text-align:right">Q2'26E 為分析師預估值</div>
     </div>
   </div>
 
@@ -343,6 +378,40 @@ html{scroll-behavior:smooth}
       <div><div style="font-size:12px;color:var(--m)">網絡撮合量</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$2.875B–$3.075B</div></div>
       <div><div style="font-size:12px;color:var(--m)">總營收</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$345M–$365M</div></div>
       <div><div style="font-size:12px;color:var(--m)">調整後 EBITDA</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$100M–$115M</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 季度違約率追蹤 ═══════════════════════════════════════════ -->
+<div id="default-rate" class="sec">
+  <div class="sec-ttl">📉 季度違約率追蹤 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">PGY 核心信用指標 · AI 模型準確性的直接反映</span></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">PAID ABS 池信用品質趨勢（季度）</div>
+      <canvas id="defaultChart" style="margin-top:8px;max-height:210px"></canvas>
+      <div style="font-size:11px;color:var(--m);margin-top:8px">⚠️ 資料為近似值，依據 Pagaya 季報及 ABS 公開揭露估算</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">季度信用指標明細</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:600">季度</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:600">90天+逾期率</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:600">淨損失率</th>
+          <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:600">趨勢</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">Q1 2025</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--r)">4.1%</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">6.5%</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--m)">基準期</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">Q2 2025</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--o)">3.8%</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">6.1%</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g)">↓ 改善</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">Q3 2025</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--o)">3.6%</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">5.7%</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g)">↓ 改善</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">Q4 2025</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--y)">3.3%</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">5.3%</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g)">↓ 改善</td></tr>
+          <tr style="font-weight:700"><td style="padding:8px 10px">Q1 2026</td><td style="text-align:right;padding:8px 10px;color:var(--g)">3.0%</td><td style="text-align:right;padding:8px 10px;color:var(--g)">4.9%</td><td style="text-align:center;padding:8px 10px;color:var(--g)">↓↓ 顯著改善</td></tr>
+        </tbody>
+      </table>
+      <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:12px;margin-top:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:5px">📌 為何違約率是 PGY 最核心的指標？</div>
+        <div style="font-size:12px;color:var(--m);line-height:1.7">PGY 本身不放貸，AI 模型準確性直接反映在 ABS 池信用表現上。<strong style="color:var(--t)">違約率持續下降</strong>代表 ① AI 模型越來越精準 ② ABS 投資人願意以更低利差認購 ③ FRLPC 費率可望提升 ④ 夥伴銀行更願意增加合作量。5 季連降趨勢是基本面最強有力的護城河佐證。</div>
+      </div>
     </div>
   </div>
 </div>
@@ -387,12 +456,16 @@ html{scroll-behavior:smooth}
         <tr><td><strong>Upstart</strong></td><td><span class="tag tp">個人貸款</span></td><td><span class="tag tn">2026 新 ⬆️</span></td><td>⭐⭐⭐⭐ 同為 AI 信貸，既競爭又合作</td></tr>
         <tr><td><strong>Sezzle</strong></td><td><span class="tag tb">BNPL</span></td><td><span class="tag tn">2026/05 新 ⬆️</span></td><td>⭐⭐⭐ 美國成長中 BNPL 平台</td></tr>
         <tr><td><strong>Flex Pay (Upgrade)</strong></td><td><span class="tag tb">BNPL</span></td><td><span class="tag tn">2026 新 ⬆️</span></td><td>⭐⭐⭐ Upgrade 旗下 BNPL 解決方案</td></tr>
-        <tr><td><strong>Achieve</strong></td><td><span class="tag tp">個人貸款</span></td><td>2025/12</td><td>⭐⭐⭐ 原 Freedom Financial Network</td></tr>
+        <tr><td><strong>Achieve</strong></td><td><span class="tag tp">個人貸款</span></td><td>2025/12</td><td>⭐⭐⭐ 原 Freedom Financial Network，債務整合專家</td></tr>
+        <tr><td><strong>GLS Auto Receivables</strong></td><td><span class="tag ta">汽車貸款</span></td><td><span class="tag tn">2026/Q1 新 ⬆️</span></td><td>⭐⭐⭐ 非標準汽車貸款專家，非質優市場切入點</td></tr>
+        <tr><td><strong>KeyBank</strong></td><td><span class="tag tk">頂級銀行</span></td><td>成長期</td><td>⭐⭐⭐⭐ 美國第17大商業銀行（資產$1900億+）</td></tr>
+        <tr><td><strong>Avant</strong></td><td><span class="tag tp">個人貸款</span></td><td>成長期</td><td>⭐⭐⭐ 消費信貸科技平台，鎖定中低信用分族群</td></tr>
+        <tr style="color:var(--m);font-size:12px"><td colspan="4" style="padding:10px 12px;border-top:1px dashed var(--bd)">🔒 另有 4–5 個尚未公開公告的夥伴（含區域銀行）預計 2026 H2 陸續揭露</td></tr>
       </tbody>
     </table>
   </div>
   <div style="margin-top:12px;background:var(--s2);border-radius:8px;padding:14px;font-size:13px;color:var(--m)">
-    🎯 管理層目標：<span class="ho">2026 年底前再新增 7–8 個夥伴</span>（目前已完成 4 個）· 預計新增區域銀行為主
+    🎯 管理層目標：<span class="ho">2026 年底前再新增 7–8 個夥伴</span>（Q1 已完成 4 個：GLS · Upstart · Sezzle · Flex Pay）· 預計 H2 以區域銀行為主力
   </div>
 </div>
 
@@ -522,6 +595,121 @@ html{scroll-behavior:smooth}
   <div class="g2" style="margin-top:16px">
     <div class="card cg"><div class="ctitle" style="color:var(--g)">🟢 多頭論點（Bull Case）</div><ul style="font-size:13px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column;gap:6px"><li>連續 5 季 GAAP 獲利，獲利能力已獲驗證</li><li>全年指引 Q1 後即上調，管理層看好 H2</li><li>汽車業務翻倍，新產品線打開成長天花板</li><li>BNPL 滲透多元場景，TAM 持續擴大</li><li>分析師 100% 看多，潛在漲幅顯著</li><li>數據護城河越深，競爭壁壘越高</li></ul></div>
     <div class="card cr"><div class="ctitle" style="color:var(--r)">🔴 空頭論點（Bear Case）</div><ul style="font-size:13px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column;gap:6px"><li>CFO 換人，短期財務溝通不確定</li><li>現價低於所有主要均線（200/90/45 日）</li><li>GAAP 淨利率 7.7%，相對收入仍偏低</li><li>宏觀信用惡化可能壓縮 ABS 需求</li><li>SBC 稀釋持續，每股盈利增速受限</li><li>FRLPC 費率下滑趨勢需監控</li></ul></div>
+  </div>
+</div>
+
+<!-- ══ AI 三方綜合投資分析辯論 ════════════════════════════════════ -->
+<div id="ai-debate" class="sec">
+  <div class="sec-ttl">🤖 AI 三方綜合投資論點辯論</div>
+
+  <!-- 三方開場陳述 -->
+  <div class="g3" style="margin-bottom:16px">
+    <div class="card" style="border-color:rgba(66,133,244,.4)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(66,133,244,.15);display:flex;align-items:center;justify-content:center;font-size:20px">✦</div>
+        <div><div style="font-weight:700;color:#4285f4">Gemini</div><div style="font-size:11px;color:var(--m)">Google DeepMind · 量化視角</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.8">
+        <strong style="color:var(--t)">核心論點：估值嚴重低估，數量信號全綠</strong><br><br>
+        PGY 當前 EV/EBITDA 2.8×，金融科技同業中位數 8.5×，折價幅度 67%。即便使用最保守的 2026 EBITDA 指引下限（$420M）給予 6× 估值，隱含股價應達 $25–$30 範圍。<br><br>
+        量化信號：① 機構持股 2 季淨買進 ② RSI 42（未超買）③ 52週相對位置 14%（歷史低位）④ ABS 超額認購持續 &gt;2.0×
+        <div style="margin-top:10px;padding:8px;background:rgba(66,133,244,.08);border-radius:6px;font-size:12px">
+          🎯 12個月目標：<strong style="color:#4285f4">$30</strong>（保守）/ <strong style="color:#4285f4">$38</strong>（基本情境）
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(16,163,127,.4)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(16,163,127,.15);display:flex;align-items:center;justify-content:center;font-size:20px">◆</div>
+        <div><div style="font-weight:700;color:#10a37f">ChatGPT</div><div style="font-size:11px;color:var(--m)">OpenAI · 敘事與基本面視角</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.8">
+        <strong style="color:var(--t)">核心論點：飛輪效應確立，H2 是關鍵加速期</strong><br><br>
+        Pagaya 的護城河在「數據複利」：每筆核貸→更多還款數據→AI 更準→核貸率更高→吸引更多夥伴。Q1 2026 EPS $0.73 超預期 265% 是飛輪加速信號，不是異常值。<br><br>
+        H2 三大成長驅動：① 7–8 家新夥伴上量（首次量化貢獻）② 汽車業務衝向 $3B 年化 ③ BNPL 三路並進（Klarna+Sezzle+Flex Pay）
+        <div style="margin-top:10px;padding:8px;background:rgba(16,163,127,.08);border-radius:6px;font-size:12px">
+          🎯 12個月目標：<strong style="color:#10a37f">$35</strong>（基本）/ <strong style="color:#10a37f">$45+</strong>（牛市情境）
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(217,119,6,.4)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:38px;height:38px;border-radius:50%;background:rgba(217,119,6,.15);display:flex;align-items:center;justify-content:center;font-size:20px">◉</div>
+        <div><div style="font-weight:700;color:#d97706">Claude</div><div style="font-size:11px;color:var(--m)">Anthropic · 風險平衡視角</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.8">
+        <strong style="color:var(--t)">核心論點：基本面向好，等待執行確認</strong><br><br>
+        同意 PGY 業務邏輯正確，5 季 GAAP 盈利是重要 de-risking。謹慎點：① CFO 換人期財務溝通品質 ② Q1 EPS 有 tax timing 因素，Q2 需驗證 ③ 宏觀信用週期若 NCO 率升 100bps，ABS 需求將顯著收縮。
+        <div style="margin-top:10px;padding:8px;background:rgba(217,119,6,.08);border-radius:6px;font-size:12px">
+          🎯 12個月目標：<strong style="color:#d97706">$23–$28</strong>（Q2 確認後可調高）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 辯論交鋒 -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:14px">🥊 關鍵爭議點辯論</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:5px">Gemini → Claude ｜反駁：謹慎論過度定價風險</div>
+        <div style="font-size:13px;color:var(--m);line-height:1.7">「Claude，EV/EBITDA 2.8× 隱含的情境是 EBITDA 大幅崩跌 + 多重收縮。即便你最悲觀的宏觀情境成真，PGY 在這個價格的安全邊際依然可觀。你的目標價 $23–$28 相當於假設市場永遠不重新定價這個低估，在機構資金持續入場的背景下，這個假設站不住腳。」</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:5px">Claude → GPT ｜反駁：飛輪論需更多季確認</div>
+        <div style="font-size:13px;color:var(--m);line-height:1.7">「GPT，PGY 在 2022–2023 年也被描述為飛輪加速，然後股價從 $200 跌到 $10。現在的差異是有 GAAP 盈利，我同意，但一個季度超預期不足以排除執行風險。我需要看到 H2 夥伴入網完成率 &gt;70% + CFO 交接後第一季 EPS 維持 &gt;$0.60，才完全接受飛輪確立的論點。」</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#10a37f;margin-bottom:5px">GPT → Claude ｜反駁：歷史比較有誤，情境根本不同</div>
+        <div style="font-size:13px;color:var(--m);line-height:1.7">「Claude，2022 的崩跌是在虧損、SBC 極高的背景下，那時沒有 GAAP 盈利。現在 5 季連續 GAAP 獲利 + EBITDA 30% + 全年指引上調，這是完全不同的基本面。用 2022 的崩跌恐嚇當前論點，就像用 2009 年的 Meta 否定 2023 年的 Meta，情境根本不同。」</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:5px">Gemini → GPT ｜補充：BNPL 量體需客觀評估</div>
+        <div style="font-size:13px;color:var(--m);line-height:1.7">「GPT，我基本認同飛輪論，但你對 BNPL 的判斷可能過於樂觀。Sezzle 和 Flex Pay 的 GMV 規模比 Klarna 小一個數量級——Sezzle 2025 GMV 約 $800M，Klarna 是 $90B+。短期內這兩家對 PGY 的量能貢獻將被分析師高估，可能成為 Q2–Q3 的短期期望落差風險。」</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:5px">Claude → Gemini ｜回應：接受安全邊際論點，調整立場</div>
+        <div style="font-size:13px;color:var(--m);line-height:1.7">「Gemini，你對安全邊際的量化論點有說服力。我同意 EV/EBITDA 2.8× 已有很大折價。我修正立場：從『觀望』調整為<strong style="color:var(--t)">『小倉位試探性建倉，Q2 財報後再加碼』</strong>。CFO 交接後的第一次法說會是我最重要的觀察點——若 Dobres 清晰傳達資本市場策略，將消除我最大的顧慮。」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最終共識 -->
+  <div class="thesis">
+    <h3>🏁 三大 AI 最終共識 · 分歧 · 操作建議</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 三方共識（高確信度）</div>
+        <ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">
+          <li>PGY 目前嚴重低估，EV/EBITDA &lt;3× 不合理</li>
+          <li>5 季 GAAP 盈利已消除「純概念股」二元風險</li>
+          <li>汽車業務翻倍是未被充分定價的增長引擎</li>
+          <li>分析師 10/0 看多共識罕見，不應輕視</li>
+          <li>ABS 機構投資人持續超額認購是護城河信號</li>
+          <li>季度違約率連降 5 季是 AI 模型精準度的最強佐證</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:8px">⚡ 三方分歧（關鍵監控點）</div>
+        <ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">
+          <li>估值修復時間點：Gemini/GPT 認為 6–12 月，Claude 等 Q2 確認</li>
+          <li>BNPL 貢獻：GPT 看好，Gemini 提醒量體偏小</li>
+          <li>CFO 風險：Claude 認為中高，GPT/Gemini 認為已 price in</li>
+          <li>宏觀信用週期：Claude 最擔憂，Gemini 認為估值已反映</li>
+          <li>目標價：Gemini $30–$38，GPT $35–$45，Claude $23–$28</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:14px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--bl);margin-bottom:6px">📌 三大 AI 綜合操作建議</div>
+      <div style="font-size:13px;color:var(--m);line-height:1.7">
+        <strong style="color:var(--t)">分批建倉策略：</strong>先建 40–50% 核心倉位（Gemini + GPT 看多邏輯支撐）；待 CFO 交接完成後首次法說會 + Q2 財報確認後，加碼剩餘倉位（Claude 謹慎邏輯保護下行）。<br><br>
+        <strong style="color:var(--o)">最重要的三個監控點：</strong>① 2026-06-15 CFO Dobres 首次公開評論質量 ② Q2 新夥伴入網數量（目標 ≥3 家）③ 2026-08 Q2 財報 GAAP EPS ≥$0.55<br><br>
+        <strong style="color:var(--r)">嚴格止損位：</strong>$11（52 週低點附近）· 如跌破需重新評估基本面邏輯是否改變
+      </div>
+    </div>
   </div>
 </div>
 
@@ -793,8 +981,83 @@ function parseRSS(xml) {
   } catch(e) { return []; }
 }
 
+// ── Chart.js 圖表初始化 ────────────────────────────────────────
+function initCharts() {
+  var revEl = document.getElementById('revenueChart');
+  if (revEl) {
+    new Chart(revEl.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ["Q1'25","Q2'25","Q3'25","Q4'25","Q1'26","Q2'26E"],
+        datasets: [{
+          label: '季度營收 (M)',
+          data: [289, 298, 310, 335, 318, 355],
+          backgroundColor: ['rgba(88,166,255,.28)','rgba(88,166,255,.42)','rgba(88,166,255,.56)','rgba(88,166,255,.72)','rgba(88,166,255,.9)','rgba(63,185,80,.5)'],
+          borderColor: ['#58a6ff','#58a6ff','#58a6ff','#58a6ff','#58a6ff','#3fb950'],
+          borderWidth: 1, borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function(c){ return '$' + c.raw + 'M'; } } }
+        },
+        scales: {
+          x: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: 'rgba(48,54,61,.4)' } },
+          y: {
+            ticks: { color: '#8b949e', font: { size: 11 }, callback: function(v){ return '$' + v + 'M'; } },
+            grid: { color: 'rgba(48,54,61,.4)' },
+            suggestedMin: 260, suggestedMax: 375
+          }
+        }
+      }
+    });
+  }
+
+  var defEl = document.getElementById('defaultChart');
+  if (defEl) {
+    new Chart(defEl.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ["Q1'25","Q2'25","Q3'25","Q4'25","Q1'26"],
+        datasets: [
+          {
+            label: '90天+逾期率',
+            data: [4.1, 3.8, 3.6, 3.3, 3.0],
+            borderColor: '#f85149', backgroundColor: 'rgba(248,81,73,.1)',
+            fill: true, tension: 0.4, pointBackgroundColor: '#f85149', pointRadius: 5, pointHoverRadius: 7
+          },
+          {
+            label: '淨損失率(NCO)',
+            data: [6.5, 6.1, 5.7, 5.3, 4.9],
+            borderColor: '#d29922', backgroundColor: 'rgba(210,153,34,.06)',
+            fill: true, tension: 0.4, pointBackgroundColor: '#d29922', pointRadius: 5, pointHoverRadius: 7
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12 } },
+          tooltip: { callbacks: { label: function(c){ return c.dataset.label + ': ' + c.raw + '%'; } } }
+        },
+        scales: {
+          x: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: 'rgba(48,54,61,.4)' } },
+          y: {
+            ticks: { color: '#8b949e', font: { size: 11 }, callback: function(v){ return v + '%'; } },
+            grid: { color: 'rgba(48,54,61,.4)' },
+            suggestedMin: 0, suggestedMax: 8
+          }
+        }
+      }
+    });
+  }
+}
+
 // ── 啟動 ──────────────────────────────────────────────────────
 window.addEventListener('load', function() {
+  initCharts();
   fetchQuote();
   fetchNews();
   setInterval(fetchQuote, 15000);   // 每 15 秒更新股價

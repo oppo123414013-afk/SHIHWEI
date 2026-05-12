@@ -139,9 +139,9 @@ html{scroll-behavior:smooth}
     <div class="hero-name">Pagaya Technologies 深度分析平台</div>
     <div class="hero-sub">AI 信貸基礎設施領先企業 · 每日更新 · 機構級研究</div>
     <div class="hero-row">
-      <div class="hero-price">$15.16</div>
-      <div class="chg neg">▼ −2.00%</div>
-      <div style="font-size:13px;color:var(--m)">2026-05-12 盤中</div>
+      <div class="hero-price" id="idx-price">$15.16</div>
+      <div class="chg neg" id="idx-chg">▼ −2.00%</div>
+      <div style="font-size:13px;color:var(--m)" id="idx-date">最後更新 2026-05-12</div>
     </div>
     <div class="updated"><span class="dot-live"></span>每日更新 · 最後更新 2026-05-12</div>
     <div class="hero-meta">
@@ -303,6 +303,26 @@ html{scroll-behavior:smooth}
     </div>
   </div>
 
+  <!-- Q1 YoY COMPARISON CHARTS -->
+  <div class="section">
+    <div class="sh"><div class="sh-title">Q1 2025 vs Q1 2026 同比對比</div><div class="sh-sub">關鍵財務指標年增率視覺化</div></div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">核心損益指標（百萬美元）</div>
+        <canvas id="q1CompareChart" style="margin-top:12px;max-height:220px"></canvas>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:12px">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:2px;background:rgba(139,148,158,.5);display:inline-block"></span>Q1 2025</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:2px;background:#58a6ff;display:inline-block"></span>Q1 2026</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">年增率（YoY %）</div>
+        <canvas id="q1YoyChart" style="margin-top:12px;max-height:220px"></canvas>
+        <div style="font-size:11px;color:var(--m);margin-top:8px;text-align:center">* Adj. EPS 超預期 +265%，GAAP 淨利 +213% 為季度亮點</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ABS RECORD -->
   <div class="section">
     <div class="sh">
@@ -364,6 +384,7 @@ html{scroll-behavior:smooth}
 </div>
 
 <script>
+// ── 近期股價走勢圖 ──────────────────────────────────────────────
 const ctx = document.getElementById('priceChart').getContext('2d');
 new Chart(ctx,{
   type:'line',
@@ -375,37 +396,112 @@ new Chart(ctx,{
       borderColor:'#58a6ff',
       backgroundColor:'rgba(88,166,255,.08)',
       pointBackgroundColor:['#8b949e','#8b949e','#3fb950','#f85149','#8b949e','#d29922'],
-      pointRadius:5,
-      pointHoverRadius:7,
-      tension:.3,
-      fill:true
+      pointRadius:5,pointHoverRadius:7,tension:.3,fill:true
     }]
   },
   options:{
     responsive:true,
     plugins:{
       legend:{display:false},
-      tooltip:{
-        callbacks:{
-          label:c=>`$${c.raw.toFixed(2)}`,
-          afterLabel:c=>{
-            const notes={2:'財報日 +11.2%',3:'後財報回落',5:'今日盤中'};
-            return notes[c.dataIndex]||'';
-          }
-        }
-      }
+      tooltip:{callbacks:{
+        label:c=>`$${c.raw.toFixed(2)}`,
+        afterLabel:c=>{const n={2:'財報日 +11.2%',3:'後財報回落',5:'今日盤中'};return n[c.dataIndex]||'';}
+      }}
     },
     scales:{
       x:{ticks:{color:'#8b949e',font:{size:11}},grid:{color:'rgba(48,54,61,.4)'}},
-      y:{
-        ticks:{color:'#8b949e',font:{size:11},callback:v=>`$${v}`},
-        grid:{color:'rgba(48,54,61,.4)'},
-        suggestedMin:11,
-        suggestedMax:18
-      }
+      y:{ticks:{color:'#8b949e',font:{size:11},callback:v=>`$${v}`},grid:{color:'rgba(48,54,61,.4)'},suggestedMin:11,suggestedMax:18}
     }
   }
 });
+
+// ── Q1 2025 vs 2026 損益比較圖 ──────────────────────────────────
+const q1Ctx = document.getElementById('q1CompareChart');
+if(q1Ctx){
+  new Chart(q1Ctx.getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:['總營收','Adj. EBITDA','GAAP 淨利'],
+      datasets:[
+        {label:'Q1 2025',data:[289,79,8],backgroundColor:'rgba(139,148,158,.45)',borderColor:'#8b949e',borderWidth:1,borderRadius:5},
+        {label:'Q1 2026',data:[318,94,25],
+          backgroundColor:['rgba(88,166,255,.75)','rgba(63,185,80,.75)','rgba(188,140,255,.75)'],
+          borderColor:['#58a6ff','#3fb950','#bc8cff'],borderWidth:1,borderRadius:5}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.raw}M`}}
+      },
+      scales:{
+        x:{ticks:{color:'#8b949e',font:{size:11}},grid:{color:'rgba(48,54,61,.4)'}},
+        y:{ticks:{color:'#8b949e',font:{size:11},callback:v=>'$'+v+'M'},grid:{color:'rgba(48,54,61,.4)'},suggestedMin:0}
+      }
+    }
+  });
+}
+
+// ── Q1 YoY 增長率橫向圖 ─────────────────────────────────────────
+const yoyCtx = document.getElementById('q1YoyChart');
+if(yoyCtx){
+  new Chart(yoyCtx.getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:['總營收 +10%','網絡量 +9%','EBITDA +19%','GAAP淨利 +213%','Adj.EPS +265%'],
+      datasets:[{
+        label:'YoY %',
+        data:[10,9,19,213,265],
+        backgroundColor:['rgba(88,166,255,.7)','rgba(88,166,255,.7)','rgba(63,185,80,.7)','rgba(188,140,255,.7)','rgba(188,140,255,.85)'],
+        borderColor:['#58a6ff','#58a6ff','#3fb950','#bc8cff','#bc8cff'],
+        borderWidth:1,borderRadius:5
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>`+${c.raw}% YoY`}}
+      },
+      scales:{
+        x:{ticks:{color:'#8b949e',font:{size:11},callback:v=>'+'+v+'%'},grid:{color:'rgba(48,54,61,.4)'}},
+        y:{ticks:{color:'#8b949e',font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ── 即時股價抓取（CORS proxy，更新首頁 hero）──────────────────
+(function(){
+  var TICKER='PGY';
+  var p1='https://corsproxy.io/?https://query1.finance.yahoo.com/v7/finance/quote?symbols='+TICKER;
+  var p2='https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+TICKER);
+  function ft(url,ms){var c=new AbortController(),t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
+  function apply(q){
+    if(!q||!q.regularMarketPrice)return;
+    var p=q.regularMarketPrice,ch=q.regularMarketChange,pct=q.regularMarketChangePercent,up=ch>=0;
+    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
+    if(pe)pe.textContent='$'+p.toFixed(2);
+    if(ce){ce.textContent=(up?'▲ +':'▼ ')+Math.abs(ch).toFixed(2)+' ('+Math.abs(pct).toFixed(2)+'%)';ce.className='chg '+(up?'pos':'neg');}
+    if(de)de.textContent='即時報價 · '+new Date().toLocaleTimeString('zh-TW');
+  }
+  function run(){
+    ft(p1,8000).then(function(r){return r.json();}).then(function(d){
+      var q=d&&d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
+      if(q)apply(q);else throw 0;
+    }).catch(function(){
+      ft(p2,8000).then(function(r){return r.json();}).then(function(d){
+        var inner=typeof d.contents==='string'?JSON.parse(d.contents):d;
+        var q=inner&&inner.quoteResponse&&inner.quoteResponse.result&&inner.quoteResponse.result[0];
+        if(q)apply(q);
+      }).catch(function(){});
+    });
+  }
+  run();
+  setInterval(run,30000);
+})();
 </script>
 </body>
 </html>
