@@ -211,7 +211,9 @@ html{scroll-behavior:smooth}
   <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
   <div class="card" style="padding:20px">
     <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日分鐘走勢圖</div>
-    <canvas id="intradayChart" style="max-height:260px"></canvas>
+    <div style="position:relative;height:240px">
+      <canvas id="intradayChart"></canvas>
+    </div>
     <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
       <span>載入中...</span>
     </div>
@@ -1035,104 +1037,102 @@ function initCharts() {
 
 // ── 今日分鐘線圖表（Yahoo Finance v8/chart）─────────────────────
 var _intradayChart = null;
+
+function drawIntradayChart(labels, values, prev, meta) {
+  var el = document.getElementById('intradayChart');
+  if (!el || !values.length) return;
+  if (_intradayChart) { _intradayChart.destroy(); _intradayChart = null; }
+
+  var last = values[values.length - 1];
+  var isUp = !prev || last >= prev;
+  var lc = isUp ? '#3fb950' : '#f85149';
+  var fc = isUp ? 'rgba(63,185,80,.1)' : 'rgba(248,81,73,.1)';
+
+  var datasets = [{
+    data: values, borderColor: lc, backgroundColor: fc,
+    fill: true, borderWidth: 2, pointRadius: 0, tension: 0.2,
+    pointHoverRadius: 4
+  }];
+  if (prev) {
+    datasets.push({
+      data: values.map(function() { return prev; }),
+      borderColor: 'rgba(139,148,158,0.4)',
+      borderDash: [5, 5], borderWidth: 1,
+      pointRadius: 0, fill: false
+    });
+  }
+
+  _intradayChart = new Chart(el.getContext('2d'), {
+    type: 'line',
+    data: { labels: labels, datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index', intersect: false,
+          callbacks: { label: function(c) { return '$' + c.raw.toFixed(2); } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b949e', font: { size: 10 }, maxTicksLimit: 8 }, grid: { color: 'rgba(48,54,61,.4)' } },
+        y: { ticks: { color: '#8b949e', font: { size: 10 }, callback: function(v) { return '$' + v.toFixed(2); } }, grid: { color: 'rgba(48,54,61,.4)' } }
+      }
+    }
+  });
+
+  var info = document.getElementById('intraday-info');
+  if (info) {
+    var m = meta || {};
+    info.innerHTML = [
+      prev ? '<span>前收 <b>$' + prev.toFixed(2) + '</b></span>' : '',
+      m.regularMarketDayHigh ? '<span>今高 <b style="color:var(--g)">$' + m.regularMarketDayHigh.toFixed(2) + '</b></span>' : '',
+      m.regularMarketDayLow  ? '<span>今低 <b style="color:var(--r)">$' + m.regularMarketDayLow.toFixed(2) + '</b></span>' : '',
+      '<span>' + values.length + ' 根分K · 更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>'
+    ].filter(Boolean).join('');
+  }
+}
+
 function fetchIntradayChart() {
   var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
-  var p1  = 'https://corsproxy.io/?' + encodeURIComponent(url);
-  var p2  = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-  var p3  = 'https://api.codetabs.com/v1/proxy?quest=' + url;
+  var proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(url),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://api.codetabs.com/v1/proxy?quest=' + url
+  ];
 
-  function parse(raw) {
-    var res = raw && raw.chart && raw.chart.result && raw.chart.result[0];
-    if (!res) throw new Error('no chart data');
-    var ts     = res.timestamp || [];
-    var q      = res.indicators && res.indicators.quote && res.indicators.quote[0];
-    var closes = (q && q.close) || [];
-    var prev   = (res.meta && (res.meta.chartPreviousClose || res.meta.previousClose)) || null;
-    return { ts: ts, closes: closes, prev: prev, meta: res.meta || {} };
-  }
-
-  function draw(data) {
-    var pairs = data.ts.map(function(t, i) {
-      return { t: t * 1000, v: data.closes[i] };
-    }).filter(function(p) { return p.v != null; });
-    if (!pairs.length) return;
-
-    var labels = pairs.map(function(p) {
-      return new Date(p.t).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York' });
-    });
-    var values = pairs.map(function(p) { return p.v; });
-    var last   = values[values.length - 1];
-    var prev   = data.prev;
-    var isUp   = !prev || last >= prev;
-    var lc     = isUp ? 'rgba(63,185,80,1)' : 'rgba(248,81,73,1)';
-    var fc     = isUp ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.08)';
-
-    var el = document.getElementById('intradayChart');
-    if (!el) return;
-    if (_intradayChart) { _intradayChart.destroy(); _intradayChart = null; }
-
-    var datasets = [{
-      data: values, borderColor: lc, backgroundColor: fc,
-      fill: true, borderWidth: 1.5, pointRadius: 0, tension: 0
-    }];
-    if (prev) {
-      datasets.push({
-        data: values.map(function() { return prev; }),
-        borderColor: 'rgba(139,148,158,0.45)', borderDash: [4, 4],
-        borderWidth: 1, pointRadius: 0, fill: false
-      });
+  function tryProxy(idx) {
+    if (idx >= proxies.length) {
+      var el = document.getElementById('intraday-info');
+      if (el) el.textContent = '走勢圖資料暫時無法載入，請直接前往 Yahoo Finance 查看。';
+      return;
     }
-
-    _intradayChart = new Chart(el.getContext('2d'), {
-      type: 'line',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        animation: false, responsive: true, maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: function(c) { return '$' + c.parsed.y.toFixed(2); } } }
-        },
-        scales: {
-          x: {
-            ticks: { color: '#8b949e', maxTicksLimit: 7, font: { size: 10 } },
-            grid: { color: 'rgba(48,54,61,0.5)' }
-          },
-          y: {
-            ticks: { color: '#8b949e', font: { size: 10 }, callback: function(v) { return '$' + v.toFixed(2); } },
-            grid: { color: 'rgba(48,54,61,0.5)' }
-          }
-        }
-      }
-    });
-
-    var m    = data.meta;
-    var info = document.getElementById('intraday-info');
-    if (info) {
-      info.innerHTML = [
-        prev ? '<span>前收 <strong>$' + prev.toFixed(2) + '</strong></span>' : '',
-        m.regularMarketDayHigh ? '<span>今高 <strong style="color:var(--g)">$' + m.regularMarketDayHigh.toFixed(2) + '</strong></span>' : '',
-        m.regularMarketDayLow  ? '<span>今低 <strong style="color:var(--r)">$' + m.regularMarketDayLow.toFixed(2) + '</strong></span>' : '',
-        '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>'
-      ].filter(Boolean).join('');
-    }
-  }
-
-  function tryProxy(px, next) {
-    fetchTimeout(px, 8000)
-      .then(function(r) { return r.json(); })
+    fetchTimeout(proxies[idx], 9000)
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(raw) {
         var inner = typeof raw.contents === 'string' ? JSON.parse(raw.contents) : raw;
-        draw(parse(inner));
+        var res = inner && inner.chart && inner.chart.result && inner.chart.result[0];
+        if (!res) throw new Error('no result');
+        var ts     = res.timestamp || [];
+        var q      = res.indicators && res.indicators.quote && res.indicators.quote[0];
+        var closes = (q && q.close) || [];
+        var prev   = (res.meta && (res.meta.chartPreviousClose || res.meta.previousClose)) || null;
+        var labels = [], values = [];
+        for (var i = 0; i < ts.length; i++) {
+          if (closes[i] == null) continue;
+          var d = new Date(ts[i] * 1000);
+          labels.push(d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }));
+          values.push(closes[i]);
+        }
+        if (!values.length) throw new Error('empty data');
+        drawIntradayChart(labels, values, prev, res.meta);
       })
-      .catch(next || function() {
-        var el = document.getElementById('intraday-info');
-        if (el) el.textContent = '分鐘線資料暫時無法載入，請查看上方新聞連結。';
-      });
+      .catch(function() { tryProxy(idx + 1); });
   }
 
-  tryProxy(p1, function() {
-    tryProxy(p2, function() { tryProxy(p3, null); });
-  });
+  tryProxy(0);
 }
 
 // ── Yahoo Finance WebSocket 即時串流 ────────────────────────────
