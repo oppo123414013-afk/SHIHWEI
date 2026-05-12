@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGY 即時監控中心 — Pagaya Technologies</title>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#1a2744,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(88,166,255,.12),transparent 70%)}
+.ticker{font-size:13px;color:var(--bl);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:var(--r);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--r);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+
+/* ── TradingView boxes ── */
+.tv-box{background:var(--s);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.tv-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);padding:12px 16px 0}
+.tv-row{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:700px){.tv-row{grid-template-columns:1fr}}
+.tv-row .tv-box{border-radius:0;margin-bottom:0;border:none;border-right:1px solid var(--bd)}
+.tv-row .tv-box:last-child{border-right:none}
+
+/* ── Why panel ── */
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-body ul{margin:6px 0 0 18px}
+.why-body li{margin-bottom:2px}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+/* ── News ── */
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--bl);background:rgba(88,166,255,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--bl);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(88,166,255,.1);border-color:var(--bl)}
+
+/* ── Section ── */
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── Card ── */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+/* ── Progress ── */
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+
+/* ── Flow ── */
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--bl);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+/* ── Range ── */
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--bl),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+/* ── Items ── */
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+/* ── Bar chart ── */
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+/* ── Rating ── */
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+/* ── Upside ── */
+.ubox{background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.05));border:1px solid rgba(63,185,80,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--g)}
+.ulbl{font-size:13px;color:var(--m)}
+
+/* ── Streak ── */
+.streak{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.sdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.son{background:rgba(63,185,80,.2);color:var(--g);border:2px solid var(--g)}
+.scur{background:var(--g);color:#000}
+
+/* ── Thesis ── */
+.thesis{background:linear-gradient(135deg,rgba(88,166,255,.08),rgba(63,185,80,.08));border:1px solid rgba(88,166,255,.2);border-radius:12px;padding:24px}
+.thesis h3{font-size:18px;font-weight:700;margin-bottom:12px}
+.thesis p{font-size:14px;line-height:1.8}
+
+/* ── Misc ── */
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#news">📰 即時新聞</a>
+  <a href="#fin">財務</a>
+  <a href="#model">商業模式</a>
+  <a href="#partners">合作夥伴</a>
+  <a href="#tech">技術面</a>
+  <a href="#analyst">分析師</a>
+  <a href="#cat">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#outlook">展望</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ═══════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: PGY</div>
+  <div class="co-name">Pagaya Technologies</div>
+  <div class="tagline">AI 驅動的信貸基礎設施平台 · B2B2C · 以色列/紐約</div>
+  <div class="live-row">
+    <div class="live-badge"><span class="ldot"></span>LIVE · 即時連網</div>
+    <span id="mkt-status" style="font-size:12px;color:var(--m)">讀取中...</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bg">✅ 連續 5 季獲利</span>
+    <span class="badge bb">🤖 AI 信貸核心</span>
+    <span class="badge bo">🚀 全年指引上調</span>
+    <span class="badge bp">💼 分析師 100% Buy</span>
+  </div>
+</div>
+
+<!-- ══ TRADINGVIEW 即時行情（100% 可用）══════════════════════════ -->
+<div id="live" class="sec">
+  <div class="sec-ttl">即時行情 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">TradingView · 自動更新</span></div>
+
+  <!-- Mini Chart + Price: TradingView Mini Symbol Overview -->
+  <div class="tv-box" style="margin-bottom:12px">
+    <div class="tradingview-widget-container" style="height:300px">
+      <div class="tradingview-widget-container__widget" style="height:300px"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+      {
+        "symbol": "NASDAQ:PGY",
+        "width": "100%",
+        "height": 300,
+        "locale": "zh_TW",
+        "dateRange": "1D",
+        "colorTheme": "dark",
+        "trendLineColor": "rgba(88, 166, 255, 1)",
+        "underLineColor": "rgba(88, 166, 255, 0.3)",
+        "underLineBottomColor": "rgba(41, 98, 255, 0)",
+        "isTransparent": true,
+        "autosize": false,
+        "largeChartUrl": ""
+      }
+      </script>
+    </div>
+  </div>
+
+  <!-- Symbol Info: price, change, vol, 52W range -->
+  <div class="tv-box">
+    <div class="tradingview-widget-container" style="height:120px">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+      {
+        "symbol": "NASDAQ:PGY",
+        "width": "100%",
+        "locale": "zh_TW",
+        "colorTheme": "dark",
+        "isTransparent": true
+      }
+      </script>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WHY 漲跌分析（即時連網 + 自動分析）══════════════════════ -->
+<div id="why" class="why">
+  <div class="why-hd">
+    📊 今日漲跌分析
+    <span id="why-badge" class="why-badge" style="background:rgba(139,148,158,.2);color:var(--m)">連線中...</span>
+  </div>
+  <div id="why-body" class="why-body">正在連接 Yahoo Finance 取得即時資料...</div>
+  <div class="why-foot">
+    <div>前收：<span id="w-prev">─</span></div>
+    <div>今日振幅：<span id="w-range">─</span></div>
+    <div>量能：<span id="w-vol">─</span></div>
+    <div>即時更新：<span id="w-time">─</span></div>
+  </div>
+</div>
+
+<!-- ══ 即時新聞══════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞</div>
+
+  <!-- 永遠可用的直連按鈕 -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/PGY/news/" target="_blank" rel="noopener">
+      📰 Yahoo Finance PGY 新聞 ↗
+    </a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/pgy/news/" target="_blank" rel="noopener">
+      📊 StockAnalysis PGY ↗
+    </a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/PGY/press-releases/" target="_blank" rel="noopener">
+      📢 官方新聞稿 ↗
+    </a>
+  </div>
+
+  <!-- RSS 自動載入（CORS 允許時顯示） -->
+  <div id="news-box" class="nbox">
+    <div style="color:var(--m);font-size:13px;padding:12px;background:var(--s2);border-radius:8px">
+      📡 嘗試載入即時新聞... 若無法顯示請點擊上方按鈕直接查看。
+    </div>
+  </div>
+</div>
+
+<!-- ══ 核心財務指標 ══════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-ttl">核心財務指標（Q1 2026 實績）</div>
+  <div class="g4">
+    <div class="card cg"><div class="ctitle">Q1 2026 營收</div><div class="cval">$317.9M</div><div class="csub">YoY <span class="hg">+10%</span></div></div>
+    <div class="card cg"><div class="ctitle">Q1 GAAP 淨利</div><div class="cval">$24.7M</div><div class="csub">YoY <span class="hg">+213%</span></div></div>
+    <div class="card cb"><div class="ctitle">調整後 EBITDA</div><div class="cval">$94.2M</div><div class="csub">利潤率 <span class="hb">30%</span></div></div>
+    <div class="card co"><div class="ctitle">網絡撮合量</div><div class="cval">$2.6B</div><div class="csub">YoY <span class="ho">+9%</span></div></div>
+  </div>
+</div>
+
+<!-- ══ 財務表現 ═══════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">財務表現</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">GAAP 連續獲利記錄</div>
+      <div class="streak">
+        <div class="sdot son">Q1<br>25</div><div class="sdot son">Q2<br>25</div>
+        <div class="sdot son">Q3<br>25</div><div class="sdot son">Q4<br>25</div>
+        <div class="sdot scur">Q1<br>26</div>
+      </div>
+      <div style="margin-top:10px;font-size:13px;color:var(--m)">第 5 季連續 GAAP 獲利，淨利 <span class="hg">$7.9M → $24.7M</span>，成長 213%</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">季度收入趨勢（百萬美元）</div>
+      <div class="bchart">
+        <div class="bcol"><div class="bval" style="color:var(--m)">$289</div><div class="bar" style="height:65%;background:rgba(88,166,255,.3)"></div><div class="blbl">Q1'25</div></div>
+        <div class="bcol"><div class="bval" style="color:var(--m)">$298</div><div class="bar" style="height:70%;background:rgba(88,166,255,.4)"></div><div class="blbl">Q2'25</div></div>
+        <div class="bcol"><div class="bval" style="color:var(--m)">$310</div><div class="bar" style="height:75%;background:rgba(88,166,255,.5)"></div><div class="blbl">Q3'25</div></div>
+        <div class="bcol"><div class="bval" style="color:var(--m)">$335</div><div class="bar" style="height:85%;background:rgba(88,166,255,.6)"></div><div class="blbl">Q4'25</div></div>
+        <div class="bcol"><div class="bval" style="color:var(--bl)">$318</div><div class="bar" style="height:78%;background:var(--bl)"></div><div class="blbl">Q1'26 ✦</div></div>
+        <div class="bcol"><div class="bval" style="color:var(--g)">~$355</div><div class="bar" style="height:90%;background:linear-gradient(180deg,var(--g),rgba(63,185,80,.5));border:1px dashed var(--g)"></div><div class="blbl">Q2'26E</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle">📊 2026 全年指引（Q1 後上調）</div>
+    <div class="g4" style="margin-top:12px;gap:12px">
+      <div><div class="pw"><div class="pl"><span>網絡撮合量</span><span style="color:var(--g)">$11.45B–$13B</span></div><div class="pb"><div class="pf fg" style="width:80%"></div></div></div><div style="font-size:11px;color:var(--m)">前次 $11.25B–$13B ⬆️</div></div>
+      <div><div class="pw"><div class="pl"><span>總營收</span><span style="color:var(--bl)">$1.4B–$1.575B</span></div><div class="pb"><div class="pf fb" style="width:75%"></div></div></div><div style="font-size:11px;color:var(--m)">分析師共識 $1.47B</div></div>
+      <div><div class="pw"><div class="pl"><span>EBITDA</span><span style="color:var(--o)">$420M–$460M</span></div><div class="pb"><div class="pf fo" style="width:70%"></div></div></div><div style="font-size:11px;color:var(--m)">首次給出 ⬆️</div></div>
+      <div><div class="pw"><div class="pl"><span>GAAP 淨利</span><span style="color:var(--p)">$110M–$160M</span></div><div class="pb"><div class="pf fp" style="width:65%"></div></div></div><div style="font-size:11px;color:var(--m)">前次 $100M–$150M ⬆️</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;background:rgba(88,166,255,.04);border-color:rgba(88,166,255,.3)">
+    <div class="ctitle">📅 Q2 2026 指引</div>
+    <div class="g3" style="margin-top:10px">
+      <div><div style="font-size:12px;color:var(--m)">網絡撮合量</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$2.875B–$3.075B</div></div>
+      <div><div style="font-size:12px;color:var(--m)">總營收</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$345M–$365M</div></div>
+      <div><div style="font-size:12px;color:var(--m)">調整後 EBITDA</div><div style="font-size:20px;font-weight:700;color:var(--bl)">$100M–$115M</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 商業模式 ═══════════════════════════════════════════════ -->
+<div id="model" class="sec">
+  <div class="sec-ttl">商業模式</div>
+  <div class="card">
+    <div style="font-size:14px;color:var(--m);margin-bottom:18px">Pagaya 是 <strong style="color:var(--t)">AI 信貸中間層</strong>，本身不放貸，靠 AI 重新評估被傳統機構拒絕的借款人，透過 ABS 籌資後核貸，收取手續費。</div>
+    <div class="flow">
+      <div class="fstep"><div><div class="ft">① 借款人向合作夥伴申請</div><div class="fd">LendingClub、SoFi、Ally 等 30+ 個夥伴，借款人感知不到 Pagaya 的存在</div></div></div>
+      <div class="fstep"><div><div class="ft">② 夥伴機構常規審核拒絕</div><div class="fd">傳統信用模型核拒 → 申請資料自動透過 API 轉給 Pagaya</div></div></div>
+      <div class="fstep"><div><div class="ft">③ Pagaya AI 引擎重新評估</div><div class="fd">機器學習模型分析 30+ 個夥伴數百萬筆還款歷史，識別被低估的優質借款人</div></div></div>
+      <div class="fstep"><div><div class="ft">④ PAID/RPM ABS 平台籌資</div><div class="fd">核貸資金來自 ABS 發行，風險轉移給機構投資人，Pagaya 不持有貸款</div></div></div>
+      <div class="fstep"><div><div class="ft">⑤ 收取 4.0–4.6% 淨手續費</div><div class="fd">每筆核貸金額的 4–5%，無直接行銷成本，<strong style="color:var(--g)">輕資產模式</strong></div></div></div>
+    </div>
+    <div style="background:var(--s2);border-radius:8px;padding:14px;margin-top:12px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px">
+      <div>💰 費率：<span class="hb">4.0–5.0%</span>/筆</div>
+      <div>🏦 累計 ABS：<span class="hg">$28.5B</span>（個人貸款）</div>
+      <div>📊 汽車 ABS：<span class="ho">$400M RPM 2026-1</span></div>
+      <div>🔄 循環型：<span class="hb">$350M PAID 2025-REV1</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 合作夥伴 ════════════════════════════════════════════════ -->
+<div id="partners" class="sec">
+  <div class="sec-ttl">合作夥伴網絡（30+ 個）</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>機構名稱</th><th>類別</th><th>加入</th><th>重要性</th></tr></thead>
+      <tbody>
+        <tr><td><strong>LendingClub</strong></td><td><span class="tag tp">個人貸款</span></td><td>早期核心</td><td>⭐⭐⭐⭐⭐ 美國最大 P2P 轉型數位銀行</td></tr>
+        <tr><td><strong>SoFi</strong></td><td><span class="tag tp">個人貸款</span></td><td>早期核心</td><td>⭐⭐⭐⭐⭐ 多產品金融科技平台</td></tr>
+        <tr><td><strong>Prosper</strong></td><td><span class="tag tp">個人貸款</span></td><td>早期核心</td><td>⭐⭐⭐⭐ 美國 P2P 元老</td></tr>
+        <tr><td><strong>Ally Financial</strong></td><td><span class="tag ta">汽車貸款</span></td><td>成長期</td><td>⭐⭐⭐⭐⭐ 美國最大汽車金融公司</td></tr>
+        <tr><td><strong>OneMain Financial</strong></td><td><span class="tag ta">汽車/個人</span></td><td>2024/08</td><td>⭐⭐⭐⭐ 美國最大非銀行消費貸款機構</td></tr>
+        <tr><td><strong>Exeter Finance</strong></td><td><span class="tag ta">汽車貸款</span></td><td>成長期</td><td>⭐⭐⭐ 次級車貸專家</td></tr>
+        <tr><td><strong>Westlake Financial</strong></td><td><span class="tag ta">汽車貸款</span></td><td>成長期</td><td>⭐⭐⭐ 間接汽車貸款</td></tr>
+        <tr><td><strong>U.S. Bank</strong></td><td><span class="tag tk">頂級銀行</span></td><td>成長期</td><td>⭐⭐⭐⭐⭐ 全美第五大銀行</td></tr>
+        <tr><td><strong>Klarna</strong></td><td><span class="tag tb">BNPL</span></td><td>成長期</td><td>⭐⭐⭐⭐⭐ 全球最大 BNPL 平台</td></tr>
+        <tr><td><strong>Upstart</strong></td><td><span class="tag tp">個人貸款</span></td><td><span class="tag tn">2026 新 ⬆️</span></td><td>⭐⭐⭐⭐ 同為 AI 信貸，既競爭又合作</td></tr>
+        <tr><td><strong>Sezzle</strong></td><td><span class="tag tb">BNPL</span></td><td><span class="tag tn">2026/05 新 ⬆️</span></td><td>⭐⭐⭐ 美國成長中 BNPL 平台</td></tr>
+        <tr><td><strong>Flex Pay (Upgrade)</strong></td><td><span class="tag tb">BNPL</span></td><td><span class="tag tn">2026 新 ⬆️</span></td><td>⭐⭐⭐ Upgrade 旗下 BNPL 解決方案</td></tr>
+        <tr><td><strong>Achieve</strong></td><td><span class="tag tp">個人貸款</span></td><td>2025/12</td><td>⭐⭐⭐ 原 Freedom Financial Network</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:12px;background:var(--s2);border-radius:8px;padding:14px;font-size:13px;color:var(--m)">
+    🎯 管理層目標：<span class="ho">2026 年底前再新增 7–8 個夥伴</span>（目前已完成 4 個）· 預計新增區域銀行為主
+  </div>
+</div>
+
+<!-- ══ 技術面 ══════════════════════════════════════════════════ -->
+<div id="tech" class="sec">
+  <div class="sec-ttl">技術分析</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">52 週位置</div>
+      <div class="trange" style="padding-top:30px;padding-bottom:30px">
+        <div class="rtrack">
+          <div id="r-fill" class="rfill" style="left:0;width:13%"></div>
+          <div class="rmark" style="left:0%;color:var(--t)"><span id="r-low">$10.40</span></div>
+          <div class="rlbl" style="left:0%">52W 低</div>
+          <div id="r-curr-m" class="rmark" style="left:13%;color:var(--o)">▼ <span id="r-curr">$15.16</span></div>
+          <div id="r-curr-l" class="rlbl" style="left:13%;color:var(--o)">現價</div>
+          <div class="rmark" style="left:100%;color:var(--t)"><span id="r-high">$44.99</span></div>
+          <div class="rlbl" style="left:100%">52W 高</div>
+        </div>
+      </div>
+      <div style="font-size:13px;margin-top:16px">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--m)">現價（即時）</span><span id="t-price" class="ho">$15.16</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--m)">52 週高點</span><span id="t-52h">$44.99</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--m)">52 週低點</span><span id="t-52l">$10.40</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--m)">45 日均線</span><span>$25.13</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--m)">90 日均線</span><span>$26.80</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:var(--m)">200 日均線</span><span class="hr">現價低於 ⚠️</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">支撐 / 阻力位</div>
+      <div style="font-size:13px;margin-top:8px">
+        <div style="background:rgba(248,81,73,.1);border-radius:6px;padding:10px;margin-bottom:8px"><div style="font-size:11px;color:var(--m);margin-bottom:4px">阻力區</div><div>R3: <strong>$25.62</strong> · R2: <strong>$25.29</strong> · R1: <strong>$25.01</strong></div></div>
+        <div style="background:rgba(88,166,255,.08);border-radius:6px;padding:10px;margin-bottom:8px;text-align:center"><div style="font-size:11px;color:var(--m)">樞紐點（Pivot）</div><div style="font-size:20px;font-weight:700">$24.68</div></div>
+        <div style="background:rgba(63,185,80,.1);border-radius:6px;padding:10px"><div style="font-size:11px;color:var(--m);margin-bottom:4px">支撐區</div><div>S1: <strong>$24.40</strong> · S2: <strong>$24.07</strong> · S3: <strong>$23.79</strong></div></div>
+      </div>
+      <div style="margin-top:12px;background:var(--s2);border-radius:8px;padding:12px;font-size:13px;color:var(--m)">⚡ Q1 財報後跳空上漲（$14.83 → $16.49），現價整固中，等待下一個催化劑。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師 ══════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級與目標價</div>
+  <div class="card">
+    <div class="ctitle">8–10 位分析師共識（100% Buy / Strong Buy）</div>
+    <div class="rbar" style="margin:14px 0">
+      <div class="rseg" style="width:63%;background:var(--g)">Strong Buy 63%</div>
+      <div class="rseg" style="width:37%;background:var(--bl)">Buy 37%</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--m)"><span>Hold 0%</span><span>Sell 0%</span><span>Strong Sell 0%</span></div>
+  </div>
+  <div class="ubox" style="margin-top:16px">
+    <div>
+      <div class="ulbl">平均目標價 vs 現價（即時計算）</div>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <div id="u-pct" class="unum">+167%</div>
+        <div style="font-size:14px;color:var(--m)">潛在漲幅</div>
+      </div>
+      <div id="u-lbl" class="ulbl">現價 $15.16 → 均值目標 $34.50</div>
+    </div>
+    <div style="font-size:13px">
+      <div>🎯 均值目標：<span class="hg">$34.50</span></div>
+      <div>⬆️ 最高目標：<span class="hg">$54.00</span></div>
+      <div>⬇️ 最低目標：<span class="hr">$20.00</span></div>
+      <div>📊 分析師覆蓋：8–10 人</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ══════════════════════════════════════════════════ -->
+<div id="cat" class="sec">
+  <div class="sec-ttl">成長催化劑</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">🤝</div><div class="ibdy"><div class="ittl">新夥伴持續入網 <span class="sev sh">高影響</span></div><div class="idsc">2026 Q1 創單季 4 個新夥伴記錄（Upstart、Sezzle、Flex Pay、GLS）。管理層目標年底再加 7–8 個，尤其看重區域銀行入網。</div></div></div>
+    <div class="iitem"><div class="iico">🚗</div><div class="ibdy"><div class="ittl">汽車業務翻倍 <span class="sev sh">高影響</span></div><div class="idsc">汽車貸款 Q1 2026 年化撮合量達 $2.3B，較去年同期<strong>翻倍成長</strong>，RPM ABS 平台持續擴大。</div></div></div>
+    <div class="iitem"><div class="iico">🏦</div><div class="ibdy"><div class="ittl">區域銀行入網加速 <span class="sev sh">高影響</span></div><div class="idsc">美國 4,700+ 家社區銀行尚未數位化。一旦大型區域銀行入網，可帶來大量低成本個人貸款量。</div></div></div>
+    <div class="iitem"><div class="iico">🔄</div><div class="ibdy"><div class="ittl">循環型 ABS 降低資本成本 <span class="sev sm">中影響</span></div><div class="idsc">首發 $350M PAID 2025-REV1 循環型 ABS，降低發行成本、提升資本效率。</div></div></div>
+    <div class="iitem"><div class="iico">📱</div><div class="ibdy"><div class="ittl">BNPL 場景滲透 <span class="sev sm">中影響</span></div><div class="idsc">與 Klarna、Sezzle、Flex Pay 合作，美國 BNPL 市場 2026–2028 預估年成長 25%+，Pagaya 作後端 AI 風控。</div></div></div>
+  </div>
+</div>
+
+<!-- ══ 風險 ═══════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">風險因素</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">📉</div><div class="ibdy"><div class="ittl">信用週期風險 <span class="sev sh">高風險</span></div><div class="idsc">若美國消費信貸違約率上升，AI 模型準確率可能下滑，ABS 投資人要求更高利差，壓縮 FRLPC 費率。</div></div></div>
+    <div class="iitem"><div class="iico">📊</div><div class="ibdy"><div class="ittl">SBC 股票稀釋 <span class="sev sm">中風險</span></div><div class="idsc">每年大量股票薪酬持續稀釋現有股東，每股盈利增速受到壓制。</div></div></div>
+    <div class="iitem"><div class="iico">👔</div><div class="ibdy"><div class="ittl">CFO 交接風險 <span class="sev sm">中風險</span></div><div class="idsc">CFO Perros 將於 2026/06/15 離職，由 Dobres 接任。過渡期財務溝通一致性面臨短期不確定。</div></div></div>
+    <div class="iitem"><div class="iico">🏛️</div><div class="ibdy"><div class="ittl">監管政策風險 <span class="sev sm">中風險</span></div><div class="idsc">CFPB 對 AI 信貸決策公平性審查持續加強，可能影響 AI 模型效力。</div></div></div>
+    <div class="iitem"><div class="iico">⚡</div><div class="ibdy"><div class="ittl">競爭加劇 <span class="sev sl">低風險（短期）</span></div><div class="idsc">Upstart 既是合作夥伴又是競爭者。數據網絡效應與 ABS 平台壁壘短期難以複製。</div></div></div>
+  </div>
+</div>
+
+<!-- ══ 展望 ════════════════════════════════════════════════════ -->
+<div id="outlook" class="sec">
+  <div class="sec-ttl">未來展望</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">2026 里程碑追蹤</div>
+      <div style="font-size:13px;display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Q2 新夥伴入網達標</span><span class="badge bo">監控中</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>CFO 交接完成（06/15）</span><span class="badge bo">6 月到期</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>汽車業務 $2.5B+ 年化</span><span class="badge bb">進行中</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>PAID 累計突破 $30B</span><span class="badge bg">接近達標</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Q2 財報（預計 8 月）</span><span class="badge bb">待公布</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">2027 展望</div>
+      <div class="g2" style="margin-top:10px;gap:12px">
+        <div><div class="pw"><div class="pl"><span>年度網絡量</span><span style="color:var(--bl)">$15B+</span></div><div class="pb"><div class="pf fb" style="width:75%"></div></div></div><div style="font-size:11px;color:var(--m)">2026 指引 $11.45B–$13B</div></div>
+        <div><div class="pw"><div class="pl"><span>GAAP 淨利率</span><span style="color:var(--o)">12–15%</span></div><div class="pb"><div class="pf fo" style="width:40%"></div></div></div><div style="font-size:11px;color:var(--m)">目前 ~7.7%（Q1）</div></div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:10px;margin-top:8px;color:var(--m)">長期邏輯：夥伴越多→數據越多→AI 越準→核貸率越高→吸引更多夥伴，<strong style="color:var(--t)">複利式護城河</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">投資論點總結</div>
+  <div class="thesis">
+    <h3>核心命題：AI 信貸基礎設施的規模飛輪效應</h3>
+    <p>Pagaya 的商業本質是<strong>數據驅動的雙邊平台</strong>：一端是 30+ 個放貸夥伴，另一端是被傳統模型低估的借款人。每一筆核貸強化 AI 模型，每一個新夥伴帶來新數據，形成<strong>正向飛輪</strong>。<br><br><strong>估值論點：</strong>以即時現價計算，距分析師均值目標 $34.50 有 <span id="thesis-up" class="hg">顯著</span>的潛在漲幅。8–10 位分析師 100% 給出 Buy/Strong Buy，無任何 Hold 或賣出評級。<br><br><strong>核心監控：</strong>① Q2 新夥伴入網數 ② FRLPC 費率走向 ③ 汽車業務動能 ④ CFO 交接後溝通一致性</p>
+  </div>
+  <div class="g2" style="margin-top:16px">
+    <div class="card cg"><div class="ctitle" style="color:var(--g)">🟢 多頭論點（Bull Case）</div><ul style="font-size:13px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column;gap:6px"><li>連續 5 季 GAAP 獲利，獲利能力已獲驗證</li><li>全年指引 Q1 後即上調，管理層看好 H2</li><li>汽車業務翻倍，新產品線打開成長天花板</li><li>BNPL 滲透多元場景，TAM 持續擴大</li><li>分析師 100% 看多，潛在漲幅顯著</li><li>數據護城河越深，競爭壁壘越高</li></ul></div>
+    <div class="card cr"><div class="ctitle" style="color:var(--r)">🔴 空頭論點（Bear Case）</div><ul style="font-size:13px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column;gap:6px"><li>CFO 換人，短期財務溝通不確定</li><li>現價低於所有主要均線（200/90/45 日）</li><li>GAAP 淨利率 7.7%，相對收入仍偏低</li><li>宏觀信用惡化可能壓縮 ABS 需求</li><li>SBC 稀釋持續，每股盈利增速受限</li><li>FRLPC 費率下滑趨勢需監控</li></ul></div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>📡 PGY 即時監控中心 · TradingView 即時圖表 · Yahoo Finance 新聞</p>
+  <p style="margin-top:4px">基本面資料：Pagaya 官方財報 · BusinessWire · MarketBeat · TipRanks（截至 2026-05-12）</p>
+  <p style="margin-top:8px;font-size:11px">⚠️ 本報告僅供個人研究參考，不構成投資建議。投資有風險，決策前請自行判斷。</p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// 即時資料：Yahoo Finance（多 CORS proxy 容錯 + 兼容舊版瀏覽器）
+// ════════════════════════════════════════════════════════════════
+var AVG_TARGET = 34.50;
+var TICKER     = 'PGY';
+var lastPrice  = 15.16;
+
+// AbortController 超時（相容所有瀏覽器，不用 AbortSignal.timeout）
+function fetchTimeout(url, ms) {
+  var ctrl = new AbortController();
+  var tid  = setTimeout(function(){ ctrl.abort(); }, ms);
+  return fetch(url, { signal: ctrl.signal })
+    .then(function(r){ clearTimeout(tid); return r; })
+    .catch(function(e){ clearTimeout(tid); throw e; });
+}
+
+function isMarketOpen() {
+  try {
+    var ny   = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    var day  = ny.getDay();
+    var mins = ny.getHours() * 60 + ny.getMinutes();
+    return day > 0 && day < 6 && mins >= 570 && mins < 960;
+  } catch(e) { return false; }
+}
+
+function fmt(n, d) {
+  d = d || 2;
+  return (n != null && !isNaN(n)) ? Number(n).toFixed(d) : '─';
+}
+
+function fmtVol(v) {
+  if (!v) return '─';
+  if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+  return String(v);
+}
+
+function setText(id, v) {
+  var e = document.getElementById(id);
+  if (e) e.textContent = v;
+}
+
+function setHtml(id, v) {
+  var e = document.getElementById(id);
+  if (e) e.innerHTML = v;
+}
+
+// ── 取得股價（嘗試 3 個端點）──────────────────────────────────
+function fetchQuote() {
+  var yUrl   = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
+  var yUrl2  = 'https://query2.finance.yahoo.com/v8/finance/chart/' + TICKER + '?interval=1m&range=1d';
+  var proxy1 = 'https://corsproxy.io/?' + yUrl;
+  var proxy2 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yUrl);
+
+  // 嘗試 proxy1
+  fetchTimeout(proxy1, 8000)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(raw) {
+      var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
+      if (!q) throw new Error('no data');
+      applyQuote(q);
+    })
+    .catch(function() {
+      // 嘗試 proxy2 (allorigins)
+      fetchTimeout(proxy2, 8000)
+        .then(function(r) { return r.json(); })
+        .then(function(raw) {
+          var inner = typeof raw.contents === 'string' ? JSON.parse(raw.contents) : raw;
+          var q = inner && inner.quoteResponse && inner.quoteResponse.result && inner.quoteResponse.result[0];
+          if (!q) throw new Error('no data');
+          applyQuote(q);
+        })
+        .catch(function() {
+          // 嘗試直連（有些瀏覽器從 file:// 允許）
+          fetchTimeout(yUrl, 8000)
+            .then(function(r) { return r.json(); })
+            .then(function(raw) {
+              var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
+              if (q) applyQuote(q);
+              else showNoData();
+            })
+            .catch(function() { showNoData(); });
+        });
+    });
+}
+
+function showNoData() {
+  setText('mkt-status', '⚠️ CORS 限制，請看上方 TradingView 即時圖表');
+  var b = document.getElementById('why-badge');
+  if (b) { b.textContent = '請參考 TradingView 圖表'; b.style = 'background:rgba(139,148,158,.2);color:var(--m)'; }
+  setHtml('why-body',
+    '您的瀏覽器的安全限制阻止了從本機 HTML 檔案發出跨域請求（CORS）。<br><br>' +
+    '<strong style="color:var(--t)">請直接使用上方 TradingView 即時圖表</strong>，它提供：<ul>' +
+    '<li>即時股價 + 漲跌幅</li><li>今日 K 線圖表</li><li>成交量 + 52 週區間</li>' +
+    '<li>懸停可見更多技術指標</li></ul>' +
+    '<strong style="color:var(--o)">漲跌分析方法：</strong>觀察 TradingView 圖表中今日的<br>' +
+    '① 開盤 vs 現價方向 ② 成交量是否爆增 ③ 再對照下方即時新聞連結找原因。'
+  );
+}
+
+function applyQuote(q) {
+  var price = q.regularMarketPrice;
+  var chg   = q.regularMarketChange;
+  var pct   = q.regularMarketChangePercent;
+  var w52h  = q.fiftyTwoWeekHigh;
+  var w52l  = q.fiftyTwoWeekLow;
+  var prev  = q.regularMarketPreviousClose;
+  var vol   = q.regularMarketVolume;
+  var avgVol= q.averageDailyVolume3Month || q.averageDailyVolume10Day;
+  var isUp  = chg >= 0;
+
+  if (!price) return;
+  lastPrice = price;
+
+  // 市場狀態
+  var open = isMarketOpen();
+  setText('mkt-status', open ? '🟢 美股開盤中 · 每15秒更新' : '⏸ 美股已收盤 · 顯示收盤價');
+
+  // 技術面 52W 位置
+  if (w52h && w52l) {
+    var rp = Math.max(0, Math.min(100, ((price - w52l) / (w52h - w52l)) * 100));
+    document.getElementById('r-fill').style.width = rp.toFixed(1) + '%';
+    document.getElementById('r-curr-m').style.left = rp.toFixed(1) + '%';
+    document.getElementById('r-curr-l').style.left = rp.toFixed(1) + '%';
+    setText('r-curr', '$' + fmt(price));
+    setText('r-low',  '$' + fmt(w52l));
+    setText('r-high', '$' + fmt(w52h));
+    setText('t-price', '$' + fmt(price));
+    setText('t-52h', '$' + fmt(w52h));
+    setText('t-52l', '$' + fmt(w52l));
+  }
+
+  // 分析師漲幅（即時）
+  var up = ((AVG_TARGET / price) - 1) * 100;
+  setText('u-pct', '+' + up.toFixed(0) + '%');
+  setText('u-lbl', '現價 $' + fmt(price) + ' → 均值目標 $' + AVG_TARGET);
+  setText('thesis-up', '+' + up.toFixed(0) + '%');
+
+  // WHY footer
+  setText('w-prev', '$' + fmt(prev));
+  if (q.regularMarketDayHigh && q.regularMarketDayLow && prev) {
+    setText('w-range', fmt(((q.regularMarketDayHigh - q.regularMarketDayLow) / prev * 100), 2) + '%');
+  }
+  var vr = avgVol ? (vol / avgVol) : null;
+  var volTxt = '─';
+  if (vr) {
+    if      (vr > 2.0)  volTxt = '⚡ 爆量 (' + vr.toFixed(1) + 'x 均量)';
+    else if (vr > 1.3)  volTxt = '↑ 偏高 (' + vr.toFixed(1) + 'x)';
+    else if (vr < 0.7)  volTxt = '↓ 縮量 (' + vr.toFixed(1) + 'x)';
+    else                volTxt = '= 正常 (' + vr.toFixed(1) + 'x)';
+  }
+  setText('w-vol', volTxt);
+  setText('w-time', new Date().toLocaleTimeString('zh-TW'));
+
+  // WHY 分析面板
+  buildWhy(pct, vr, price, w52h, w52l, chg);
+}
+
+function vNote(vr) {
+  if (!vr) return '';
+  if (vr > 2.0) return '，<strong>成交量爆增至均量 ' + vr.toFixed(1) + ' 倍</strong>，強烈暗示特定消息驅動';
+  if (vr > 1.4) return '，量能偏高（' + vr.toFixed(1) + 'x），有機構資金參與跡象';
+  if (vr < 0.6) return '，但成交量萎縮（' + vr.toFixed(1) + 'x），缺乏資金支撐';
+  return '，量能正常（' + vr.toFixed(1) + 'x）';
+}
+
+function buildWhy(pct, vr, price, w52h, w52l, chg) {
+  var bd   = document.getElementById('why-badge');
+  var body = document.getElementById('why-body');
+  var bs, bb, txt;
+  var isUp = chg >= 0;
+
+  if (pct >= 5) {
+    bs = 'background:rgba(63,185,80,.2);color:var(--g)';
+    bb = '🚀 強勢大漲 +' + pct.toFixed(1) + '%';
+    txt = '今日上漲超過 5%，屬於<strong style="color:var(--g)">強勢上攻</strong>' + vNote(vr) + '。<br><strong>可能觸發原因：</strong><ul><li>財報超預期 / 指引大幅上調</li><li>重大夥伴公告（如大型銀行入網）</li><li>機構大量買進或分析師上調目標價</li><li>金融科技板塊強勢輪動</li></ul>📌 距 52 週高點 $' + fmt(w52h) + ' 仍有 ' + Math.abs(((price/w52h)-1)*100).toFixed(1) + '% 空間。<strong>請對照下方新聞連結確認驅動原因。</strong>';
+  } else if (pct >= 2) {
+    bs = 'background:rgba(63,185,80,.15);color:var(--g)';
+    bb = '↑ 溫和上漲 +' + pct.toFixed(1) + '%';
+    txt = '今日溫和上漲' + vNote(vr) + '。<br>可能原因：市場情緒改善、板塊輪動、小幅利好（合作公告、分析師評論）或大盤拉動。目前 <strong>向上空間（+' + (((AVG_TARGET/price)-1)*100).toFixed(0) + '%）遠大於向下空間</strong>。密切關注量能是否放大。';
+  } else if (pct >= 0.5) {
+    bs = 'background:rgba(57,211,83,.1);color:var(--tl)';
+    bb = '↗ 小幅上漲 +' + pct.toFixed(1) + '%';
+    txt = '今日小幅上漲，在正常波動範圍內' + vNote(vr) + '。無明顯特定催化劑，可能跟隨大盤或金融科技板塊走勢。PGY 基本面持續改善，低位整固屬正常現象。';
+  } else if (pct > -0.5) {
+    bs = 'background:rgba(139,148,158,.2);color:var(--m)';
+    bb = '→ 盤整 ' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+    txt = '今日橫盤整固' + vNote(vr) + '。市場多空均衡，等待新催化劑。<br>近期重要等待事件：<ul><li>Q2 業績指引（預計 8 月財報）</li><li>新夥伴入網公告</li><li>CFO 交接後首次法說會</li></ul>';
+  } else if (pct > -2) {
+    bs = 'background:rgba(255,166,87,.2);color:var(--o)';
+    bb = '↓ 小幅回落 ' + pct.toFixed(1) + '%';
+    txt = '今日小幅回落，在正常回調範圍內' + vNote(vr) + '。可能因素：獲利回吐、大盤走弱或無特定利多支撐。' + (price < 14 ? '⚠️ 接近 52W 低點 $' + fmt(w52l) + '，需關注賣壓。' : '目前仍在近期支撐位上方。');
+  } else if (pct > -5) {
+    bs = 'background:rgba(248,81,73,.2);color:var(--r)';
+    bb = '⚠️ 明顯下跌 ' + pct.toFixed(1) + '%';
+    txt = '今日明顯下跌，需要關注' + vNote(vr) + '。<br>可能原因：<ul><li>金融科技板塊整體走弱</li><li>宏觀面利空（Fed 鷹派、信貸數據惡化）</li><li>個股特定負面消息（查閱下方新聞）</li><li>技術面跌破支撐位</li></ul>📌 <strong>請點擊上方新聞按鈕查看最新動態。</strong>';
+  } else {
+    bs = 'background:rgba(248,81,73,.25);color:var(--r)';
+    bb = '🔴 大幅下跌 ' + pct.toFixed(1) + '%';
+    txt = '今日大幅下跌，<strong style="color:var(--r)">需立即關注</strong>' + vNote(vr) + '。<br>高優先排查：<ul><li>🔴 財報不及預期 / 指引下調</li><li>🔴 重要夥伴退出 / 業務受損</li><li>🔴 監管調查或訴訟</li><li>🟡 機構大量出清（查 13F）</li><li>🟡 信用市場流動性危機</li></ul><strong>⚠️ 請立即點擊上方新聞按鈕，再做任何操作決策。</strong>';
+  }
+
+  if (bd) { bd.textContent = bb; bd.setAttribute('style', bs); }
+  if (body) body.innerHTML = txt;
+}
+
+// ── 新聞（RSS via CORS proxy，失敗則靜默）───────────────────
+function fetchNews() {
+  var rss = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=' + TICKER + '&region=US&lang=en-US';
+  var proxy = 'https://corsproxy.io/?' + rss;
+  var box = document.getElementById('news-box');
+
+  fetchTimeout(proxy, 10000)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(xml) {
+      var items = parseRSS(xml);
+      if (!items.length) throw new Error('empty');
+      box.innerHTML = items.slice(0, 8).map(function(i) {
+        return '<a class="nitem" href="' + i.link + '" target="_blank" rel="noopener">' +
+               '<div class="ntitle">' + i.title + '</div>' +
+               '<div class="nmeta">📰 ' + i.src + ' · ' + i.date + '</div></a>';
+      }).join('');
+    })
+    .catch(function() {
+      // 失敗就靜默移除提示，按鈕連結已足夠
+      if (box) box.innerHTML = '<div style="color:var(--m);font-size:13px;padding:10px">新聞需要網路連線，請使用上方按鈕開啟 Yahoo Finance 新聞頁面。</div>';
+    });
+}
+
+function fmtDate(raw) {
+  try {
+    var d = new Date(raw);
+    return d.toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return raw || ''; }
+}
+
+function parseRSS(xml) {
+  try {
+    var doc   = new DOMParser().parseFromString(xml, 'text/xml');
+    var nodes = doc.querySelectorAll('item');
+    var out   = [];
+    nodes.forEach(function(n) {
+      out.push({
+        title: (n.querySelector('title')  || {}).textContent || '',
+        link:  (n.querySelector('link')   || {}).textContent || '#',
+        date:  fmtDate((n.querySelector('pubDate') || {}).textContent),
+        src:   (n.querySelector('source') || {}).textContent || 'Yahoo Finance',
+      });
+    });
+    return out;
+  } catch(e) { return []; }
+}
+
+// ── 啟動 ──────────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  fetchQuote();
+  fetchNews();
+  setInterval(fetchQuote, 15000);   // 每 15 秒更新股價
+  setInterval(fetchNews,  300000);  // 每 5 分鐘更新新聞
+});
+</script>
+
+</body>
+</html>
