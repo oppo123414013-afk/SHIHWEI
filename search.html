@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票即時查詢 — 美股 & 台股</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+html{scroll-behavior:smooth}
+
+/* Nav */
+.nav{position:sticky;top:0;background:rgba(13,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:0 24px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:4px;height:54px;overflow-x:auto}
+.nav-logo{font-size:15px;font-weight:800;color:var(--bl);margin-right:16px;text-decoration:none;white-space:nowrap}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px;transition:all .2s;white-space:nowrap}
+.nav a:hover,.nav a.active{color:var(--t);background:var(--s2)}
+
+/* Layout */
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px}
+
+/* Search Hero */
+.search-hero{background:linear-gradient(135deg,#1a2744 0%,#0d1117 60%);border:1px solid rgba(88,166,255,.2);border-radius:16px;padding:40px;margin-bottom:28px;position:relative;overflow:hidden}
+.search-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(88,166,255,.1),transparent 70%);pointer-events:none}
+.sh-title{font-size:28px;font-weight:800;margin-bottom:6px;letter-spacing:-.5px}
+.sh-sub{color:var(--m);font-size:14px;margin-bottom:28px}
+
+/* Search bar */
+.search-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.mkt-sel{background:var(--s2);border:1px solid var(--bd);color:var(--t);border-radius:10px;padding:12px 16px;font-size:14px;cursor:pointer;min-width:190px;outline:none}
+.mkt-sel:focus{border-color:var(--bl)}
+.sym-input{flex:1;min-width:180px;background:var(--s2);border:1px solid var(--bd);color:var(--t);border-radius:10px;padding:12px 18px;font-size:16px;outline:none;transition:border-color .2s}
+.sym-input:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(88,166,255,.12)}
+.sym-input::placeholder{color:var(--m)}
+.search-btn{background:var(--bl);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.search-btn:hover{opacity:.85}
+.search-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Quick chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--m);transition:all .2s}
+.chip:hover{border-color:var(--bl);color:var(--bl);background:rgba(88,166,255,.08)}
+.chip-us{border-color:rgba(88,166,255,.3);color:var(--bl)}
+.chip-tw{border-color:rgba(63,185,80,.3);color:var(--g)}
+
+/* Status */
+.status-bar{text-align:center;padding:28px;color:var(--m);font-size:14px}
+.loader{display:inline-block;width:20px;height:20px;border:2px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:10px;padding:16px 20px;color:var(--r);font-size:14px}
+
+/* Result card */
+.result-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.res-hdr{background:linear-gradient(135deg,#1a2744,#0d1117);padding:28px 32px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px;border-bottom:1px solid var(--bd)}
+.res-company{}
+.res-name{font-size:22px;font-weight:800;margin-bottom:4px}
+.res-sym{font-size:12px;color:var(--m);letter-spacing:2px;text-transform:uppercase}
+.res-price-block{text-align:right}
+.res-price{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1}
+.res-chg{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;margin-top:8px}
+.chg-up{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:var(--g)}
+.chg-dn{background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:var(--r)}
+.res-upd{font-size:11px;color:var(--m);margin-top:6px}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0;border-top:none}
+.stat-item{padding:18px 24px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.stat-item:last-child{border-right:none}
+.stat-label{font-size:11px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.res-hdr{padding:20px}.res-price{font-size:36px}.res-price-block{text-align:left}}
+
+/* Chart section */
+.chart-section{padding:20px 24px;border-top:1px solid var(--bd)}
+.chart-title{font-size:13px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+
+/* Live pulse */
+.dot-live{width:7px;height:7px;background:var(--g);border-radius:50%;animation:pulse 2s infinite;display:inline-block;margin-right:5px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Footer */
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding:20px 0;border-top:1px solid var(--bd)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">PGY 分析中心</a>
+    <a href="index.html">首頁</a>
+    <a href="pagaya/PGY_live_dashboard.html">即時監控</a>
+    <a href="search.html" class="active">股票搜尋</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- SEARCH HERO -->
+<div class="search-hero">
+  <div class="sh-title">股票即時查詢</div>
+  <div class="sh-sub">支援美股全市場 (NASDAQ / NYSE / AMEX) 及台股上市 / 上櫃 · 數據來源：Yahoo Finance</div>
+
+  <div class="search-row">
+    <select id="mkt-sel" class="mkt-sel">
+      <option value="us">🇺🇸 美股 (NASDAQ / NYSE)</option>
+      <option value="tw">🇹🇼 台灣上市 TSE (.TW)</option>
+      <option value="two">🇹🇼 台灣上櫃 OTC (.TWO)</option>
+    </select>
+    <input id="sym-input" class="sym-input" placeholder="輸入代號，如 AAPL 或 2330" autocomplete="off" spellcheck="false">
+    <button id="search-btn" class="search-btn">查詢</button>
+  </div>
+
+  <div class="chips">
+    <span style="font-size:11px;color:var(--m);align-self:center;margin-right:4px">常用：</span>
+    <span class="chip chip-us" data-sym="PGY" data-mkt="us">PGY Pagaya</span>
+    <span class="chip chip-us" data-sym="AAPL" data-mkt="us">AAPL Apple</span>
+    <span class="chip chip-us" data-sym="NVDA" data-mkt="us">NVDA Nvidia</span>
+    <span class="chip chip-us" data-sym="TSLA" data-mkt="us">TSLA Tesla</span>
+    <span class="chip chip-us" data-sym="MSFT" data-mkt="us">MSFT Microsoft</span>
+    <span class="chip chip-us" data-sym="META" data-mkt="us">META Meta</span>
+    <span class="chip chip-us" data-sym="AMZN" data-mkt="us">AMZN Amazon</span>
+    <span class="chip chip-us" data-sym="GOOGL" data-mkt="us">GOOGL Alphabet</span>
+    <span class="chip chip-tw" data-sym="2330" data-mkt="tw">2330 台積電</span>
+    <span class="chip chip-tw" data-sym="2454" data-mkt="tw">2454 聯發科</span>
+    <span class="chip chip-tw" data-sym="2317" data-mkt="tw">2317 鴻海</span>
+    <span class="chip chip-tw" data-sym="2308" data-mkt="tw">2308 台達電</span>
+    <span class="chip chip-tw" data-sym="2412" data-mkt="tw">2412 中華電</span>
+    <span class="chip chip-tw" data-sym="3008" data-mkt="tw">3008 大立光</span>
+    <span class="chip chip-tw" data-sym="2882" data-mkt="tw">2882 國泰金</span>
+  </div>
+</div>
+
+<!-- STATUS / ERROR -->
+<div id="status-area"></div>
+
+<!-- RESULT CARD (hidden until data loaded) -->
+<div id="result-wrap" style="display:none">
+  <div class="result-card">
+    <div class="res-hdr">
+      <div class="res-company">
+        <div id="res-name" class="res-name">─</div>
+        <div id="res-sym" class="res-sym">─</div>
+        <div id="res-exchange" style="font-size:12px;color:var(--m);margin-top:4px">─</div>
+      </div>
+      <div class="res-price-block">
+        <div id="res-price" class="res-price">─</div>
+        <div><span id="res-chg" class="res-chg chg-dn">─</span></div>
+        <div class="res-upd"><span class="dot-live"></span><span id="res-upd">─</span></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-item"><div class="stat-label">今日開盤</div><div id="s-open" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">今日高 / 低</div><div id="s-hl" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">前日收盤</div><div id="s-prev" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">52 週高 / 低</div><div id="s-52w" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">成交量</div><div id="s-vol" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">均量 (3M)</div><div id="s-avgvol" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">市值</div><div id="s-mktcap" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">本益比 P/E</div><div id="s-pe" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">EPS (TTM)</div><div id="s-eps" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">股息殖利率</div><div id="s-div" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">貝他值 (β)</div><div id="s-beta" class="stat-val">─</div></div>
+      <div class="stat-item"><div class="stat-label">幣別</div><div id="s-cur" class="stat-val">─</div></div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-title">今日走勢（1分K，Yahoo Finance）</div>
+      <canvas id="price-chart" style="max-height:200px"></canvas>
+      <div id="chart-msg" style="color:var(--m);font-size:12px;margin-top:8px;text-align:right"></div>
+    </div>
+  </div>
+
+  <!-- Auto-refresh controls -->
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px">
+    <label style="font-size:13px;color:var(--m);display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="auto-refresh" checked style="accent-color:var(--bl)">
+      每 10 秒自動更新
+    </label>
+    <button id="refresh-now-btn" style="background:none;border:1px solid var(--bd);color:var(--m);border-radius:6px;padding:4px 14px;font-size:12px;cursor:pointer;">立即重新整理</button>
+    <span id="next-refresh" style="font-size:12px;color:var(--m)"></span>
+  </div>
+</div>
+
+<div class="footer">
+  <p>數據來源：Yahoo Finance · 本頁報價僅供參考，不構成任何投資建議</p>
+  <p style="margin-top:4px"><a href="index.html" style="color:var(--bl)">← 回 PGY 分析中心</a></p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── 工具函數 ─────────────────────────────────────────────────────
+function fmt2(n){ return (n==null||isNaN(n))? '─' : Number(n).toFixed(2); }
+function fmtVol(v){
+  if(!v||isNaN(v)) return '─';
+  if(v>=1e12) return (v/1e12).toFixed(2)+'T';
+  if(v>=1e9)  return (v/1e9).toFixed(2)+'B';
+  if(v>=1e6)  return (v/1e6).toFixed(2)+'M';
+  if(v>=1e3)  return (v/1e3).toFixed(0)+'K';
+  return String(v);
+}
+function setText(id,v){ var e=document.getElementById(id); if(e)e.textContent=v; }
+
+// ── 狀態顯示 ─────────────────────────────────────────────────────
+function showLoading(msg){
+  document.getElementById('status-area').innerHTML='<div class="status-bar"><span class="loader"></span>'+(msg||'查詢中...')+'</div>';
+  document.getElementById('result-wrap').style.display='none';
+}
+function showError(msg){
+  document.getElementById('status-area').innerHTML='<div class="err-box">'+msg+'</div>';
+  document.getElementById('result-wrap').style.display='none';
+}
+function showResult(){
+  document.getElementById('status-area').innerHTML='';
+  document.getElementById('result-wrap').style.display='block';
+}
+
+// ── CORS Proxy + Yahoo Finance fetch ─────────────────────────────
+var currentChart = null;
+var refreshTimer = null;
+var refreshCountdown = null;
+var currentFullSym = '';
+
+function ft(url){
+  var c=new AbortController(),t=setTimeout(function(){c.abort();},9000);
+  return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});
+}
+
+function buildProxies(url){
+  return [
+    'https://corsproxy.io/?'+encodeURIComponent(url),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
+    'https://api.codetabs.com/v1/proxy?quest='+url
+  ];
+}
+
+function tryFetch(proxies, i, onSuccess, onFail){
+  if(i>=proxies.length){ onFail(); return; }
+  ft(proxies[i])
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){ onSuccess(d); })
+    .catch(function(){ tryFetch(proxies, i+1, onSuccess, onFail); });
+}
+
+// ── 轉換股票代號 ─────────────────────────────────────────────────
+function buildSymbol(raw, mkt){
+  var s = raw.trim().toUpperCase().replace(/\s/g,'');
+  if(mkt==='tw')  return s.endsWith('.TW') ? s : s+'.TW';
+  if(mkt==='two') return s.endsWith('.TWO') ? s : s+'.TWO';
+  return s; // US: keep as is
+}
+
+// ── 主查詢 ───────────────────────────────────────────────────────
+function doSearch(sym, mkt, silent){
+  var fullSym = buildSymbol(sym, mkt);
+  currentFullSym = fullSym;
+  if(!silent) showLoading('查詢 '+fullSym+' 中...');
+
+  var qUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(fullSym);
+  var cUrl = 'https://query2.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(fullSym)+'?interval=1m&range=1d';
+  var qProxies = buildProxies(qUrl);
+  var cProxies = buildProxies(cUrl);
+
+  // 先取 quote（基本資訊 + 價格）
+  tryFetch(qProxies, 0, function(qData){
+    var q = qData && qData.quoteResponse && qData.quoteResponse.result && qData.quoteResponse.result[0];
+    if(!q || !q.regularMarketPrice){
+      showError('找不到「'+fullSym+'」的報價。請確認代號是否正確。<br>台股格式：上市請選「台灣上市」→ 輸入 <strong>2330</strong>；上櫃請選「台灣上櫃」');
+      return;
+    }
+    applyQuote(q, fullSym);
+    // 取今日分K走勢圖
+    tryFetch(cProxies, 0, function(cData){
+      drawChart(cData);
+    }, function(){
+      document.getElementById('chart-msg').textContent='走勢圖資料無法載入';
+    });
+    scheduleRefresh(sym, mkt);
+  }, function(){
+    showError('所有資料來源均無法連線。可能原因：<br>① 股票代號錯誤 ② 網路限制 ③ Yahoo Finance 暫時無回應<br>請稍後再試，或直接查看 <a href="https://finance.yahoo.com/quote/'+fullSym+'" target="_blank" style="color:var(--bl)">Yahoo Finance ↗</a>');
+  });
+}
+
+// ── 套用報價資料 ──────────────────────────────────────────────────
+function applyQuote(q, fullSym){
+  showResult();
+  var price  = q.regularMarketPrice;
+  var chg    = q.regularMarketChange;
+  var pct    = q.regularMarketChangePercent;
+  var isUp   = chg >= 0;
+  var cur    = q.currency || 'USD';
+  var prefix = (cur==='TWD') ? 'NT$' : (cur==='USD') ? '$' : cur+' ';
+
+  setText('res-name', q.longName || q.shortName || fullSym);
+  setText('res-sym',  fullSym + ' · ' + (q.quoteType||'').replace('EQUITY','股票').replace('ETF','ETF'));
+  setText('res-exchange', (q.fullExchangeName||q.exchange||'─') + ' · ' + (q.marketState==='REGULAR'?'交易時段':'盤後/盤前'));
+  setText('res-price', prefix + fmt2(price));
+
+  var chgEl = document.getElementById('res-chg');
+  if(chgEl){
+    chgEl.textContent = (isUp?'▲ +':'▼ ') + Math.abs(chg).toFixed(2) + ' (' + Math.abs(pct).toFixed(2) + '%)';
+    chgEl.className = 'res-chg ' + (isUp ? 'chg-up' : 'chg-dn');
+  }
+  setText('res-upd', 'Yahoo Finance · ' + new Date().toLocaleTimeString('zh-TW'));
+
+  // Stats
+  setText('s-open',  prefix + fmt2(q.regularMarketOpen));
+  setText('s-hl',    prefix + fmt2(q.regularMarketDayHigh) + ' / ' + prefix + fmt2(q.regularMarketDayLow));
+  setText('s-prev',  prefix + fmt2(q.regularMarketPreviousClose));
+  setText('s-52w',   prefix + fmt2(q.fiftyTwoWeekHigh) + ' / ' + prefix + fmt2(q.fiftyTwoWeekLow));
+  setText('s-vol',   fmtVol(q.regularMarketVolume));
+  setText('s-avgvol',fmtVol(q.averageDailyVolume3Month || q.averageDailyVolume10Day));
+  setText('s-mktcap',fmtVol(q.marketCap));
+  setText('s-pe',    q.trailingPE ? fmt2(q.trailingPE) + 'x' : '─');
+  setText('s-eps',   q.epsTrailingTwelveMonths ? prefix + fmt2(q.epsTrailingTwelveMonths) : '─');
+  setText('s-div',   q.trailingAnnualDividendYield ? (q.trailingAnnualDividendYield*100).toFixed(2) + '%' : '─');
+  setText('s-beta',  q.beta ? fmt2(q.beta) : '─');
+  setText('s-cur',   cur);
+}
+
+// ── 繪製今日走勢圖 ────────────────────────────────────────────────
+function drawChart(cData){
+  var res = cData && cData.chart && cData.chart.result && cData.chart.result[0];
+  if(!res){ document.getElementById('chart-msg').textContent='走勢圖無數據'; return; }
+
+  var timestamps = res.timestamp || [];
+  var closes = (res.indicators && res.indicators.quote && res.indicators.quote[0] && res.indicators.quote[0].close) || [];
+  var meta = res.meta || {};
+  var cur = meta.currency || 'USD';
+  var prefix = cur==='TWD' ? 'NT$' : '$';
+  var prev = meta.chartPreviousClose || meta.previousClose || 0;
+
+  // 過濾空值
+  var labels = [], data = [];
+  for(var i=0;i<timestamps.length;i++){
+    if(closes[i]==null) continue;
+    var d = new Date(timestamps[i]*1000);
+    labels.push(d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
+    data.push(closes[i]);
+  }
+  if(!data.length){ document.getElementById('chart-msg').textContent='無法取得分K資料'; return; }
+
+  var ctx = document.getElementById('price-chart').getContext('2d');
+  if(currentChart) currentChart.destroy();
+
+  var isUp = data[data.length-1] >= prev;
+  var lineColor = isUp ? '#3fb950' : '#f85149';
+  var fillColor = isUp ? 'rgba(63,185,80,.1)' : 'rgba(248,81,73,.1)';
+
+  currentChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: labels,
+      datasets:[{
+        data: data,
+        borderColor: lineColor,
+        backgroundColor: fillColor,
+        fill: true,
+        tension: 0.2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        borderWidth: 2
+      }]
+    },
+    options:{
+      responsive: true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index', intersect:false,
+          callbacks:{
+            label:function(c){ return prefix+c.raw.toFixed(2); }
+          }
+        }
+      },
+      scales:{
+        x:{ ticks:{color:'#8b949e',font:{size:10},maxTicksLimit:10}, grid:{color:'rgba(48,54,61,.4)'} },
+        y:{ ticks:{color:'#8b949e',font:{size:11},callback:function(v){return prefix+v.toFixed(2);}}, grid:{color:'rgba(48,54,61,.4)'} }
+      }
+    }
+  });
+  document.getElementById('chart-msg').textContent='今日分K · 共 '+data.length+' 根';
+}
+
+// ── 自動更新 ─────────────────────────────────────────────────────
+var countdown = 10;
+function scheduleRefresh(sym, mkt){
+  clearInterval(refreshTimer);
+  clearInterval(refreshCountdown);
+  countdown = 10;
+  refreshTimer = setInterval(function(){
+    if(document.getElementById('auto-refresh').checked){
+      countdown = 10;
+      doSearch(sym, mkt, true);
+    }
+  }, 10000);
+  refreshCountdown = setInterval(function(){
+    if(document.getElementById('auto-refresh').checked){
+      countdown--;
+      document.getElementById('next-refresh').textContent = countdown > 0 ? '下次更新：'+countdown+'秒' : '';
+      if(countdown <= 0) countdown = 10;
+    } else {
+      document.getElementById('next-refresh').textContent = '自動更新已暫停';
+    }
+  }, 1000);
+}
+
+// ── 事件綁定 ─────────────────────────────────────────────────────
+document.getElementById('search-btn').addEventListener('click', function(){
+  var sym = document.getElementById('sym-input').value.trim();
+  var mkt = document.getElementById('mkt-sel').value;
+  if(!sym){ document.getElementById('sym-input').focus(); return; }
+  doSearch(sym, mkt, false);
+});
+
+document.getElementById('sym-input').addEventListener('keydown', function(e){
+  if(e.key==='Enter') document.getElementById('search-btn').click();
+});
+
+document.querySelectorAll('.chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    var sym = this.dataset.sym;
+    var mkt = this.dataset.mkt;
+    document.getElementById('sym-input').value = sym;
+    document.getElementById('mkt-sel').value = mkt;
+    doSearch(sym, mkt, false);
+  });
+});
+
+document.getElementById('refresh-now-btn').addEventListener('click', function(){
+  var sym = document.getElementById('sym-input').value.trim();
+  var mkt = document.getElementById('mkt-sel').value;
+  if(sym) doSearch(sym, mkt, false);
+});
+
+// 市場切換時自動清空建議
+document.getElementById('mkt-sel').addEventListener('change', function(){
+  document.getElementById('sym-input').placeholder =
+    this.value==='us' ? '輸入代號，如 AAPL / NVDA / PGY' :
+    this.value==='tw' ? '輸入上市代號，如 2330 / 2454 / 2317' :
+                        '輸入上櫃代號，如 6488 / 3711 / 8299';
+});
+
+// 預設顯示引導
+document.getElementById('status-area').innerHTML='<div class="status-bar">選擇市場，輸入股票代號後按「查詢」，或點擊上方快速選股</div>';
+</script>
+</body>
+</html>

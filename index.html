@@ -128,6 +128,7 @@ html{scroll-behavior:smooth}
     <a href="pagaya/PGY_live_dashboard.html">即時監控</a>
     <a href="pagaya/reports.html">每日報告</a>
     <a href="research/PGY/PGY_full_report_2026-05-11.html">完整分析</a>
+    <a href="search.html">🔍 股票搜尋</a>
   </div>
 </nav>
 
@@ -473,57 +474,114 @@ if(yoyCtx){
   });
 }
 
-// ── 即時股價抓取（多重來源，每 30 秒更新首頁 hero）─────────────
+// ── 即時股價：Yahoo Finance WebSocket + REST 多重備援 ────────────
 (function(){
   var TICKER = 'PGY';
-  var yUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + TICKER + '?interval=1m&range=1d';
-  var yUrlQ = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
-  // 4 個 CORS proxy 依序嘗試（URL 正確 encode，避免 ?symbols= 被誤解析）
-  var proxies = [
-    'https://corsproxy.io/?' + encodeURIComponent(yUrlQ),
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrlQ),
-    'https://api.codetabs.com/v1/proxy?quest=' + yUrlQ,
-    'https://corsproxy.io/?' + encodeURIComponent(yUrl)
+  var pe = document.getElementById('idx-price');
+  var ce = document.getElementById('idx-chg');
+  var de = document.getElementById('idx-date');
+
+  function apply(price, ch, pct, src) {
+    var up = ch >= 0;
+    if (pe) pe.textContent = '$' + price.toFixed(2);
+    if (ce) {
+      ce.textContent = (up ? '▲ +' : '▼ ') + Math.abs(ch).toFixed(2) + ' (' + Math.abs(pct).toFixed(2) + '%)';
+      ce.className = 'chg ' + (up ? 'pos' : 'neg');
+    }
+    if (de) de.textContent = (src||'Yahoo Finance') + ' · ' + new Date().toLocaleTimeString('zh-TW');
+  }
+
+  // ── 最小 Protobuf 解碼器（解析 Yahoo Finance WebSocket 訊息）──
+  function readVar(b, p) {
+    var v=0,s=0;
+    while(p<b.length){var x=b[p++];v|=(x&0x7F)<<s;if(!(x&0x80))break;s+=7;}
+    return {v:v,p:p};
+  }
+  function decodeProto(b64) {
+    try {
+      var bin=atob(b64), bytes=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      var pos=0, price=null, ch=null, pct=null, prev=null;
+      while(pos<bytes.length){
+        var r=readVar(bytes,pos); pos=r.p;
+        var field=r.v>>3, wire=r.v&7;
+        if(wire===5){
+          if(pos+4>bytes.length)break;
+          var f=new DataView(bytes.buffer,bytes.byteOffset+pos,4).getFloat32(0,true); pos+=4;
+          if(field===2)price=f; else if(field===8)pct=f;
+          else if(field===12)ch=f; else if(field===16)prev=f;
+        } else if(wire===2){var lr=readVar(bytes,pos);pos=lr.p+lr.v;}
+          else if(wire===0){while(pos<bytes.length&&(bytes[pos++]&0x80));}
+          else if(wire===1){pos+=8;} else break;
+      }
+      if(price){
+        var c=(ch!=null)?ch:(prev?price-prev:0);
+        var p=(pct!=null)?pct:(prev&&prev?c/prev*100:0);
+        return {price:price,ch:c,pct:p};
+      }
+    }catch(e){}
+    return null;
+  }
+
+  // ── WebSocket 即時串流（Yahoo Finance 內部 API，無 CORS 限制）─
+  var ws, wsLive = false;
+  function startWS() {
+    try {
+      ws = new WebSocket('wss://streamer.finance.yahoo.com/');
+      ws.onopen = function() {
+        wsLive = true;
+        ws.send(JSON.stringify({subscribe:[TICKER]}));
+      };
+      ws.onmessage = function(evt) {
+        try {
+          var raw=evt.data, b64=raw;
+          try{var j=JSON.parse(raw);if(j.type==='heartbeat')return;b64=j.data||raw;}catch(e){}
+          var d=decodeProto(b64);
+          if(d&&d.price>0){wsLive=true;apply(d.price,d.ch,d.pct,'即時串流');}
+        }catch(e){}
+      };
+      ws.onclose=ws.onerror=function(){
+        wsLive=false;
+        setTimeout(startWS,8000);
+      };
+    }catch(e){wsLive=false;}
+  }
+
+  // ── REST 備援：4 個 CORS proxy 依序嘗試 ─────────────────────────
+  var yQ = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols='+TICKER;
+  var yC = 'https://query2.finance.yahoo.com/v8/finance/chart/'+TICKER+'?interval=1m&range=1d';
+  var PX = [
+    'https://corsproxy.io/?'+encodeURIComponent(yQ),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(yQ),
+    'https://api.codetabs.com/v1/proxy?quest='+yQ,
+    'https://corsproxy.io/?'+encodeURIComponent(yC)
   ];
-  function ft(url,ms){
-    var c=new AbortController(),t=setTimeout(function(){c.abort();},ms);
+  function ft(url){
+    var c=new AbortController(),t=setTimeout(function(){c.abort();},8000);
     return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});
   }
-  function applyRaw(pe,ce,de,price,ch,pct){
-    var up=ch>=0;
-    if(pe)pe.textContent='$'+price.toFixed(2);
-    if(ce){ce.textContent=(up?'▲ +':'▼ ')+Math.abs(ch).toFixed(2)+' ('+Math.abs(pct).toFixed(2)+'%)';ce.className='chg '+(up?'pos':'neg');}
-    if(de)de.textContent='即時報價 · '+new Date().toLocaleTimeString('zh-TW');
-  }
-  function applyQuote(d){
-    var q=d&&d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
-    if(!q||!q.regularMarketPrice)return false;
-    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
-    applyRaw(pe,ce,de,q.regularMarketPrice,q.regularMarketChange,q.regularMarketChangePercent);
-    return true;
-  }
-  function applyChart(d){
-    var meta=d&&d.chart&&d.chart.result&&d.chart.result[0]&&d.chart.result[0].meta;
-    if(!meta||!meta.regularMarketPrice)return false;
-    var price=meta.regularMarketPrice,prev=meta.chartPreviousClose||meta.previousClose||0;
-    var ch=prev?price-prev:0,pct=prev?(ch/prev*100):0;
-    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
-    applyRaw(pe,ce,de,price,ch,pct);
-    return true;
-  }
-  function tryProxy(i){
-    if(i>=proxies.length)return;
-    ft(proxies[i],8000).then(function(r){
-      if(!r.ok)throw 0;
-      return r.json();
-    }).then(function(d){
-      var ok=(i===3)?applyChart(d):applyQuote(d);
+  function tryRest(i){
+    if(i>=PX.length)return;
+    ft(PX[i]).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){
+      var ok=false;
+      if(i===3){
+        var m=d&&d.chart&&d.chart.result&&d.chart.result[0]&&d.chart.result[0].meta;
+        if(m&&m.regularMarketPrice){
+          var pv=m.chartPreviousClose||m.previousClose||0,c=pv?m.regularMarketPrice-pv:0;
+          apply(m.regularMarketPrice,c,pv?c/pv*100:0,'Yahoo REST');ok=true;
+        }
+      }else{
+        var q=d&&d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
+        if(q&&q.regularMarketPrice){apply(q.regularMarketPrice,q.regularMarketChange,q.regularMarketChangePercent,'Yahoo REST');ok=true;}
+      }
       if(!ok)throw 0;
-    }).catch(function(){tryProxy(i+1);});
+    }).catch(function(){tryRest(i+1);});
   }
-  function run(){tryProxy(0);}
-  run();
-  setInterval(run,30000);
+
+  startWS();
+  tryRest(0);
+  // 每 10 秒：若 WebSocket 沒收到資料則啟動 REST 備援
+  setInterval(function(){if(!wsLive)tryRest(0);}, 10000);
 })();
 </script>
 </body>
