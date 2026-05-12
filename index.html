@@ -139,8 +139,8 @@ html{scroll-behavior:smooth}
     <div class="hero-name">Pagaya Technologies 深度分析平台</div>
     <div class="hero-sub">AI 信貸基礎設施領先企業 · 每日更新 · 機構級研究</div>
     <div class="hero-row">
-      <div class="hero-price" id="idx-price">$15.16</div>
-      <div class="chg neg" id="idx-chg">▼ −2.00%</div>
+      <div class="hero-price" id="idx-price">$14.19</div>
+      <div class="chg neg" id="idx-chg">▼ −2.41%</div>
       <div style="font-size:13px;color:var(--m)" id="idx-date">最後更新 2026-05-12</div>
     </div>
     <div class="updated"><span class="dot-live"></span>每日更新 · 最後更新 2026-05-12</div>
@@ -473,32 +473,55 @@ if(yoyCtx){
   });
 }
 
-// ── 即時股價抓取（CORS proxy，更新首頁 hero）──────────────────
+// ── 即時股價抓取（多重來源，每 30 秒更新首頁 hero）─────────────
 (function(){
-  var TICKER='PGY';
-  var p1='https://corsproxy.io/?https://query1.finance.yahoo.com/v7/finance/quote?symbols='+TICKER;
-  var p2='https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+TICKER);
-  function ft(url,ms){var c=new AbortController(),t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
-  function apply(q){
-    if(!q||!q.regularMarketPrice)return;
-    var p=q.regularMarketPrice,ch=q.regularMarketChange,pct=q.regularMarketChangePercent,up=ch>=0;
-    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
-    if(pe)pe.textContent='$'+p.toFixed(2);
+  var TICKER = 'PGY';
+  var yUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + TICKER + '?interval=1m&range=1d';
+  var yUrlQ = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
+  // 4 個 CORS proxy 依序嘗試（URL 正確 encode，避免 ?symbols= 被誤解析）
+  var proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(yUrlQ),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrlQ),
+    'https://api.codetabs.com/v1/proxy?quest=' + yUrlQ,
+    'https://corsproxy.io/?' + encodeURIComponent(yUrl)
+  ];
+  function ft(url,ms){
+    var c=new AbortController(),t=setTimeout(function(){c.abort();},ms);
+    return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});
+  }
+  function applyRaw(pe,ce,de,price,ch,pct){
+    var up=ch>=0;
+    if(pe)pe.textContent='$'+price.toFixed(2);
     if(ce){ce.textContent=(up?'▲ +':'▼ ')+Math.abs(ch).toFixed(2)+' ('+Math.abs(pct).toFixed(2)+'%)';ce.className='chg '+(up?'pos':'neg');}
     if(de)de.textContent='即時報價 · '+new Date().toLocaleTimeString('zh-TW');
   }
-  function run(){
-    ft(p1,8000).then(function(r){return r.json();}).then(function(d){
-      var q=d&&d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
-      if(q)apply(q);else throw 0;
-    }).catch(function(){
-      ft(p2,8000).then(function(r){return r.json();}).then(function(d){
-        var inner=typeof d.contents==='string'?JSON.parse(d.contents):d;
-        var q=inner&&inner.quoteResponse&&inner.quoteResponse.result&&inner.quoteResponse.result[0];
-        if(q)apply(q);
-      }).catch(function(){});
-    });
+  function applyQuote(d){
+    var q=d&&d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
+    if(!q||!q.regularMarketPrice)return false;
+    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
+    applyRaw(pe,ce,de,q.regularMarketPrice,q.regularMarketChange,q.regularMarketChangePercent);
+    return true;
   }
+  function applyChart(d){
+    var meta=d&&d.chart&&d.chart.result&&d.chart.result[0]&&d.chart.result[0].meta;
+    if(!meta||!meta.regularMarketPrice)return false;
+    var price=meta.regularMarketPrice,prev=meta.chartPreviousClose||meta.previousClose||0;
+    var ch=prev?price-prev:0,pct=prev?(ch/prev*100):0;
+    var pe=document.getElementById('idx-price'),ce=document.getElementById('idx-chg'),de=document.getElementById('idx-date');
+    applyRaw(pe,ce,de,price,ch,pct);
+    return true;
+  }
+  function tryProxy(i){
+    if(i>=proxies.length)return;
+    ft(proxies[i],8000).then(function(r){
+      if(!r.ok)throw 0;
+      return r.json();
+    }).then(function(d){
+      var ok=(i===3)?applyChart(d):applyQuote(d);
+      if(!ok)throw 0;
+    }).catch(function(){tryProxy(i+1);});
+  }
+  function run(){tryProxy(0);}
   run();
   setInterval(run,30000);
 })();

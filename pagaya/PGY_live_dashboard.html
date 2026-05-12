@@ -769,12 +769,12 @@ function setHtml(id, v) {
   if (e) e.innerHTML = v;
 }
 
-// ── 取得股價（嘗試 3 個端點）──────────────────────────────────
+// ── 取得股價（嘗試多個端點，URL 正確 encode）──────────────────
 function fetchQuote() {
   var yUrl   = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
   var yUrl2  = 'https://query2.finance.yahoo.com/v8/finance/chart/' + TICKER + '?interval=1m&range=1d';
-  var proxy1 = 'https://corsproxy.io/?' + yUrl;
-  var proxy2 = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yUrl);
+  var proxy1 = 'https://corsproxy.io/?' + encodeURIComponent(yUrl);
+  var proxy2 = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrl);
 
   // 嘗試 proxy1
   fetchTimeout(proxy1, 8000)
@@ -798,8 +798,9 @@ function fetchQuote() {
           applyQuote(q);
         })
         .catch(function() {
-          // 嘗試直連（有些瀏覽器從 file:// 允許）
-          fetchTimeout(yUrl, 8000)
+          // 嘗試第三個 proxy（codetabs）
+          var proxy3 = 'https://api.codetabs.com/v1/proxy?quest=' + yUrl;
+          fetchTimeout(proxy3, 8000)
             .then(function(r) { return r.json(); })
             .then(function(raw) {
               var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
