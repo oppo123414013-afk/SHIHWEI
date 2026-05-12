@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日動態報告 — PGY 分析中心</title>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+
+/* Nav */
+.nav{position:sticky;top:0;background:rgba(13,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);z-index:100;padding:0 24px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:2px;height:54px;overflow-x:auto}
+.nav-logo{font-size:15px;font-weight:800;color:var(--bl);margin-right:16px;text-decoration:none;white-space:nowrap;letter-spacing:-.5px}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px;transition:all .2s;white-space:nowrap}
+.nav a:hover{color:var(--t);background:var(--s2)}
+.nav a.active{color:var(--t);background:var(--s2)}
+
+.wrap{max-width:1200px;margin:0 auto;padding:32px 20px}
+
+/* Page header */
+.ph{background:linear-gradient(135deg,#1a2744,#0d1117);border:1px solid rgba(88,166,255,.2);border-radius:16px;padding:36px;margin-bottom:28px;position:relative;overflow:hidden}
+.ph::before{content:'';position:absolute;top:-80px;right:-80px;width:250px;height:250px;background:radial-gradient(circle,rgba(88,166,255,.1),transparent 70%);pointer-events:none}
+.ph-tag{font-size:11px;color:var(--bl);font-weight:700;letter-spacing:3px;margin-bottom:6px}
+.ph-title{font-size:26px;font-weight:800;margin-bottom:6px}
+.ph-sub{color:var(--m);font-size:14px}
+.ph-stats{display:flex;gap:28px;margin-top:20px;flex-wrap:wrap}
+.ph-stat{display:flex;flex-direction:column;gap:2px}
+.ph-stat-val{font-size:22px;font-weight:700}
+.ph-stat-label{font-size:11px;color:var(--m)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr}}
+.stat-card{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.stat-label{font-size:11px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:700}
+
+/* Section */
+.sec{margin-bottom:28px}
+.sec-title{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* Report grid */
+.report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+
+/* Report card */
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:18px;transition:border-color .2s}
+.rcard:hover{border-color:rgba(88,166,255,.4)}
+.rcard.latest{border-color:rgba(63,185,80,.3);background:linear-gradient(135deg,rgba(63,185,80,.04),var(--s))}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.rc-date{font-size:15px;font-weight:700}
+.rc-weekday{font-size:11px;color:var(--m);margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.bg{background:rgba(63,185,80,.15);color:var(--g)}
+.br{background:rgba(248,81,73,.15);color:var(--r)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl)}
+.by{background:rgba(210,153,34,.15);color:var(--y)}
+.bp{background:rgba(188,140,255,.15);color:var(--p)}
+.rc-highlight{font-size:13px;color:var(--m);margin-bottom:12px;line-height:1.5}
+.rc-price{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.rc-price-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.rc-price-chg{font-size:12px;font-weight:600;padding:2px 7px;border-radius:10px}
+.rc-price-chg.pos{background:rgba(63,185,80,.15);color:var(--g)}
+.rc-price-chg.neg{background:rgba(248,81,73,.15);color:var(--r)}
+.rc-links{display:flex;gap:8px;flex-wrap:wrap}
+.rc-link{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s;border:1px solid}
+.rc-link.pdf{color:var(--o);border-color:rgba(255,166,87,.3);background:rgba(255,166,87,.06)}
+.rc-link.pdf:hover{background:rgba(255,166,87,.12)}
+.rc-link.md{color:var(--bl);border-color:rgba(88,166,255,.3);background:rgba(88,166,255,.06)}
+.rc-link.md:hover{background:rgba(88,166,255,.12)}
+
+/* Latest report highlight */
+.latest-banner{background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.05));border:1px solid rgba(63,185,80,.25);border-radius:12px;padding:24px;margin-bottom:28px}
+.lb-tag{font-size:11px;color:var(--g);font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.lb-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.lb-stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px}
+.lb-stat{display:flex;flex-direction:column;gap:2px}
+.lb-stat-label{font-size:11px;color:var(--m)}
+.lb-stat-val{font-size:15px;font-weight:700}
+.lb-links{display:flex;gap:10px;margin-top:16px}
+
+/* Footer */
+.footer{text-align:center;padding:36px 20px 28px;color:var(--m);font-size:12px;border-top:1px solid var(--bd);margin-top:8px}
+.footer a{color:var(--bl);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">PGY 分析中心</a>
+    <a href="../index.html">首頁</a>
+    <a href="PGY_live_dashboard.html">即時監控</a>
+    <a href="reports.html" class="active">每日報告</a>
+    <a href="../research/PGY/PGY_full_report_2026-05-11.html">完整分析</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="ph">
+    <div class="ph-tag">PAGAYA TECHNOLOGIES · NASDAQ: PGY</div>
+    <div class="ph-title">每日動態報告</div>
+    <div class="ph-sub">每日更新的 PGY 股價走勢、重要公告、AI 分析觀點完整歸檔</div>
+    <div class="ph-stats">
+      <div class="ph-stat"><span class="ph-stat-val">16</span><span class="ph-stat-label">報告總數</span></div>
+      <div class="ph-stat"><span class="ph-stat-val">2026-04-24</span><span class="ph-stat-label">最早報告</span></div>
+      <div class="ph-stat"><span class="ph-stat-val">2026-05-12</span><span class="ph-stat-label">最新報告</span></div>
+    </div>
+  </div>
+
+  <!-- LATEST REPORT HIGHLIGHT -->
+  <div class="latest-banner">
+    <div class="lb-tag">📌 最新報告</div>
+    <div class="lb-title">2026-05-12（二）— 後財報整理第二週</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.6">
+      今日盤中約 $15.16，較前收跌 -2.00%。Q1 財報後進入技術整理窗口，$14.23 低點守住後形成短期支撐。
+      <strong style="color:var(--t)">2026-05-20 B. Riley 投資人大會</strong>是近期最重要催化劑。
+    </div>
+    <div class="lb-stats">
+      <div class="lb-stat"><span class="lb-stat-label">今日股價</span><span class="lb-stat-val" style="color:var(--r)">$15.16 (−2.00%)</span></div>
+      <div class="lb-stat"><span class="lb-stat-label">Q1 Adj. EPS</span><span class="lb-stat-val" style="color:var(--g)">$0.73（超預期 265%）</span></div>
+      <div class="lb-stat"><span class="lb-stat-label">RSI (14)</span><span class="lb-stat-val">54.98–59.79（中性偏多）</span></div>
+      <div class="lb-stat"><span class="lb-stat-label">分析師評級</span><span class="lb-stat-val" style="color:var(--g)">強力買入 10/0</span></div>
+    </div>
+    <div class="lb-links">
+      <a href="../Pagaya_Daily/pdf/2026-05-12_report.pdf" class="rc-link pdf" target="_blank">📄 下載 PDF</a>
+      <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-12_report.md" class="rc-link md" target="_blank">📝 查看 Markdown</a>
+    </div>
+  </div>
+
+  <!-- ALL REPORTS -->
+  <div class="sec">
+    <div class="sec-title">📅 所有報告</div>
+    <div class="report-grid">
+
+      <!-- May reports -->
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-11</div><div class="rc-weekday">星期一</div></div>
+          <span class="badge bb">後財報整理</span>
+        </div>
+        <div class="rc-price"><span class="rc-price-val">$15.47</span><span class="rc-price-chg pos">+</span></div>
+        <div class="rc-highlight">早盤下探 $14.23 低點，尾盤強力反彈收 $15.47，確立短期技術支撐。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-11_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-11_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-10</div><div class="rc-weekday">星期日</div></div>
+          <span class="badge by">週末快報</span>
+        </div>
+        <div class="rc-highlight">週末彙整：財報週後整體回顧、下週催化劑預覽。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-10_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-10_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-09</div><div class="rc-weekday">星期六</div></div>
+          <span class="badge by">週末快報</span>
+        </div>
+        <div class="rc-highlight">週末回顧：財報後第一週完整覆盤，技術面分析。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-09_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-09_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-08</div><div class="rc-weekday">星期四</div></div>
+          <span class="badge br">獲利了結</span>
+        </div>
+        <div class="rc-price"><span class="rc-price-val">~$14.75</span><span class="rc-price-chg neg">回落</span></div>
+        <div class="rc-highlight">財報後獲利了結，區間 $14.46–$15.87，財報情緒消化中。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-08_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-08_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard" style="border-color:rgba(63,185,80,.4)">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-07</div><div class="rc-weekday">星期三</div></div>
+          <span class="badge bg">財報日 ⭐</span>
+        </div>
+        <div class="rc-price"><span class="rc-price-val">$16.49</span><span class="rc-price-chg pos">+11.2%</span></div>
+        <div class="rc-highlight">Q1 2026 財報發布！Adj. EPS $0.73 超預期 265%，全年指引上調，股價暴漲 +11.2%。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-07_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-07_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-06</div><div class="rc-weekday">星期二</div></div>
+          <span class="badge bg">ABS 完成</span>
+        </div>
+        <div class="rc-highlight">PAID 2026-3 $8億 AAA ABS 完成（增額）；財報明日發布，市場靜待。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-06_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-06_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-05</div><div class="rc-weekday">星期一</div></div>
+          <span class="badge by">財報前夕</span>
+        </div>
+        <div class="rc-highlight">財報發布倒數 2 天，市場預期分析，技術支撐位確認。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-05_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-05_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-04</div><div class="rc-weekday">星期日</div></div>
+          <span class="badge by">週末快報</span>
+        </div>
+        <div class="rc-price"><span class="rc-price-val">$14.44</span></div>
+        <div class="rc-highlight">週末回顧：$14.44 收盤守穩 $14 關卡，財報前技術面分析。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-04_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-04_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-03</div><div class="rc-weekday">星期六</div></div>
+          <span class="badge by">週末快報</span>
+        </div>
+        <div class="rc-highlight">財報前一週週末快報：技術指標、分析師預期匯整。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-03_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-03_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-02</div><div class="rc-weekday">星期五</div></div>
+          <span class="badge bb">每日報告</span>
+        </div>
+        <div class="rc-highlight">財報倒數 5 天，股價走勢追蹤，市場情緒分析。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-02_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-02_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-05-01</div><div class="rc-weekday">星期四</div></div>
+          <span class="badge bb">每日報告</span>
+        </div>
+        <div class="rc-price"><span class="rc-price-val">~$12.97</span><span class="rc-price-chg neg">弱勢</span></div>
+        <div class="rc-highlight">RPM-2026-2 $5億汽車 ABS 完成（史上最大）；股價仍在 $12-13 整理。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-05-01_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-01_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-04-30</div><div class="rc-weekday">星期三</div></div>
+          <span class="badge bb">每日報告</span>
+        </div>
+        <div class="rc-highlight">月末回顧：4月重要事件彙整，PAID-2026-R2 Fitch AAA 首獲再證券化。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-04-30_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-30_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-04-25</div><div class="rc-weekday">星期六</div></div>
+          <span class="badge by">週末快報</span>
+        </div>
+        <div class="rc-highlight">本週回顧：RPM-2026-2 $5億汽車 ABS 重要里程碑，技術支撐分析。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-04-25_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-25_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <div class="rc-top">
+          <div><div class="rc-date">2026-04-24</div><div class="rc-weekday">星期五</div></div>
+          <span class="badge bp">首份報告</span>
+        </div>
+        <div class="rc-highlight">RPM-2026-2 $5億汽車 ABS 完成（史上最大單筆）；系列報告正式啟動。</div>
+        <div class="rc-links">
+          <a href="../Pagaya_Daily/pdf/2026-04-24_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
+          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-24_report.md" class="rc-link md" target="_blank">📝 MD</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p style="font-size:14px;font-weight:600;color:var(--t);margin-bottom:6px">PGY 分析中心 · 每日動態報告</p>
+  <p>報告資料涵蓋 2026-04-24 至 2026-05-12 &nbsp;·&nbsp; <a href="../index.html">返回首頁</a></p>
+  <p style="margin-top:8px">本站內容由 Claude AI 自動生成，<strong>僅供資訊參考，不構成任何投資建議。</strong></p>
+</div>
+
+</body>
+</html>

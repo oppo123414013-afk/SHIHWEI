@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGY 全面分析報告 — 2026-05-11</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --blue: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --purple: #bc8cff;
+    --orange: #ffa657;
+    --teal: #39d353;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media(max-width: 700px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  /* ── Header ── */
+  .header { background: linear-gradient(135deg, #1a2744 0%, #0d1117 100%); border: 1px solid var(--border); border-radius: 16px; padding: 36px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(88,166,255,0.12) 0%, transparent 70%); }
+  .ticker { font-size: 13px; color: var(--blue); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .company-name { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .tagline { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .price-row { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .price-main { font-size: 48px; font-weight: 800; color: var(--text); }
+  .price-change { font-size: 20px; color: var(--green); font-weight: 600; }
+  .price-meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--blue); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-orange { background: rgba(255,166,87,0.15); color: var(--orange); border: 1px solid rgba(255,166,87,0.3); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+  .header-badges { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .report-date { position: absolute; top: 20px; right: 24px; font-size: 12px; color: var(--muted); }
+
+  /* ── Section ── */
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  .card-value { font-size: 26px; font-weight: 700; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card-green { border-left: 3px solid var(--green); }
+  .card-blue { border-left: 3px solid var(--blue); }
+  .card-orange { border-left: 3px solid var(--orange); }
+  .card-purple { border-left: 3px solid var(--purple); }
+  .card-red { border-left: 3px solid var(--red); }
+
+  /* ── Progress Bar ── */
+  .progress-wrap { margin: 10px 0; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+  .progress-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+  .fill-green { background: linear-gradient(90deg, #2ea043, #3fb950); }
+  .fill-blue { background: linear-gradient(90deg, #388bfd, #58a6ff); }
+  .fill-orange { background: linear-gradient(90deg, #d18616, #ffa657); }
+  .fill-red { background: linear-gradient(90deg, #cf222e, #f85149); }
+  .fill-purple { background: linear-gradient(90deg, #8957e5, #bc8cff); }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.5); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .tag-new { background: rgba(63,185,80,0.2); color: var(--green); }
+  .tag-auto { background: rgba(88,166,255,0.2); color: var(--blue); }
+  .tag-personal { background: rgba(188,140,255,0.2); color: var(--purple); }
+  .tag-bnpl { background: rgba(255,166,87,0.2); color: var(--orange); }
+  .tag-bank { background: rgba(57,211,83,0.2); color: var(--teal); }
+
+  /* ── Timeline / Flow ── */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; gap: 16px; padding: 16px 0; border-left: 2px solid var(--border); margin-left: 10px; padding-left: 20px; position: relative; }
+  .flow-step::before { content: ''; position: absolute; left: -7px; top: 20px; width: 12px; height: 12px; border-radius: 50%; background: var(--blue); border: 2px solid var(--bg); }
+  .flow-step:last-child { border-left: 2px solid transparent; }
+  .flow-content { flex: 1; }
+  .flow-title { font-weight: 600; margin-bottom: 4px; }
+  .flow-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── Analyst Rating Bar ── */
+  .rating-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 10px 0; }
+  .rating-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+
+  /* ── Target Range ── */
+  .target-range { background: var(--surface2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .range-track { position: relative; height: 6px; background: var(--border); border-radius: 3px; margin: 20px 8px; }
+  .range-fill { position: absolute; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--blue), var(--green)); }
+  .range-marker { position: absolute; top: -18px; transform: translateX(-50%); font-size: 11px; white-space: nowrap; color: var(--text); font-weight: 600; }
+  .range-marker::after { content: ''; position: absolute; left: 50%; bottom: -10px; width: 2px; height: 10px; background: currentColor; }
+  .range-label { position: absolute; bottom: -18px; transform: translateX(-50%); font-size: 10px; color: var(--muted); }
+
+  /* ── Risk / Catalyst ── */
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--surface2); border-radius: 8px; }
+  .item-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .item-body { flex: 1; }
+  .item-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .item-desc { font-size: 13px; color: var(--muted); }
+  .severity { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .sev-high { background: rgba(248,81,73,0.2); color: var(--red); }
+  .sev-mid { background: rgba(210,153,34,0.2); color: var(--yellow); }
+  .sev-low { background: rgba(88,166,255,0.2); color: var(--blue); }
+
+  /* ── Quarterly Chart ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 120px; padding: 0 4px; margin: 12px 0; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s; min-height: 4px; }
+  .bar-label { font-size: 10px; color: var(--muted); text-align: center; }
+  .bar-val { font-size: 11px; font-weight: 600; text-align: center; }
+
+  /* ── Thesis ── */
+  .thesis { background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(63,185,80,0.08)); border: 1px solid rgba(88,166,255,0.2); border-radius: 12px; padding: 24px; }
+  .thesis-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+  .thesis-body { font-size: 14px; line-height: 1.8; color: var(--text); }
+
+  /* ── Footer ── */
+  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  /* ── Upside callout ── */
+  .upside-box { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.05)); border: 1px solid rgba(63,185,80,0.25); border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .upside-num { font-size: 42px; font-weight: 800; color: var(--green); }
+  .upside-label { font-size: 13px; color: var(--muted); }
+  .upside-detail { font-size: 13px; color: var(--text); }
+
+  /* ── highlight text ── */
+  .hl-green { color: var(--green); font-weight: 600; }
+  .hl-red { color: var(--red); font-weight: 600; }
+  .hl-blue { color: var(--blue); font-weight: 600; }
+  .hl-orange { color: var(--orange); font-weight: 600; }
+
+  /* ── Profit streak ── */
+  .streak { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+  .streak-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .streak-on { background: rgba(63,185,80,0.2); color: var(--green); border: 2px solid var(--green); }
+  .streak-curr { background: var(--green); color: #000; }
+
+  /* scroll smooth */
+  html { scroll-behavior: smooth; }
+  .nav { position: sticky; top: 0; background: rgba(13,17,23,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); z-index: 100; padding: 10px 20px; display: flex; gap: 20px; overflow-x: auto; }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 13px; white-space: nowrap; padding: 4px 0; }
+  .nav a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:#58a6ff;margin-right:8px">← 分析中心</a>
+  <a href="#overview">概覽</a>
+  <a href="#financials">財務表現</a>
+  <a href="#model">商業模式</a>
+  <a href="#partners">合作夥伴</a>
+  <a href="#technical">技術面</a>
+  <a href="#analysts">分析師</a>
+  <a href="#catalysts">成長催化劑</a>
+  <a href="#risks">風險因素</a>
+  <a href="#outlook">未來展望</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="container">
+
+  <!-- ── HEADER ── -->
+  <div class="header" id="overview">
+    <div class="report-date">報告日期：2026-05-11</div>
+    <div class="ticker">NASDAQ: PGY</div>
+    <div class="company-name">Pagaya Technologies</div>
+    <div class="tagline">AI 驅動的信貸基礎設施平台 · B2B2C · 以色列/紐約</div>
+    <div class="price-row">
+      <div class="price-main">$15.16</div>
+      <div class="price-change">▲ 2.2% 今日</div>
+    </div>
+    <div class="price-meta">52 週區間：$10.40 — $44.99 ｜ 距 52 週高點 -66%</div>
+    <div class="header-badges">
+      <span class="badge badge-green">✅ 連續 5 季獲利</span>
+      <span class="badge badge-blue">🤖 AI 信貸核心</span>
+      <span class="badge badge-orange">🚀 全年指引上調</span>
+      <span class="badge badge-purple">💼 分析師 Strong Buy</span>
+    </div>
+  </div>
+
+  <!-- ── 快速指標 ── -->
+  <div class="section">
+    <div class="section-title">核心指標快覽</div>
+    <div class="grid-4">
+      <div class="card card-green">
+        <div class="card-title">Q1 2026 營收</div>
+        <div class="card-value">$317.9M</div>
+        <div class="card-sub">年增 <span class="hl-green">+10%</span></div>
+      </div>
+      <div class="card card-green">
+        <div class="card-title">Q1 GAAP 淨利</div>
+        <div class="card-value">$24.7M</div>
+        <div class="card-sub">YoY <span class="hl-green">+213%</span>（去年 $7.9M）</div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-title">調整後 EBITDA</div>
+        <div class="card-value">$94.2M</div>
+        <div class="card-sub">利潤率 <span class="hl-blue">30%</span> ｜ YoY +18%</div>
+      </div>
+      <div class="card card-orange">
+        <div class="card-title">Q1 網絡撮合量</div>
+        <div class="card-value">$2.6B</div>
+        <div class="card-sub">年增 <span class="hl-orange">+9%</span>（剔除 SFR +23%）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 財務表現 ── -->
+  <div class="section" id="financials">
+    <div class="section-title">財務表現</div>
+    <div class="grid-2">
+
+      <!-- 獲利連勝紀錄 -->
+      <div class="card">
+        <div class="card-title">GAAP 連續獲利記錄</div>
+        <div class="streak">
+          <div class="streak-dot streak-on">Q1<br>25</div>
+          <div class="streak-dot streak-on">Q2<br>25</div>
+          <div class="streak-dot streak-on">Q3<br>25</div>
+          <div class="streak-dot streak-on">Q4<br>25</div>
+          <div class="streak-dot streak-curr">Q1<br>26</div>
+        </div>
+        <div style="margin-top:10px; font-size:13px; color:var(--muted)">
+          第 5 季連續 GAAP 獲利，淨利從 Q1'25 <span class="hl-green">$7.9M → $24.7M</span>，成長 213%
+        </div>
+      </div>
+
+      <!-- 季度收入趨勢 -->
+      <div class="card">
+        <div class="card-title">季度收入趨勢（百萬美元）</div>
+        <div class="bar-chart">
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--muted)">$289</div>
+            <div class="bar" style="height:65%; background: rgba(88,166,255,0.3)"></div>
+            <div class="bar-label">Q1'25</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--muted)">$298</div>
+            <div class="bar" style="height:70%; background: rgba(88,166,255,0.4)"></div>
+            <div class="bar-label">Q2'25</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--muted)">$310</div>
+            <div class="bar" style="height:75%; background: rgba(88,166,255,0.5)"></div>
+            <div class="bar-label">Q3'25</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--muted)">$335</div>
+            <div class="bar" style="height:85%; background: rgba(88,166,255,0.6)"></div>
+            <div class="bar-label">Q4'25</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--blue)">$318</div>
+            <div class="bar" style="height:78%; background: var(--blue)"></div>
+            <div class="bar-label">Q1'26 ✦</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val" style="color:var(--green)">~$355</div>
+            <div class="bar" style="height:90%; background: linear-gradient(180deg, var(--green), rgba(63,185,80,0.5)); border: 1px dashed var(--green)"></div>
+            <div class="bar-label">Q2'26E</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全年指引 -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">📊 2026 全年指引（管理層最新，Q1後上調）</div>
+      <div class="grid-4" style="margin-top:12px; gap:12px;">
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>網絡撮合量</span><span style="color:var(--green)">$11.45B – $13B</span></div>
+            <div class="progress-bar"><div class="progress-fill fill-green" style="width:80%"></div></div>
+          </div>
+          <div style="font-size:11px; color:var(--muted)">前次：$11.25B–$13B ⬆️</div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>總營收</span><span style="color:var(--blue)">$1.4B – $1.575B</span></div>
+            <div class="progress-bar"><div class="progress-fill fill-blue" style="width:75%"></div></div>
+          </div>
+          <div style="font-size:11px; color:var(--muted)">分析師共識：$1.47B</div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>調整後 EBITDA</span><span style="color:var(--orange)">$420M – $460M</span></div>
+            <div class="progress-bar"><div class="progress-fill fill-orange" style="width:70%"></div></div>
+          </div>
+          <div style="font-size:11px; color:var(--muted)">前次：未披露 ⬆️ 首次給出</div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>GAAP 淨利</span><span style="color:var(--purple)">$110M – $160M</span></div>
+            <div class="progress-bar"><div class="progress-fill fill-purple" style="width:65%"></div></div>
+          </div>
+          <div style="font-size:11px; color:var(--muted)">前次：$100M–$150M ⬆️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 指引 -->
+    <div class="card" style="margin-top:12px; background: rgba(88,166,255,0.04); border-color: rgba(88,166,255,0.3);">
+      <div class="card-title">📅 Q2 2026 指引</div>
+      <div class="grid-3" style="margin-top:10px;">
+        <div><div style="font-size:12px; color:var(--muted)">網絡撮合量</div><div style="font-size:20px; font-weight:700; color:var(--blue)">$2.875B–$3.075B</div></div>
+        <div><div style="font-size:12px; color:var(--muted)">總營收</div><div style="font-size:20px; font-weight:700; color:var(--blue)">$345M–$365M</div></div>
+        <div><div style="font-size:12px; color:var(--muted)">調整後 EBITDA</div><div style="font-size:20px; font-weight:700; color:var(--blue)">$100M–$115M</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 商業模式 ── -->
+  <div class="section" id="model">
+    <div class="section-title">商業模式</div>
+    <div class="card">
+      <div style="font-size:14px; color:var(--muted); margin-bottom:20px;">Pagaya 是 <strong style="color:var(--text)">AI 信貸中間層</strong>，本身不放貸，靠 AI 重新評估被傳統機構拒絕的借款人，透過 ABS 籌資後核貸，收取手續費。</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-content">
+            <div class="flow-title">① 借款人向合作夥伴申請</div>
+            <div class="flow-desc">LendingClub、SoFi、Ally 等 30+ 個夥伴，借款人完全感知不到 Pagaya 的存在</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-content">
+            <div class="flow-title">② 夥伴機構常規審核拒絕</div>
+            <div class="flow-desc">傳統信用模型核拒 → 申請資料自動透過 API 轉給 Pagaya</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-content">
+            <div class="flow-title">③ Pagaya AI 引擎重新評估</div>
+            <div class="flow-desc">機器學習模型分析 30+ 個夥伴的數百萬筆還款歷史，識別被低估的優質借款人</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-content">
+            <div class="flow-title">④ PAID/RPM ABS 平台籌資</div>
+            <div class="flow-desc">核貸資金來自 ABS 發行，風險轉移給機構投資人（退休基金、保險公司），Pagaya 不持有貸款</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-content">
+            <div class="flow-title">⑤ 收取 4.0–4.6% 淨手續費</div>
+            <div class="flow-desc">每筆核貸金額的 4–5%，無直接行銷成本（客戶由夥伴帶入），<strong style="color:var(--green)">輕資產模式</strong></div>
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--surface2); border-radius:8px; padding:14px; margin-top:12px; display:flex; gap:20px; flex-wrap:wrap; font-size:13px;">
+        <div>💰 <strong>費率：</strong> <span class="hl-blue">4.0–5.0%</span> / 筆</div>
+        <div>🏦 <strong>累計 ABS：</strong> <span class="hl-green">$28.5B</span>（個人貸款）</div>
+        <div>📊 <strong>汽車 ABS 2026：</strong> <span class="hl-orange">$400M RPM 2026-1</span></div>
+        <div>🔄 <strong>最新：</strong> 首發循環型 ABS <span class="hl-purple">$350M PAID 2025-REV1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 合作夥伴 ── -->
+  <div class="section" id="partners">
+    <div class="section-title">合作夥伴網絡（30+ 個）</div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>機構名稱</th>
+            <th>類別</th>
+            <th>加入時間</th>
+            <th>重要性</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>LendingClub</strong></td>
+            <td><span class="tag tag-personal">個人貸款</span></td>
+            <td>早期核心</td>
+            <td>⭐⭐⭐⭐⭐ 美國最大 P2P 轉型數位銀行</td>
+          </tr>
+          <tr>
+            <td><strong>SoFi</strong></td>
+            <td><span class="tag tag-personal">個人貸款</span></td>
+            <td>早期核心</td>
+            <td>⭐⭐⭐⭐⭐ 多產品金融科技平台</td>
+          </tr>
+          <tr>
+            <td><strong>Prosper</strong></td>
+            <td><span class="tag tag-personal">個人貸款</span></td>
+            <td>早期核心</td>
+            <td>⭐⭐⭐⭐ 美國 P2P 元老</td>
+          </tr>
+          <tr>
+            <td><strong>Ally Financial</strong></td>
+            <td><span class="tag tag-auto">汽車貸款</span></td>
+            <td>成長期</td>
+            <td>⭐⭐⭐⭐⭐ 美國最大汽車金融公司</td>
+          </tr>
+          <tr>
+            <td><strong>OneMain Financial</strong></td>
+            <td><span class="tag tag-auto">汽車/個人</span></td>
+            <td>2024/08</td>
+            <td>⭐⭐⭐⭐ 美國最大非銀行消費貸款機構</td>
+          </tr>
+          <tr>
+            <td><strong>Exeter Finance</strong></td>
+            <td><span class="tag tag-auto">汽車貸款</span></td>
+            <td>成長期</td>
+            <td>⭐⭐⭐ 次級車貸專家</td>
+          </tr>
+          <tr>
+            <td><strong>Westlake Financial</strong></td>
+            <td><span class="tag tag-auto">汽車貸款</span></td>
+            <td>成長期</td>
+            <td>⭐⭐⭐ 間接汽車貸款</td>
+          </tr>
+          <tr>
+            <td><strong>U.S. Bank</strong></td>
+            <td><span class="tag tag-bank">頂級銀行</span></td>
+            <td>成長期</td>
+            <td>⭐⭐⭐⭐⭐ 全美第五大銀行</td>
+          </tr>
+          <tr>
+            <td><strong>Klarna</strong></td>
+            <td><span class="tag tag-bnpl">BNPL</span></td>
+            <td>成長期</td>
+            <td>⭐⭐⭐⭐⭐ 全球最大 BNPL 平台</td>
+          </tr>
+          <tr>
+            <td><strong>Upstart</strong></td>
+            <td><span class="tag tag-personal">個人貸款</span></td>
+            <td><span class="tag tag-new">2026 新 ⬆️</span></td>
+            <td>⭐⭐⭐⭐ 同為 AI 信貸，既競爭又合作</td>
+          </tr>
+          <tr>
+            <td><strong>Sezzle</strong></td>
+            <td><span class="tag tag-bnpl">BNPL</span></td>
+            <td><span class="tag tag-new">2026/05 新 ⬆️</span></td>
+            <td>⭐⭐⭐ 美國成長中 BNPL 平台</td>
+          </tr>
+          <tr>
+            <td><strong>Flex Pay (Upgrade)</strong></td>
+            <td><span class="tag tag-bnpl">BNPL</span></td>
+            <td><span class="tag tag-new">2026 新 ⬆️</span></td>
+            <td>⭐⭐⭐ Upgrade 旗下 BNPL 解決方案</td>
+          </tr>
+          <tr>
+            <td><strong>Achieve</strong></td>
+            <td><span class="tag tag-personal">個人貸款</span></td>
+            <td>2025/12</td>
+            <td>⭐⭐⭐ 原 Freedom Financial Network</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px; background: var(--surface2); border-radius:8px; padding:14px; font-size:13px; color:var(--muted);">
+      🎯 管理層目標：<span class="hl-orange">2026 年底前再新增 7–8 個夥伴</span>（目前已完成 4 個）· 預計新增區域銀行為主
+    </div>
+  </div>
+
+  <!-- ── 技術面 ── -->
+  <div class="section" id="technical">
+    <div class="section-title">技術分析</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">股價位置</div>
+
+        <!-- Price range visualization -->
+        <div class="target-range" style="padding-top:30px; padding-bottom:30px;">
+          <div class="range-track">
+            <!-- Current price at ~25% of the range -->
+            <div class="range-fill" style="left:0; width:13%"></div>
+            <div class="range-marker" style="left:0%">$10.40</div>
+            <div class="range-label" style="left:0%">52W 低</div>
+            <div class="range-marker" style="left:13%; color:var(--orange)">▼ $15.16</div>
+            <div class="range-label" style="left:13%; color:var(--orange)">現價</div>
+            <div class="range-marker" style="left:100%">$44.99</div>
+            <div class="range-label" style="left:100%">52W 高</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px; margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted)">現價</span><span class="hl-orange">$15.16</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted)">52 週高點</span><span>$44.99</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted)">52 週低點</span><span>$10.40</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted)">45 日均線</span><span>$25.13</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted)">90 日均線</span><span>$26.80</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;">
+            <span style="color:var(--muted)">200 日均線</span><span class="hl-red">現價低於 ⚠️</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">支撐 / 阻力位</div>
+        <div style="font-size:13px; margin-top:8px;">
+          <div style="background: rgba(248,81,73,0.1); border-radius:6px; padding:10px; margin-bottom:8px;">
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">阻力區（Resistance）</div>
+            <div>R3: <strong>$25.62</strong> · R2: <strong>$25.29</strong> · R1: <strong>$25.01</strong></div>
+          </div>
+          <div style="background: rgba(88,166,255,0.08); border-radius:6px; padding:10px; margin-bottom:8px; text-align:center;">
+            <div style="font-size:11px; color:var(--muted)">樞紐點（Pivot）</div>
+            <div style="font-size:20px; font-weight:700;">$24.68</div>
+          </div>
+          <div style="background: rgba(63,185,80,0.1); border-radius:6px; padding:10px;">
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">支撐區（Support）</div>
+            <div>S1: <strong>$24.40</strong> · S2: <strong>$24.07</strong> · S3: <strong>$23.79</strong></div>
+          </div>
+        </div>
+        <div style="margin-top:14px; background: var(--surface2); border-radius:8px; padding:12px; font-size:13px; color:var(--muted);">
+          ⚡ Q1 財報後股價跳空上漲（$14.83 → $16.49），突破近期震盪區間，成交量明顯放大。現價整固中，等待下一個催化劑。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 分析師評級 ── -->
+  <div class="section" id="analysts">
+    <div class="section-title">分析師評級與目標價</div>
+
+    <div class="card">
+      <div class="card-title">8–10 位分析師共識</div>
+      <div class="rating-bar" style="margin: 14px 0;">
+        <div class="rating-seg" style="width:63%; background: var(--green);">Strong Buy 63%</div>
+        <div class="rating-seg" style="width:37%; background: var(--blue);">Buy 37%</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted);">
+        <span>Hold 0%</span>
+        <span>Sell 0%</span>
+        <span>Strong Sell 0%</span>
+      </div>
+    </div>
+
+    <!-- Upside -->
+    <div class="upside-box" style="margin-top:16px;">
+      <div>
+        <div class="upside-label">平均目標價 vs 現價</div>
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <div class="upside-num">+167%</div>
+          <div style="font-size:14px; color:var(--muted)">潛在漲幅</div>
+        </div>
+        <div class="upside-label">現價 $15.16 → 均值目標 $34.50</div>
+      </div>
+      <div>
+        <div class="upside-detail">
+          <div>🎯 均值目標：<span class="hl-green">$34.50</span></div>
+          <div>⬆️ 最高目標：<span class="hl-green">$54.00</span></div>
+          <div>⬇️ 最低目標：<span class="hl-red">$20.00</span></div>
+          <div>📊 分析師覆蓋數：8–10 人</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 成長催化劑 ── -->
+  <div class="section" id="catalysts">
+    <div class="section-title">成長催化劑</div>
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">🤝</div>
+        <div class="item-body">
+          <div class="item-title">新夥伴持續入網 <span class="severity sev-high">高影響</span></div>
+          <div class="item-desc">2026 Q1 創單季 4 個新夥伴入網記錄（Upstart、Sezzle、Flex Pay、GLS）。管理層目標年底再加 7–8 個，尤其看重區域銀行入網，因其帶來穩定且低成本的個人貸款量。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🚗</div>
+        <div class="item-body">
+          <div class="item-title">汽車業務翻倍 <span class="severity sev-high">高影響</span></div>
+          <div class="item-desc">汽車貸款業務 Q1 2026 年化撮合量達 $2.3B，較去年同期 <strong>翻倍成長</strong>，正從補充業務轉型為核心結構性增長引擎，RPM ABS 平台持續擴大。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">💳</div>
+        <div class="item-body">
+          <div class="item-title">BNPL 滲透新場景 <span class="severity sev-mid">中影響</span></div>
+          <div class="item-desc">Sezzle、Flex Pay 等新 BNPL 夥伴代表 Pagaya 進入電商/零售的即時信貸場景，擴大可服務市場（TAM），且客單量小但頻率高，有助提升 AI 模型訓練數據量。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🏦</div>
+        <div class="item-body">
+          <div class="item-title">主流銀行深度合作 <span class="severity sev-high">高影響</span></div>
+          <div class="item-desc">U.S. Bank、Top 5 Bank 等主流銀行的入網，代表傳統金融機構對 AI 信貸輔助決策的認可。銀行客戶信用質量普遍較高，有助降低整體逾期風險，且規模潛力更大。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">📈</div>
+        <div class="item-body">
+          <div class="item-title">H2 2026 加速效應 <span class="severity sev-high">高影響</span></div>
+          <div class="item-desc">管理層明確指出：H1 為新夥伴入網期，H2 才是規模釋放期。若 Q2 達成 7–8 個新夥伴入網，H2 的網絡量和收入成長加速將超越 H1，是本年度最大的正向催化劑。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🔄</div>
+        <div class="item-body">
+          <div class="item-title">循環型 ABS（PAID-REV1）創新 <span class="severity sev-mid">中影響</span></div>
+          <div class="item-desc">$350M PAID 2025-REV1 是 Pagaya 個人貸款業務的首個循環型資產支持融資結構，降低融資成本、提高流動性靈活度，有助降低整體資金成本，提升盈利能力。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 風險因素 ── -->
+  <div class="section" id="risks">
+    <div class="section-title">風險因素</div>
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">⚠️</div>
+        <div class="item-body">
+          <div class="item-title">CFO 交接不確定性 <span class="severity sev-mid">中風險</span></div>
+          <div class="item-desc">Evangelos Perros 將於 2026/06/15 卸任，由 Jon Dobres（原 CSO）接任。CFO 換人在財務敏感時期可能影響機構投資人信心，需觀察交接後的財務溝通是否保持一致性。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">📉</div>
+        <div class="item-body">
+          <div class="item-title">信用環境惡化 <span class="severity sev-high">高風險</span></div>
+          <div class="item-desc">若宏觀經濟衰退導致消費者違約率上升，ABS 投資人可能要求更高回報率甚至收縮購買，壓縮 Pagaya 的 ABS 發行能力和費率空間。競爭對手（如 Upstart）的信用惡化已被市場用來聯想 PGY。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">💸</div>
+        <div class="item-body">
+          <div class="item-title">股權稀釋風險 <span class="severity sev-mid">中風險</span></div>
+          <div class="item-desc">高科技公司特性，SBC（股權薪酬）持續稀釋股東權益。需持續監控 GAAP 淨利 vs 股份數量增長的相對速度，確認每股盈利（EPS）的實質改善。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">📋</div>
+        <div class="item-body">
+          <div class="item-title">監管政策風險 <span class="severity sev-mid">中風險</span></div>
+          <div class="item-desc">美國消費金融保護局（CFPB）對 AI 信貸決策的監管趨嚴，若出現針對算法歧視或透明度的新規定，可能增加合規成本或限制 Pagaya 的核貸範圍。</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🤝</div>
+        <div class="item-body">
+          <div class="item-title">夥伴集中度風險 <span class="severity sev-low">低風險</span></div>
+          <div class="item-desc">若頭部夥伴（如 LendingClub、SoFi）削減合作量或自建 AI 能力，可能影響 PGY 的網絡量。目前 30+ 個夥伴分散度已大幅降低此風險。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 未來展望 ── -->
+  <div class="section" id="outlook">
+    <div class="section-title">未來展望 2026–2027</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📅 2026 年關鍵里程碑</div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px; font-size:13px;">
+          <div style="display:flex; gap:10px;"><span style="color:var(--orange); font-weight:600; min-width:70px;">Q2 2026</span><span>目標完成 7–8 個新夥伴入網；NV 目標 $2.875B–$3.075B</span></div>
+          <div style="display:flex; gap:10px;"><span style="color:var(--orange); font-weight:600; min-width:70px;">Jun 2026</span><span>CFO 正式交接（Jon Dobres 接任），市場觀察財務溝通延續性</span></div>
+          <div style="display:flex; gap:10px;"><span style="color:var(--orange); font-weight:600; min-width:70px;">H2 2026</span><span>新夥伴規模釋放期，預期成長加速；汽車業務衝擊 $3B 年化</span></div>
+          <div style="display:flex; gap:10px;"><span style="color:var(--orange); font-weight:600; min-width:70px;">Aug 2026</span><span>Q2 財報發布，關鍵驗證：夥伴入網數、FRLPC 費率回升</span></div>
+          <div style="display:flex; gap:10px;"><span style="color:var(--orange); font-weight:600; min-width:70px;">FY 2026</span><span>GAAP 淨利 $110M–$160M，若達成則 EPS 約 $1.23</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔭 2027 長期展望</div>
+        <div style="font-size:13px; display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+          <div>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>夥伴數量</span><span style="color:var(--green)">目標 50+ 個</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-green" style="width:60%"></div></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted)">目前 30+，擴張空間仍大</div>
+          </div>
+          <div>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>年度網絡量</span><span style="color:var(--blue)">目標 $15B+</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-blue" style="width:75%"></div></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted)">2026 指引 $11.45B–$13B</div>
+          </div>
+          <div>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>GAAP 淨利率</span><span style="color:var(--orange)">目標 12–15%</span></div>
+              <div class="progress-bar"><div class="progress-fill fill-orange" style="width:40%"></div></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted)">目前 ~7.7%（Q1），仍在爬升期</div>
+          </div>
+          <div style="background:var(--surface2); border-radius:8px; padding:10px; margin-top:4px; color:var(--muted);">
+            長期邏輯：數據網絡效應飛輪——夥伴越多 → 數據越多 → AI 越準 → 核貸率越高 → 吸引更多夥伴，構成<strong style="color:var(--text)">複利式護城河</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 投資論點 ── -->
+  <div class="section" id="thesis">
+    <div class="section-title">投資論點總結</div>
+    <div class="thesis">
+      <div class="thesis-title">核心命題：AI 信貸基礎設施的規模飛輪效應</div>
+      <div class="thesis-body">
+        Pagaya 的商業本質是一個<strong>數據驅動的雙邊平台</strong>：一端是 30+ 個放貸夥伴（持續增加中），另一端是需要信貸但被傳統模型低估的借款人群體。每一筆成功核貸都在強化 AI 模型，每一個新夥伴都帶來新數據，形成<strong>正向飛輪</strong>。
+        <br><br>
+        <strong>估值論點：</strong>以 $15.16 的現價，距分析師均值目標 $34.50 有 <span class="hl-green">167% 的潛在上漲空間</span>，且 8–10 位分析師 100% 給出 Buy/Strong Buy，無任何 Hold 或賣出評級。股價相對 52 週高點 $44.99 下跌 66%，但公司基本面（連續 5 季獲利、指引持續上調）持續改善。
+        <br><br>
+        <strong>核心監控指標：</strong>① Q2 新夥伴入網數是否達標（7–8 個）② FRLPC 費率是否回升（目前 4.6%，前值更高）③ 汽車業務是否維持翻倍成長動能 ④ CFO 交接後財務溝通一致性
+      </div>
+    </div>
+
+    <!-- Bull / Bear -->
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="card card-green">
+        <div class="card-title" style="color:var(--green)">🟢 多頭論點（Bull Case）</div>
+        <ul style="font-size:13px; padding-left:16px; margin-top:8px; display:flex; flex-direction:column; gap:6px; color:var(--text);">
+          <li>連續 5 季 GAAP 獲利，獲利能力已獲驗證</li>
+          <li>全年指引 Q1 後即上調，管理層看好 H2</li>
+          <li>汽車業務翻倍，新產品線打開成長天花板</li>
+          <li>BNPL 滲透多元場景，TAM 持續擴大</li>
+          <li>分析師 100% 看多，平均上漲空間 167%</li>
+          <li>數據護城河越深，競爭壁壘越高</li>
+        </ul>
+      </div>
+      <div class="card card-red">
+        <div class="card-title" style="color:var(--red)">🔴 空頭論點（Bear Case）</div>
+        <ul style="font-size:13px; padding-left:16px; margin-top:8px; display:flex; flex-direction:column; gap:6px; color:var(--text);">
+          <li>CFO 換人，短期財務溝通不確定</li>
+          <li>現價低於所有主要均線（200/90/45 日）</li>
+          <li>GAAP 淨利率 7.7%，相對收入仍偏低</li>
+          <li>宏觀信用惡化可能壓縮 ABS 市場需求</li>
+          <li>SBC 稀釋持續，每股盈利增速受限</li>
+          <li>FRLPC 費率下滑趨勢需監控</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <p>📊 PGY 全面分析報告 · 製作日期：2026-05-11</p>
+    <p style="margin-top:4px;">資料來源：Pagaya 官方財報 · BusinessWire · Yahoo Finance · StockTitan · MarketBeat · TipRanks</p>
+    <p style="margin-top:8px; font-size:11px;">⚠️ 本報告僅供個人研究參考，不構成投資建議。投資有風險，決策前請自行判斷。</p>
+  </div>
+
+</div>
+</body>
+</html>
