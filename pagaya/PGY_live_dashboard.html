@@ -38,14 +38,6 @@ body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSyste
 .bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
 .br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
 
-/* ── TradingView boxes ── */
-.tv-box{background:var(--s);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:16px}
-.tv-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);padding:12px 16px 0}
-.tv-row{display:grid;grid-template-columns:1fr 1fr;gap:0}
-@media(max-width:700px){.tv-row{grid-template-columns:1fr}}
-.tv-row .tv-box{border-radius:0;margin-bottom:0;border:none;border-right:1px solid var(--bd)}
-.tv-row .tv-box:last-child{border-right:none}
-
 /* ── Why panel ── */
 .why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
 .why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
@@ -214,46 +206,14 @@ html{scroll-behavior:smooth}
   </div>
 </div>
 
-<!-- ══ TRADINGVIEW 即時行情（100% 可用）══════════════════════════ -->
+<!-- ══ 即時行情（Yahoo Finance 分鐘線）══════════════════════════ -->
 <div id="live" class="sec">
-  <div class="sec-ttl">即時行情 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">TradingView · 自動更新</span></div>
-
-  <!-- Mini Chart + Price: TradingView Mini Symbol Overview -->
-  <div class="tv-box" style="margin-bottom:12px">
-    <div class="tradingview-widget-container" style="height:300px">
-      <div class="tradingview-widget-container__widget" style="height:300px"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-      {
-        "symbol": "NASDAQ:PGY",
-        "width": "100%",
-        "height": 300,
-        "locale": "zh_TW",
-        "dateRange": "1D",
-        "colorTheme": "dark",
-        "trendLineColor": "rgba(88, 166, 255, 1)",
-        "underLineColor": "rgba(88, 166, 255, 0.3)",
-        "underLineBottomColor": "rgba(41, 98, 255, 0)",
-        "isTransparent": true,
-        "autosize": false,
-        "largeChartUrl": ""
-      }
-      </script>
-    </div>
-  </div>
-
-  <!-- Symbol Info: price, change, vol, 52W range -->
-  <div class="tv-box">
-    <div class="tradingview-widget-container" style="height:120px">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
-      {
-        "symbol": "NASDAQ:PGY",
-        "width": "100%",
-        "locale": "zh_TW",
-        "colorTheme": "dark",
-        "isTransparent": true
-      }
-      </script>
+  <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
+  <div class="card" style="padding:20px">
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日分鐘走勢圖</div>
+    <canvas id="intradayChart" style="max-height:260px"></canvas>
+    <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
+      <span>載入中...</span>
     </div>
   </div>
 </div>
@@ -720,7 +680,7 @@ html{scroll-behavior:smooth}
 </div>
 
 <div class="footer">
-  <p>📡 PGY 即時監控中心 · TradingView 即時圖表 · Yahoo Finance 新聞</p>
+  <p>📡 PGY 即時監控中心 · Yahoo Finance 即時報價 · Yahoo Finance 新聞</p>
   <p style="margin-top:4px">基本面資料：Pagaya 官方財報 · BusinessWire · MarketBeat · TipRanks（截至 2026-05-12）</p>
   <p style="margin-top:8px;font-size:11px">⚠️ 本報告僅供個人研究參考，不構成投資建議。投資有風險，決策前請自行判斷。</p>
 </div>
@@ -819,16 +779,15 @@ function fetchQuote() {
 }
 
 function showNoData() {
-  setText('mkt-status', '⚠️ CORS 限制，請看上方 TradingView 即時圖表');
+  setText('mkt-status', '⚠️ 即時資料暫時無法取得，請稍後重試');
   var b = document.getElementById('why-badge');
-  if (b) { b.textContent = '請參考 TradingView 圖表'; b.style = 'background:rgba(139,148,158,.2);color:var(--m)'; }
+  if (b) { b.textContent = '資料讀取失敗'; b.style = 'background:rgba(139,148,158,.2);color:var(--m)'; }
   setHtml('why-body',
-    '您的瀏覽器的安全限制阻止了從本機 HTML 檔案發出跨域請求（CORS）。<br><br>' +
-    '<strong style="color:var(--t)">請直接使用上方 TradingView 即時圖表</strong>，它提供：<ul>' +
-    '<li>即時股價 + 漲跌幅</li><li>今日 K 線圖表</li><li>成交量 + 52 週區間</li>' +
-    '<li>懸停可見更多技術指標</li></ul>' +
-    '<strong style="color:var(--o)">漲跌分析方法：</strong>觀察 TradingView 圖表中今日的<br>' +
-    '① 開盤 vs 現價方向 ② 成交量是否爆增 ③ 再對照下方即時新聞連結找原因。'
+    '即時資料暫時無法取得，可能是網路或 CORS 限制。<br><br>' +
+    '可前往以下頁面查看即時報價：<ul>' +
+    '<li><a href="https://finance.yahoo.com/quote/PGY" target="_blank" rel="noopener" style="color:var(--bl)">Yahoo Finance PGY 即時報價 ↗</a></li>' +
+    '<li><a href="https://stockanalysis.com/stocks/pgy/" target="_blank" rel="noopener" style="color:var(--bl)">StockAnalysis PGY ↗</a></li>' +
+    '</ul>'
   );
 }
 
@@ -1074,6 +1033,108 @@ function initCharts() {
   }
 }
 
+// ── 今日分鐘線圖表（Yahoo Finance v8/chart）─────────────────────
+var _intradayChart = null;
+function fetchIntradayChart() {
+  var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
+  var p1  = 'https://corsproxy.io/?' + encodeURIComponent(url);
+  var p2  = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+  var p3  = 'https://api.codetabs.com/v1/proxy?quest=' + url;
+
+  function parse(raw) {
+    var res = raw && raw.chart && raw.chart.result && raw.chart.result[0];
+    if (!res) throw new Error('no chart data');
+    var ts     = res.timestamp || [];
+    var q      = res.indicators && res.indicators.quote && res.indicators.quote[0];
+    var closes = (q && q.close) || [];
+    var prev   = (res.meta && (res.meta.chartPreviousClose || res.meta.previousClose)) || null;
+    return { ts: ts, closes: closes, prev: prev, meta: res.meta || {} };
+  }
+
+  function draw(data) {
+    var pairs = data.ts.map(function(t, i) {
+      return { t: t * 1000, v: data.closes[i] };
+    }).filter(function(p) { return p.v != null; });
+    if (!pairs.length) return;
+
+    var labels = pairs.map(function(p) {
+      return new Date(p.t).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York' });
+    });
+    var values = pairs.map(function(p) { return p.v; });
+    var last   = values[values.length - 1];
+    var prev   = data.prev;
+    var isUp   = !prev || last >= prev;
+    var lc     = isUp ? 'rgba(63,185,80,1)' : 'rgba(248,81,73,1)';
+    var fc     = isUp ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.08)';
+
+    var el = document.getElementById('intradayChart');
+    if (!el) return;
+    if (_intradayChart) { _intradayChart.destroy(); _intradayChart = null; }
+
+    var datasets = [{
+      data: values, borderColor: lc, backgroundColor: fc,
+      fill: true, borderWidth: 1.5, pointRadius: 0, tension: 0
+    }];
+    if (prev) {
+      datasets.push({
+        data: values.map(function() { return prev; }),
+        borderColor: 'rgba(139,148,158,0.45)', borderDash: [4, 4],
+        borderWidth: 1, pointRadius: 0, fill: false
+      });
+    }
+
+    _intradayChart = new Chart(el.getContext('2d'), {
+      type: 'line',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        animation: false, responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function(c) { return '$' + c.parsed.y.toFixed(2); } } }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#8b949e', maxTicksLimit: 7, font: { size: 10 } },
+            grid: { color: 'rgba(48,54,61,0.5)' }
+          },
+          y: {
+            ticks: { color: '#8b949e', font: { size: 10 }, callback: function(v) { return '$' + v.toFixed(2); } },
+            grid: { color: 'rgba(48,54,61,0.5)' }
+          }
+        }
+      }
+    });
+
+    var m    = data.meta;
+    var info = document.getElementById('intraday-info');
+    if (info) {
+      info.innerHTML = [
+        prev ? '<span>前收 <strong>$' + prev.toFixed(2) + '</strong></span>' : '',
+        m.regularMarketDayHigh ? '<span>今高 <strong style="color:var(--g)">$' + m.regularMarketDayHigh.toFixed(2) + '</strong></span>' : '',
+        m.regularMarketDayLow  ? '<span>今低 <strong style="color:var(--r)">$' + m.regularMarketDayLow.toFixed(2) + '</strong></span>' : '',
+        '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>'
+      ].filter(Boolean).join('');
+    }
+  }
+
+  function tryProxy(px, next) {
+    fetchTimeout(px, 8000)
+      .then(function(r) { return r.json(); })
+      .then(function(raw) {
+        var inner = typeof raw.contents === 'string' ? JSON.parse(raw.contents) : raw;
+        draw(parse(inner));
+      })
+      .catch(next || function() {
+        var el = document.getElementById('intraday-info');
+        if (el) el.textContent = '分鐘線資料暫時無法載入，請查看上方新聞連結。';
+      });
+  }
+
+  tryProxy(p1, function() {
+    tryProxy(p2, function() { tryProxy(p3, null); });
+  });
+}
+
 // ── Yahoo Finance WebSocket 即時串流 ────────────────────────────
 (function(){
   var TICKER = 'PGY';
@@ -1132,8 +1193,10 @@ function initCharts() {
 window.addEventListener('load', function() {
   initCharts();
   fetchQuote();
+  fetchIntradayChart();
   fetchNews();
   setInterval(function(){ if(!window._wsLive||!window._wsLive()) fetchQuote(); }, 10000);
+  setInterval(fetchIntradayChart, 30000);
   setInterval(fetchNews, 300000);
 });
 </script>
