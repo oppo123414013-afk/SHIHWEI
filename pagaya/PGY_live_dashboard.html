@@ -242,7 +242,7 @@ html{scroll-behavior:smooth}
 
   <!-- AI 三方今日走勢觀點 -->
   <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 四大 AI 今日走勢觀點</div>
 
     <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
@@ -268,13 +268,24 @@ html{scroll-behavior:smooth}
       <div style="font-size:12px;color:var(--m);line-height:1.75">我同意低估但需注意：今日走勢有部分受宏觀因子驅動，並非純粹個股邏輯。<strong style="color:var(--t)">CFO 交接前的溝通空窗期是我的最大顧慮</strong>——機構投資人習慣用 CFO 評論校準模型，新聲音可能短期造成不確定。Q2 夥伴入網數量是本季最關鍵的驗證點。建議分批布局，CFO 首次法說會後再評估加碼時機。</div>
     </div>
 
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">今日量能偏低正是「隱形股」問題的體現——基本面轉好，但市場根本沒注意到。<strong style="color:var(--t)">Short Interest ~18% float 是雙面刃：空頭是潛在燃料，但也代表市場仍有疑慮。</strong>當前最重要的觀察指標不是股價，而是成交量是否放大——若 B. Riley 大會後出現 >$80M 日均量，代表催化劑已觸發，屆時空頭回補將加速上漲。無催化劑情況下建議 LEAPS 代替現股，降低等待時間成本。</div>
+    </div>
+
     <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
       <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
       <div style="font-size:12px;color:var(--m);line-height:1.9">
         <strong style="color:#4285f4">Gemini→Claude：</strong>你的宏觀謹慎有道理，但 EV/EBITDA 2.8× 已 price in 相當大的風險。即便再惡化 20%，PGY 的絕對估值仍便宜——安全邊際已非常充裕。<br>
         <strong style="color:#d97706">Claude→GPT：</strong>「本質性轉型」需要連續多季確認，而非一季超預期。市場等的是 H2 新夥伴量是否真正落地，再宣告論點成立更為穩健。<br>
         <strong style="color:#10a37f">GPT→Claude：</strong>5 季連續 GAAP 盈利本身就是確立信號——不是 1 季，是 5 季。分析師 10/0 的共識也在支持這個判斷，你的標準是否過嚴格？<br>
-        <strong style="color:#4285f4">Gemini→GPT：</strong>同意飛輪論，但提醒：Sezzle 和 Flex Pay 的 GMV 規模相比 Klarna 小一個數量級，BNPL 貢獻短期不宜高估。
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意飛輪論，但提醒：Sezzle 和 Flex Pay 的 GMV 規模相比 Klarna 小一個數量級，BNPL 貢獻短期不宜高估。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>基本面討論都正確，但你們漏掉了流量問題。PGY 日均 $40M 成交量在納斯達克近乎隱形，沒有新資金注意到，估值折價可以一直存在。B. Riley 大會是短期最重要的觀察節點。<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>Klarna IPO 溢出效應 + Q2 財報超預期就是你要的催化劑，它不是缺席，只是在倒計時。<br>
+        <strong style="color:#e11d48">Grok→GPT：</strong>認同，但 Klarna IPO 若在 Q3–Q4，中間有 3–6 個月空窗。建議 LEAPS 橋接，降低等待的時間成本——這不是悲觀，是資金效率。
       </div>
     </div>
   </div>
@@ -1226,7 +1237,7 @@ function renderDebate(d) {
         c.diverge.map(function(s){ return '<li>' + _esc(s) + '</li>'; }).join('') + '</ul></div>' +
     '</div>' +
     '<div style="margin-top:16px;padding:14px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:8px">' +
-      '<div style="font-size:12px;font-weight:700;color:var(--bl);margin-bottom:6px">📌 三大 AI 綜合操作建議</div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--bl);margin-bottom:6px">📌 四大 AI 綜合操作建議</div>' +
       '<div style="font-size:13px;color:var(--m);line-height:1.7">' +
         c.action.map(function(item) {
           return '<strong style="color:' + item.color + '">' + _esc(item.label) + '：</strong>' + _md(item.text);
