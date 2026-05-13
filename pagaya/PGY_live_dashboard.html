@@ -652,10 +652,10 @@ html{scroll-behavior:smooth}
 
   <!-- 最終共識 -->
   <div class="thesis">
-    <h3>🏁 三大 AI 最終共識 · 分歧 · 操作建議</h3>
+    <h3>🏁 四大 AI 最終共識 · 分歧 · 操作建議</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div>
-        <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 三方共識（高確信度）</div>
+        <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 四方共識（高確信度）</div>
         <ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">
           <li>PGY 目前嚴重低估，EV/EBITDA &lt;3× 不合理</li>
           <li>5 季 GAAP 盈利已消除「純概念股」二元風險</li>
@@ -1149,7 +1149,7 @@ function _md(s) {
 }
 
 function renderDebate(d) {
-  var agentsHtml = '<div class="g3" style="margin-bottom:16px">' +
+  var agentsHtml = '<div class="g4" style="margin-bottom:16px">' +
     d.agents.map(function(a) {
       return '<div class="card" style="border-color:' + _hexRgba(a.color, 0.4) + '">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
@@ -1179,12 +1179,12 @@ function renderDebate(d) {
 
   var c = d.consensus;
   var consensusHtml = '<div class="thesis">' +
-    '<h3>🏁 三大 AI 最終共識 · 分歧 · 操作建議</h3>' +
+    '<h3>🏁 四大 AI 最終共識 · 分歧 · 操作建議</h3>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">' +
-      '<div><div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 三方共識（高確信度）</div>' +
+      '<div><div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 四方共識（高確信度）</div>' +
         '<ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">' +
         c.agree.map(function(s){ return '<li>' + _esc(s) + '</li>'; }).join('') + '</ul></div>' +
-      '<div><div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:8px">⚡ 三方分歧（關鍵監控點）</div>' +
+      '<div><div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:8px">⚡ 四方分歧（關鍵監控點）</div>' +
         '<ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">' +
         c.diverge.map(function(s){ return '<li>' + _esc(s) + '</li>'; }).join('') + '</ul></div>' +
     '</div>' +
