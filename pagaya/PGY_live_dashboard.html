@@ -210,19 +210,18 @@ html{scroll-behavior:smooth}
 <div id="live" class="sec">
   <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
   <div class="card" style="padding:20px">
-    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · Finviz 即時盤中圖</div>
-    <div style="border-radius:8px;overflow:hidden;background:var(--s2)">
-      <img id="finviz-chart" src="https://finviz.com/chart.ashx?t=PGY&ty=l&ta=0&p=i1"
-           style="width:100%;display:block"
-           onerror="this.onerror=null;this.style.display='none';document.getElementById('chart-err').style.display='flex'"
-           alt="PGY 今日走勢">
-      <div id="chart-err" style="display:none;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:var(--s2)">
-        <div style="font-size:13px;color:var(--m)">走勢圖暫時無法顯示</div>
-        <a href="https://finance.yahoo.com/chart/PGY" target="_blank" rel="noopener" style="color:var(--bl);font-size:13px;text-decoration:none">前往 Yahoo Finance 查看即時圖表 ↗</a>
-      </div>
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · TradingView 即時盤中圖</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px">
+      <iframe
+        src="https://s.tradingview.com/widgetembed/?symbol=NASDAQ%3APGY&interval=5&theme=dark&style=1&locale=zh_TW&toolbar_bg=%23161b22&hide_side_toolbar=1&allow_symbol_change=0&autosize=1"
+        style="width:100%;height:100%;border:0"
+        frameborder="0"
+        allowtransparency="true"
+        scrolling="no"
+      ></iframe>
     </div>
     <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
-      <span>Finviz 盤中走勢 · 5 分鐘更新</span>
+      <span>TradingView 盤中走勢 · 即時更新</span>
     </div>
   </div>
 </div>
@@ -744,47 +743,53 @@ function setHtml(id, v) {
   if (e) e.innerHTML = v;
 }
 
-// ── 取得股價（嘗試多個端點，URL 正確 encode）──────────────────
+// ── 取得股價（多端點容錯：3個CORS proxy + Stooq直連備援）────────
+function _parseYahoo(raw) {
+  var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
+  return q || null;
+}
+function _parseAllOrigins(raw) {
+  try {
+    var inner = typeof raw.contents === 'string' ? JSON.parse(raw.contents) : raw;
+    return _parseYahoo(inner);
+  } catch(e) { return null; }
+}
+function _parseStooq(raw) {
+  var sym = raw && raw.symbols && raw.symbols[0];
+  if (!sym || !sym.c || sym.c === 'N/D') return null;
+  var price = parseFloat(sym.c);
+  var open  = parseFloat(sym.o) || price;
+  var chg   = price - open;
+  return {
+    regularMarketPrice:         price,
+    regularMarketChange:        chg,
+    regularMarketChangePercent: open ? (chg / open * 100) : 0,
+    regularMarketDayHigh:       parseFloat(sym.h) || null,
+    regularMarketDayLow:        parseFloat(sym.l) || null,
+    regularMarketVolume:        parseInt(sym.v)   || null,
+    regularMarketPreviousClose: null
+  };
+}
 function fetchQuote() {
-  var yUrl   = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
-  var yUrl2  = 'https://query2.finance.yahoo.com/v8/finance/chart/' + TICKER + '?interval=1m&range=1d';
-  var proxy1 = 'https://corsproxy.io/?' + encodeURIComponent(yUrl);
-  var proxy2 = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrl);
-
-  // 嘗試 proxy1
-  fetchTimeout(proxy1, 8000)
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    })
-    .then(function(raw) {
-      var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
-      if (!q) throw new Error('no data');
-      applyQuote(q);
-    })
-    .catch(function() {
-      // 嘗試 proxy2 (allorigins)
-      fetchTimeout(proxy2, 8000)
-        .then(function(r) { return r.json(); })
-        .then(function(raw) {
-          var inner = typeof raw.contents === 'string' ? JSON.parse(raw.contents) : raw;
-          var q = inner && inner.quoteResponse && inner.quoteResponse.result && inner.quoteResponse.result[0];
-          if (!q) throw new Error('no data');
-          applyQuote(q);
-        })
-        .catch(function() {
-          // 嘗試第三個 proxy（codetabs）
-          var proxy3 = 'https://api.codetabs.com/v1/proxy?quest=' + yUrl;
-          fetchTimeout(proxy3, 8000)
-            .then(function(r) { return r.json(); })
-            .then(function(raw) {
-              var q = raw && raw.quoteResponse && raw.quoteResponse.result && raw.quoteResponse.result[0];
-              if (q) applyQuote(q);
-              else showNoData();
-            })
-            .catch(function() { showNoData(); });
-        });
-    });
+  var yUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
+  var sources = [
+    { url: 'https://corsproxy.io/?' + encodeURIComponent(yUrl),              parse: _parseYahoo },
+    { url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrl), parse: _parseAllOrigins },
+    { url: 'https://api.codetabs.com/v1/proxy?quest=' + yUrl,                parse: _parseYahoo },
+    { url: 'https://stooq.com/q/l/?s=pgy.us&f=sd2t2ohlcv&h&e=json',         parse: _parseStooq }
+  ];
+  function trySource(i) {
+    if (i >= sources.length) { showNoData(); return; }
+    fetchTimeout(sources[i].url, 8000)
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(raw) {
+        var q = sources[i].parse(raw);
+        if (!q) throw new Error('parse failed');
+        applyQuote(q);
+      })
+      .catch(function() { trySource(i + 1); });
+  }
+  trySource(0);
 }
 
 function showNoData() {
@@ -887,7 +892,7 @@ function buildWhy(pct, vr, price, w52h, w52l, chg) {
   if (pct >= 5) {
     bs = 'background:rgba(63,185,80,.2);color:var(--g)';
     bb = '🚀 強勢大漲 +' + pct.toFixed(1) + '%';
-    txt = '今日上漲超過 5%，屬於<strong style="color:var(--g)">強勢上攻</strong>' + vNote(vr) + '。<br><strong>可能觸發原因：</strong><ul><li>財報超預期 / 指引大幅上調</li><li>重大夥伴公告（如大型銀行入網）</li><li>機構大量買進或分析師上調目標價</li><li>金融科技板塊強勢輪動</li></ul>📌 距 52 週高點 $' + fmt(w52h) + ' 仍有 ' + Math.abs(((price/w52h)-1)*100).toFixed(1) + '% 空間。<strong>請對照下方新聞連結確認驅動原因。</strong>';
+    txt = '今日上漲超過 5%，屬於<strong style="color:var(--g)">強勢上攻</strong>' + vNote(vr) + '。<br><strong>可能觸發原因：</strong><ul><li>財報超預期 / 指引大幅上調</li><li>重大夥伴公告（如大型銀行入網）</li><li>機構大量買進或分析師上調目標價</li><li>金融科技板塊強勢輪動</li></ul>' + (w52h ? '📌 距 52 週高點 $' + fmt(w52h) + ' 仍有 ' + Math.abs(((price/w52h)-1)*100).toFixed(1) + '% 空間。' : '') + '<strong>請對照下方新聞連結確認驅動原因。</strong>';
   } else if (pct >= 2) {
     bs = 'background:rgba(63,185,80,.15);color:var(--g)';
     bb = '↑ 溫和上漲 +' + pct.toFixed(1) + '%';
@@ -1042,15 +1047,9 @@ function initCharts() {
   }
 }
 
-// ── 今日走勢圖（Finviz 圖片 + Yahoo 統計）────────────────────────
+// ── 走勢圖統計（TradingView iframe 自動刷新，僅補充前收/今高/今低）
 function fetchIntradayChart() {
-  // 刷新 Finviz 圖片（直接 img，無 CORS 問題）
-  var img = document.getElementById('finviz-chart');
-  if (img && img.style.display !== 'none') {
-    img.src = 'https://finviz.com/chart.ashx?t=PGY&ty=l&ta=0&p=i1&v=' + Date.now();
-  }
-
-  // 附加嘗試：從 CORS proxy 抓統計數字（前收/今高/今低）
+  // TradingView iframe 自動更新，此函式只補充底部統計數字
   var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
   var proxies = [
     'https://corsproxy.io/?' + encodeURIComponent(url),
@@ -1123,7 +1122,7 @@ function fetchIntradayChart() {
   function startWS(){
     try{
       ws=new WebSocket('wss://streamer.finance.yahoo.com/');
-      ws.onopen=function(){wsLive=true;ws.send(JSON.stringify({subscribe:[TICKER]}));};
+      ws.onopen=function(){ws.send(JSON.stringify({subscribe:[TICKER]}));};
       ws.onmessage=function(evt){
         try{var raw=evt.data,b64=raw;
           try{var j=JSON.parse(raw);if(j.type==='heartbeat')return;b64=j.data||raw;}catch(e){}
