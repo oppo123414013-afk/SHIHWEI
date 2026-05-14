@@ -163,6 +163,16 @@ html{scroll-behavior:smooth}
 /* ── AI 刷新按鈕 & 編輯 Modal ── */
 .ai-refresh-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bl);background:rgba(88,166,255,.15);color:var(--bl);transition:all .2s;margin-left:auto;flex-shrink:0;user-select:none;white-space:nowrap;letter-spacing:.3px}
 .ai-refresh-btn:hover{background:rgba(88,166,255,.35);box-shadow:0 0 14px rgba(88,166,255,.4);transform:translateY(-1px)}
+.refresh-all-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--g);background:rgba(63,185,80,.12);color:var(--g);transition:all .2s;user-select:none;white-space:nowrap}
+.refresh-all-btn:hover:not([disabled]){background:rgba(63,185,80,.28);box-shadow:0 0 14px rgba(63,185,80,.35);transform:translateY(-1px)}
+.refresh-all-btn[disabled]{opacity:.5;cursor:not-allowed}
+.set-key-btn{background:none;border:none;cursor:pointer;padding:4px 6px;font-size:15px;opacity:.45;transition:opacity .2s;line-height:1}
+.set-key-btn:hover{opacity:1}
+.ai-chat-wrap{margin-top:14px}
+.chat-input-row{display:flex;gap:10px;flex-wrap:wrap}
+.chat-input-row input{flex:1;min-width:200px;padding:10px 14px;background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;color:var(--t);font-size:13px;outline:none;transition:border-color .2s}
+.chat-input-row input:focus{border-color:var(--bl)}
+#aiChatResult{margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)}
 .ai-ts{font-size:10px;color:var(--m);margin-left:6px}
 .edit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center}
 .edit-overlay.open{display:flex}
@@ -197,6 +207,7 @@ html{scroll-behavior:smooth}
   <a href="#outlook">展望</a>
   <a href="#thesis">投資論點</a>
   <a href="#ai-debate">🤖 AI辯論</a>
+  <a href="#ai-chat">💬 AI對話</a>
   <a href="../search.html">🔍 股票搜尋</a>
 </nav>
 
@@ -260,7 +271,13 @@ html{scroll-behavior:smooth}
 
   <!-- AI 三方今日走勢觀點 -->
   <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 四大 AI 今日走勢觀點</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m)">🤖 四大 AI 今日走勢觀點</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="refreshAllBtn" class="refresh-all-btn" onclick="autoRefreshAll()">⚡ 一鍵更新全部</button>
+        <button class="set-key-btn" onclick="openApiKeyModal('refresh')" title="設定 Claude API Key">🔑</button>
+      </div>
+    </div>
 
     <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
@@ -762,6 +779,20 @@ html{scroll-behavior:smooth}
         <strong style="color:var(--r)">嚴格止損位：</strong>$11（52 週低點附近）· 如跌破需重新評估基本面邏輯是否改變
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ AI 四方問答辯論 ═══════════════════════════════════════════ -->
+<div id="ai-chat" class="sec">
+  <div class="sec-ttl">💬 直接與四大 AI 對話辯論</div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--m);margin-bottom:14px">輸入任何關於 PGY 的問題，四大 AI 將各自發表看法，再互相辯論交鋒。<br><span style="font-size:12px">例：「LendingClub Q1 財報出來了，對 PGY 有什麼影響？」「現在是買點嗎？」「$14 值得加碼嗎？」</span></div>
+    <div class="chat-input-row">
+      <input id="aiChatInput" type="text" placeholder="輸入你的問題..." onkeydown="if(event.key==='Enter')submitAiQuestion()">
+      <button id="aiChatBtn" class="refresh-all-btn" onclick="submitAiQuestion()">🚀 發問，開始辯論</button>
+      <button class="set-key-btn" onclick="openApiKeyModal('chat')" title="設定 Claude API Key">🔑</button>
+    </div>
+    <div id="aiChatResult" style="display:none"></div>
   </div>
 </div>
 
@@ -1327,6 +1358,24 @@ window.addEventListener('load', function() {
 });
 </script>
 
+<!-- ══ Claude API Key Modal ══════════════════════════════════════ -->
+<div id="apiKeyOverlay" class="edit-overlay" onclick="if(event.target===this)closeApiKeyModal()">
+  <div class="edit-modal" style="max-width:520px">
+    <div class="edit-modal-title">🔑 設定 Claude API Key</div>
+    <div class="edit-modal-hint">
+      <strong>取得方式：</strong>前往 <code style="color:var(--bl);background:rgba(88,166,255,.1);padding:1px 5px;border-radius:4px">console.anthropic.com</code> → 登入 → API Keys → Create Key<br><br>
+      Key 僅儲存於你的瀏覽器本機（localStorage），不會上傳至任何伺服器。<br>
+      用途：一鍵更新四大 AI 走勢觀點 + AI 四方問答辯論功能。
+    </div>
+    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;color:var(--t);font-family:monospace;font-size:13px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--bl)'" onblur="this.style.borderColor='var(--bd)'" onkeydown="if(event.key==='Enter')saveApiKeyAndProceed()">
+    <div class="edit-modal-foot">
+      <div id="apiKeyModalInfo" class="edit-modal-ts"></div>
+      <button class="btn-cancel" onclick="closeApiKeyModal()">取消</button>
+      <button class="btn-save" onclick="saveApiKeyAndProceed()">儲存並繼續</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ AI 看法手動更新 Modal ══════════════════════════════════════ -->
 <div id="editOverlay" class="edit-overlay" onclick="if(event.target===this)closeEditModal()">
   <div class="edit-modal">
@@ -1345,6 +1394,173 @@ window.addEventListener('load', function() {
 </div>
 
 <script>
+// ════════════════════════════════════════════════════════════════
+// 一鍵自動更新 & AI 四方問答辯論（Claude API）
+// ════════════════════════════════════════════════════════════════
+var _refreshingAll = false;
+var _chatting = false;
+var _afterKeyAction = null;
+
+var _AI_PERSONAS = [
+  { key:'trend-gemini', tsId:'ai-ts-trend-gemini', name:'Gemini', color:'#4285f4', icon:'✦', org:'量化視角',
+    system:'你是 Gemini，Google DeepMind 量化分析師。請用繁體中文，以數據驅動的量化風格回答，重點在估值指標、技術面、機構資金流向。',
+    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從 EV/EBITDA（目前~2.8×，同業中位~8.5×）、技術指標（RSI、52週相對位置14%）、機構連續2季淨買進三個角度，寫出今日3句走勢觀點，最後一句給目標價範圍。不要標題，直接輸出。'; }
+  },
+  { key:'trend-gpt', tsId:'ai-ts-trend-gpt', name:'ChatGPT', color:'#10a37f', icon:'◆', org:'基本面視角',
+    system:'你是 ChatGPT，OpenAI 基本面與敘事分析師。請用繁體中文，以清晰的成長故事和基本面邏輯回答，強調業務飛輪和長期價值。',
+    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從數據飛輪護城河、Q1 2026 EPS $0.73 超預期265%、H2 新夥伴入網與 BNPL 三路並進（Klarna+Sezzle+Flex Pay）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+  },
+  { key:'trend-claude', tsId:'ai-ts-trend-claude', name:'Claude', color:'#d97706', icon:'◉', org:'風險平衡視角',
+    system:'你是 Claude，Anthropic 風險平衡分析師。請用繁體中文，以客觀審慎的風險收益風格回答，承認基本面向好但指出關鍵風險。',
+    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從 CFO 交接溝通風險、Q1 EPS 含 tax timing 需 Q2 驗證、宏觀信用週期 NCO 率風險角度，寫出今日3句走勢觀點（謹慎但非悲觀）。不要標題，直接輸出。'; }
+  },
+  { key:'trend-grok', tsId:'ai-ts-trend-grok', name:'Grok', color:'#e11d48', icon:'⊗', org:'市場結構視角',
+    system:'你是 Grok，xAI 市場結構與籌碼分析師。請用繁體中文，以直接犀利的市場流量和籌碼邏輯回答，重點在成交量、空頭結構、催化劑需求。',
+    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從日均成交量偏低（$30-50M，納斯達克「隱形股」）、空頭~18% float（潛在回補燃料）、需催化劑觸發（Klarna IPO、Q2財報、機構路演）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+  }
+];
+
+async function _callClaude(apiKey, system, userMsg, maxTok) {
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTok || 400,
+      system: system,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+  if (!resp.ok) {
+    var err = await resp.json().catch(function(){ return {error:{message:'HTTP '+resp.status}}; });
+    throw new Error((err.error && err.error.message) || 'HTTP '+resp.status);
+  }
+  var data = await resp.json();
+  return data.content[0].text.trim();
+}
+
+// ── 一鍵更新全部走勢觀點 ────────────────────────────────────────
+async function autoRefreshAll() {
+  if (_refreshingAll) return;
+  var apiKey = localStorage.getItem('pgy_claude_api_key');
+  if (!apiKey) { openApiKeyModal('refresh'); return; }
+  _refreshingAll = true;
+  var btn = document.getElementById('refreshAllBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 更新中…'; }
+  var price = (document.getElementById('price')||{}).textContent || '─';
+  var date = new Date().toLocaleDateString('zh-TW');
+  var tasks = _AI_PERSONAS.map(function(cfg) {
+    var el = document.getElementById('ai-view-'+cfg.key);
+    if (el) el.innerHTML = '<span style="color:var(--m);font-style:italic">⏳ '+cfg.name+' 分析中…</span>';
+    return _callClaude(apiKey, cfg.system, cfg.trendQ(price, date))
+      .then(function(text) {
+        var ts = new Date().toLocaleString('zh-TW');
+        localStorage.setItem('ai_view_'+cfg.key, text);
+        localStorage.setItem('ai_view_ts_'+cfg.key, ts);
+        _applyText(cfg.key, text);
+        var badge = document.getElementById(cfg.tsId);
+        if (badge) badge.textContent = '🤖 '+ts;
+      })
+      .catch(function(e) {
+        var el2 = document.getElementById('ai-view-'+cfg.key);
+        if (el2) el2.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
+      });
+  });
+  await Promise.all(tasks);
+  _refreshingAll = false;
+  if (btn) { btn.disabled = false; btn.innerHTML = '⚡ 一鍵更新全部'; }
+}
+
+// ── AI 四方問答辯論 ──────────────────────────────────────────────
+async function submitAiQuestion() {
+  if (_chatting) return;
+  var apiKey = localStorage.getItem('pgy_claude_api_key');
+  if (!apiKey) { openApiKeyModal('chat'); return; }
+  var qInput = document.getElementById('aiChatInput');
+  var q = qInput ? qInput.value.trim() : '';
+  if (!q) return;
+  _chatting = true;
+  var btn = document.getElementById('aiChatBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 思考中…'; }
+  var result = document.getElementById('aiChatResult');
+  result.style.display = 'block';
+  result.innerHTML = '<div style="color:var(--m);font-style:italic;padding:16px 0">🤖 四大 AI 正在分析，請稍候…</div>';
+  var price = (document.getElementById('price')||{}).textContent || '─';
+  var ctx = 'PGY（Pagaya Technologies）背景：AI驅動信貸科技平台，Q1 2026 EPS $0.73（超預期265%），5季連續GAAP盈利，EV/EBITDA約2.8×，股價約'+price+'。';
+  // Step 1: 四大AI各自回答
+  var responses = {};
+  var step1 = _AI_PERSONAS.map(function(cfg) {
+    return _callClaude(apiKey, cfg.system, ctx+'\n\n用戶問題：'+q+'\n\n針對此問題從你的角色視角給出2-3句精簡分析觀點。', 280)
+      .then(function(t){ responses[cfg.name] = t; })
+      .catch(function(e){ responses[cfg.name] = '（分析失敗：'+e.message+'）'; });
+  });
+  await Promise.all(step1);
+  // 建立初始回應卡片
+  var initialHtml = _AI_PERSONAS.map(function(cfg) {
+    var txt = (responses[cfg.name]||'─').replace(/\n/g,'<br>');
+    return '<div style="background:var(--s2);border-left:3px solid '+cfg.color+';border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:8px">'+
+      '<div style="font-size:12px;font-weight:700;color:'+cfg.color+';margin-bottom:5px">'+cfg.icon+' '+cfg.name+' <span style="font-weight:400;color:var(--m)">'+cfg.org+'</span></div>'+
+      '<div style="font-size:13px;color:var(--m);line-height:1.75">'+txt+'</div></div>';
+  }).join('');
+  result.innerHTML =
+    '<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)">💬 問題：'+_esc(q)+'</div>'+
+    '<div style="font-size:12px;font-weight:700;color:var(--m);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">📣 四方初始觀點</div>'+
+    initialHtml+
+    '<div style="color:var(--m);font-style:italic;font-size:12px;margin-top:12px">🥊 正在生成辯論交鋒…</div>';
+  // Step 2: 辯論交鋒
+  var debatePrompt = ctx+'\n\n用戶問題：「'+q+'」\n\n';
+  _AI_PERSONAS.forEach(function(cfg){ debatePrompt += cfg.name+'（'+cfg.org+'）：「'+(responses[cfg.name]||'─')+'」\n\n'; });
+  debatePrompt += '請模擬這四個分析師的辯論交鋒。格式（每行一個交鋒）：\n[發言者 → 回應對象]：...\n共4-5個交鋒，每個1-2句話，聚焦觀點衝突或補充。直接輸出，無需額外說明。';
+  var debateText = await _callClaude(apiKey, '你是中立辯論主持人，負責生成四個AI分析師之間精彩的辯論交鋒。用繁體中文。', debatePrompt, 700)
+    .catch(function(e){ return '（辯論生成失敗：'+e.message+'）'; });
+  // 解析辯論上色
+  var debateHtml = debateText.split('\n').filter(function(l){ return l.trim(); }).map(function(line) {
+    var m = line.match(/^\[(.+?)\s*[→>]\s*(.+?)\][:：]\s*(.*)/);
+    if (!m) return '<div style="font-size:13px;color:var(--m);padding:3px 0">'+_esc(line)+'</div>';
+    var from = m[1].trim(), to = m[2].trim(), txt = m[3].trim();
+    var color = 'var(--m)';
+    for (var i=0;i<_AI_PERSONAS.length;i++){
+      if (from.toLowerCase().indexOf(_AI_PERSONAS[i].name.toLowerCase())>=0){ color=_AI_PERSONAS[i].color; break; }
+    }
+    return '<div style="background:var(--s2);border-radius:8px;padding:10px 12px;margin-bottom:8px">'+
+      '<div style="font-size:12px;font-weight:700;color:'+color+';margin-bottom:4px">'+_esc(from)+' → '+_esc(to)+'</div>'+
+      '<div style="font-size:13px;color:var(--m);line-height:1.7">'+txt.replace(/\n/g,'<br>')+'</div></div>';
+  }).join('');
+  result.innerHTML =
+    '<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)">💬 問題：'+_esc(q)+'</div>'+
+    '<div style="font-size:12px;font-weight:700;color:var(--m);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">📣 四方初始觀點</div>'+
+    initialHtml+
+    '<div style="font-size:12px;font-weight:700;color:var(--m);margin:16px 0 10px;letter-spacing:1px;text-transform:uppercase">🥊 辯論交鋒</div>'+
+    '<div>'+debateHtml+'</div>';
+  _chatting = false;
+  if (btn) { btn.disabled = false; btn.innerHTML = '🚀 發問，開始辯論'; }
+}
+
+// ── API Key Modal ────────────────────────────────────────────────
+function openApiKeyModal(action) {
+  _afterKeyAction = action || 'refresh';
+  var k = localStorage.getItem('pgy_claude_api_key') || '';
+  document.getElementById('apiKeyInput').value = k;
+  var info = document.getElementById('apiKeyModalInfo');
+  if (info) info.textContent = k ? '已有儲存的 Key，可直接更新' : '';
+  document.getElementById('apiKeyOverlay').classList.add('open');
+  setTimeout(function(){ document.getElementById('apiKeyInput').focus(); }, 80);
+}
+function closeApiKeyModal() { document.getElementById('apiKeyOverlay').classList.remove('open'); }
+async function saveApiKeyAndProceed() {
+  var k = document.getElementById('apiKeyInput').value.trim();
+  if (!k) { document.getElementById('apiKeyModalInfo').textContent = '⚠️ 請輸入 API Key'; return; }
+  localStorage.setItem('pgy_claude_api_key', k);
+  closeApiKeyModal();
+  if (_afterKeyAction === 'chat') { await submitAiQuestion(); }
+  else { await autoRefreshAll(); }
+}
+
 // ════════════════════════════════════════════════════════════════
 // AI 看法手動刷新（localStorage 持久化）
 // ════════════════════════════════════════════════════════════════
