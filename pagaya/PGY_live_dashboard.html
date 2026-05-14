@@ -159,6 +159,24 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .hb{color:var(--bl);font-weight:600}
 .ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
+
+/* ── AI 刷新按鈕 & 編輯 Modal ── */
+.ai-refresh-btn{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(88,166,255,.3);background:rgba(88,166,255,.08);color:var(--bl);transition:all .2s;margin-left:auto;flex-shrink:0;user-select:none}
+.ai-refresh-btn:hover{background:rgba(88,166,255,.25);border-color:var(--bl)}
+.ai-ts{font-size:10px;color:var(--m);margin-left:6px}
+.edit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center}
+.edit-overlay.open{display:flex}
+.edit-modal{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:24px;width:min(640px,92vw);max-height:85vh;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.edit-modal-title{font-size:15px;font-weight:700;color:var(--t)}
+.edit-modal-hint{font-size:12px;color:var(--m);line-height:1.6;padding:8px 12px;background:rgba(88,166,255,.06);border-radius:6px;border-left:3px solid var(--bl)}
+.edit-modal textarea{width:100%;height:220px;resize:vertical;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--t);font-family:inherit;font-size:13px;line-height:1.75;padding:12px;outline:none;transition:border-color .2s}
+.edit-modal textarea:focus{border-color:var(--bl)}
+.edit-modal-foot{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.edit-modal-ts{font-size:11px;color:var(--m);flex:1}
+.btn-save{background:var(--bl);color:#000;border:none;border-radius:6px;padding:8px 22px;font-weight:700;cursor:pointer;font-size:13px;transition:opacity .2s}
+.btn-save:hover{opacity:.85}
+.btn-cancel{background:transparent;color:var(--m);border:1px solid var(--bd);border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px}
+.btn-cancel:hover{color:var(--t)}
 </style>
 </head>
 <body>
@@ -248,37 +266,49 @@ html{scroll-behavior:smooth}
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
         <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
         <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+        <span id="ai-ts-trend-gemini" class="ai-ts"></span>
+        <button class="ai-refresh-btn" onclick="openEditModal('trend-gemini','Gemini 今日走勢觀點',document.getElementById('ai-view-trend-gemini').innerText)">🔄 刷新看法</button>
       </div>
-      <div style="font-size:12px;color:var(--m);line-height:1.75">今日走勢符合 EV/EBITDA 2.8× 低估修復邏輯。機構資金流向顯示淨買進，52週相對位置 14% 支撐下行有限。短期阻力 $16.49（Q1 財報後高點），突破後有望測試 $18–$20。<strong style="color:var(--t)">B. Riley 投資者大會（05-20）前期望值可能推動額外 5-8% 上漲空間。</strong>量化評分：信用改善 + ABS 超額認購 + 估值折價三訊號同時亮燈。</div>
+      <div id="ai-view-trend-gemini" style="font-size:12px;color:var(--m);line-height:1.75">今日走勢符合 EV/EBITDA 2.8× 低估修復邏輯。機構資金流向顯示淨買進，52週相對位置 14% 支撐下行有限。短期阻力 $16.49（Q1 財報後高點），突破後有望測試 $18–$20。<strong style="color:var(--t)">B. Riley 投資者大會（05-20）前期望值可能推動額外 5-8% 上漲空間。</strong>量化評分：信用改善 + ABS 超額認購 + 估值折價三訊號同時亮燈。</div>
     </div>
 
     <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
         <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
         <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+        <span id="ai-ts-trend-gpt" class="ai-ts"></span>
+        <button class="ai-refresh-btn" onclick="openEditModal('trend-gpt','ChatGPT 今日走勢觀點',document.getElementById('ai-view-trend-gpt').innerText)">🔄 刷新看法</button>
       </div>
-      <div style="font-size:12px;color:var(--m);line-height:1.75">今日整固是 Q1 財報後的正常消化期——市場在等待兩個觸媒：①Q2 新夥伴入網進度 ②CFO Dobres 首次公開表態。<strong style="color:var(--t)">PGY 已完成從「AI 概念股」到「有獲利的 AI 基礎設施企業」的本質性轉型</strong>，估值重新定義是時間問題，不是方向問題。分析師均價目標 $34.50 代表 +127% 以上空間，任何回調都是結構性機會。</div>
+      <div id="ai-view-trend-gpt" style="font-size:12px;color:var(--m);line-height:1.75">今日整固是 Q1 財報後的正常消化期——市場在等待兩個觸媒：①Q2 新夥伴入網進度 ②CFO Dobres 首次公開表態。<strong style="color:var(--t)">PGY 已完成從「AI 概念股」到「有獲利的 AI 基礎設施企業」的本質性轉型</strong>，估值重新定義是時間問題，不是方向問題。分析師均價目標 $34.50 代表 +127% 以上空間，任何回調都是結構性機會。</div>
     </div>
 
     <div style="background:var(--bg);border:1px solid rgba(217,119,6,.35);border-radius:8px;padding:12px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
         <span style="width:9px;height:9px;border-radius:50%;background:#d97706;flex-shrink:0"></span>
         <span style="font-size:12px;font-weight:700;color:#d97706">Claude（風險平衡）</span>
+        <span id="ai-ts-trend-claude" class="ai-ts"></span>
+        <button class="ai-refresh-btn" onclick="openEditModal('trend-claude','Claude 今日走勢觀點',document.getElementById('ai-view-trend-claude').innerText)">🔄 刷新看法</button>
       </div>
-      <div style="font-size:12px;color:var(--m);line-height:1.75">我同意低估但需注意：今日走勢有部分受宏觀因子驅動，並非純粹個股邏輯。<strong style="color:var(--t)">CFO 交接前的溝通空窗期是我的最大顧慮</strong>——機構投資人習慣用 CFO 評論校準模型，新聲音可能短期造成不確定。Q2 夥伴入網數量是本季最關鍵的驗證點。建議分批布局，CFO 首次法說會後再評估加碼時機。</div>
+      <div id="ai-view-trend-claude" style="font-size:12px;color:var(--m);line-height:1.75">我同意低估但需注意：今日走勢有部分受宏觀因子驅動，並非純粹個股邏輯。<strong style="color:var(--t)">CFO 交接前的溝通空窗期是我的最大顧慮</strong>——機構投資人習慣用 CFO 評論校準模型，新聲音可能短期造成不確定。Q2 夥伴入網數量是本季最關鍵的驗證點。建議分批布局，CFO 首次法說會後再評估加碼時機。</div>
     </div>
 
     <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
         <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
         <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+        <span id="ai-ts-trend-grok" class="ai-ts"></span>
+        <button class="ai-refresh-btn" onclick="openEditModal('trend-grok','Grok 今日走勢觀點',document.getElementById('ai-view-trend-grok').innerText)">🔄 刷新看法</button>
       </div>
-      <div style="font-size:12px;color:var(--m);line-height:1.75">今日量能偏低正是「隱形股」問題的體現——基本面轉好，但市場根本沒注意到。<strong style="color:var(--t)">Short Interest ~18% float 是雙面刃：空頭是潛在燃料，但也代表市場仍有疑慮。</strong>當前最重要的觀察指標不是股價，而是成交量是否放大——若 B. Riley 大會後出現 >$80M 日均量，代表催化劑已觸發，屆時空頭回補將加速上漲。無催化劑情況下建議 LEAPS 代替現股，降低等待時間成本。</div>
+      <div id="ai-view-trend-grok" style="font-size:12px;color:var(--m);line-height:1.75">今日量能偏低正是「隱形股」問題的體現——基本面轉好，但市場根本沒注意到。<strong style="color:var(--t)">Short Interest ~18% float 是雙面刃：空頭是潛在燃料，但也代表市場仍有疑慮。</strong>當前最重要的觀察指標不是股價，而是成交量是否放大——若 B. Riley 大會後出現 >$80M 日均量，代表催化劑已觸發，屆時空頭回補將加速上漲。無催化劑情況下建議 LEAPS 代替現股，降低等待時間成本。</div>
     </div>
 
     <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
-      <div style="font-size:12px;color:var(--m);line-height:1.9">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--bl)">💬 AI 辯論交鋒</div>
+        <span id="ai-ts-trend-debate" class="ai-ts"></span>
+        <button class="ai-refresh-btn" onclick="openEditModal('trend-debate','AI 辯論交鋒（走勢）',document.getElementById('ai-view-trend-debate').innerText)">🔄 刷新看法</button>
+      </div>
+      <div id="ai-view-trend-debate" style="font-size:12px;color:var(--m);line-height:1.9">
         <strong style="color:#4285f4">Gemini→Claude：</strong>你的宏觀謹慎有道理，但 EV/EBITDA 2.8× 已 price in 相當大的風險。即便再惡化 20%，PGY 的絕對估值仍便宜——安全邊際已非常充裕。<br>
         <strong style="color:#d97706">Claude→GPT：</strong>「本質性轉型」需要連續多季確認，而非一季超預期。市場等的是 H2 新夥伴量是否真正落地，再宣告論點成立更為穩健。<br>
         <strong style="color:#10a37f">GPT→Claude：</strong>5 季連續 GAAP 盈利本身就是確立信號——不是 1 季，是 5 季。分析師 10/0 的共識也在支持這個判斷，你的標準是否過嚴格？<br>
@@ -1199,15 +1229,24 @@ function _md(s) {
 function renderDebate(d) {
   var agentsHtml = '<div class="g4" style="margin-bottom:16px">' +
     d.agents.map(function(a) {
+      var key = 'debate-' + a.name.toLowerCase().replace(/[^a-z]/g,'');
+      var savedBody = localStorage.getItem('ai_view_' + key);
+      var savedTs   = localStorage.getItem('ai_view_ts_' + key);
+      var bodyHtml  = savedBody
+        ? savedBody.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
+        : '<strong style="color:var(--t)">' + _esc(a.stance) + '</strong><br><br>' + _md(a.body);
       return '<div class="card" style="border-color:' + _hexRgba(a.color, 0.4) + '">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
           '<div style="width:38px;height:38px;border-radius:50%;background:' + _hexRgba(a.color, 0.15) + ';display:flex;align-items:center;justify-content:center;font-size:20px">' + a.icon + '</div>' +
-          '<div><div style="font-weight:700;color:' + a.color + '">' + _esc(a.name) + '</div>' +
+          '<div style="flex:1"><div style="font-weight:700;color:' + a.color + '">' + _esc(a.name) + '</div>' +
           '<div style="font-size:11px;color:var(--m)">' + _esc(a.org) + '</div></div>' +
+          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">' +
+            (savedTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedTs + '</span>' : '') +
+            '<button class="ai-refresh-btn" onclick="openEditModal(\'' + key + '\',\'' + _esc(a.name) + ' 投資論點\',document.getElementById(\'ai-view-' + key + '\').innerText)">🔄 刷新看法</button>' +
+          '</div>' +
         '</div>' +
-        '<div style="font-size:13px;color:var(--m);line-height:1.8">' +
-          '<strong style="color:var(--t)">' + _esc(a.stance) + '</strong><br><br>' +
-          _md(a.body) +
+        '<div id="ai-view-' + key + '" style="font-size:13px;color:var(--m);line-height:1.8">' +
+          bodyHtml +
           '<div style="margin-top:10px;padding:8px;background:' + _hexRgba(a.color, 0.08) + ';border-radius:6px;font-size:12px">' +
             '🎯 ' + _esc(a.target_label) + '：<strong style="color:' + a.color + '">' + _esc(a.targets) + '</strong>' +
           '</div>' +
@@ -1215,19 +1254,33 @@ function renderDebate(d) {
       '</div>';
     }).join('') + '</div>';
 
+  var savedDebate = localStorage.getItem('ai_view_debate-exchange');
+  var savedDebateTs = localStorage.getItem('ai_view_ts_debate-exchange');
+  var debateInner = savedDebate
+    ? '<div id="ai-view-debate-exchange" style="font-size:13px;color:var(--m);line-height:1.7">' + savedDebate.replace(/\n/g,'<br>') + '</div>'
+    : '<div id="ai-view-debate-exchange">' + d.debate.map(function(e) {
+        return '<div style="background:var(--s2);border-radius:8px;padding:12px;margin-bottom:10px">' +
+          '<div style="font-size:12px;font-weight:700;color:' + e.color + ';margin-bottom:5px">' + _esc(e.label) + '</div>' +
+          '<div style="font-size:13px;color:var(--m);line-height:1.7">' + _md(e.text) + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
   var debateHtml = '<div class="card" style="margin-bottom:16px">' +
-    '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:14px">🥊 關鍵爭議點辯論</div>' +
-    '<div style="display:flex;flex-direction:column;gap:10px">' +
-    d.debate.map(function(e) {
-      return '<div style="background:var(--s2);border-radius:8px;padding:12px">' +
-        '<div style="font-size:12px;font-weight:700;color:' + e.color + ';margin-bottom:5px">' + _esc(e.label) + '</div>' +
-        '<div style="font-size:13px;color:var(--m);line-height:1.7">' + _md(e.text) + '</div>' +
-      '</div>';
-    }).join('') + '</div></div>';
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">' +
+      '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m)">🥊 關鍵爭議點辯論</div>' +
+      (savedDebateTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedDebateTs + '</span>' : '') +
+      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-exchange\',\'關鍵爭議點辯論\',document.getElementById(\'ai-view-debate-exchange\').innerText)">🔄 刷新看法</button>' +
+    '</div>' +
+    debateInner + '</div>';
 
   var c = d.consensus;
+  var savedConsensusTs = localStorage.getItem('ai_view_ts_debate-consensus');
   var consensusHtml = '<div class="thesis">' +
-    '<h3>🏁 四大 AI 最終共識 · 分歧 · 操作建議</h3>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
+      '<h3 style="margin-bottom:0">🏁 四大 AI 最終共識 · 分歧 · 操作建議</h3>' +
+      (savedConsensusTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedConsensusTs + '</span>' : '') +
+      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-consensus\',\'四大 AI 最終共識\',document.getElementById(\'ai-view-debate-consensus\').innerText)">🔄 刷新看法</button>' +
+    '</div>' +
+    '<div id="ai-view-debate-consensus">' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">' +
       '<div><div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:8px">✅ 四方共識（高確信度）</div>' +
         '<ul style="font-size:13px;padding-left:16px;display:flex;flex-direction:column;gap:6px;color:var(--m)">' +
@@ -1242,7 +1295,8 @@ function renderDebate(d) {
         c.action.map(function(item) {
           return '<strong style="color:' + item.color + '">' + _esc(item.label) + '：</strong>' + _md(item.text);
         }).join('<br><br>') +
-      '</div></div></div>';
+      '</div></div></div>' +
+    '</div>';
 
   var el = document.getElementById('ai-debate');
   if (el) {
@@ -1271,6 +1325,92 @@ window.addEventListener('load', function() {
   setInterval(fetchIntradayChart, 300000);
   setInterval(fetchNews, 300000);
 });
+</script>
+
+<!-- ══ AI 看法手動更新 Modal ══════════════════════════════════════ -->
+<div id="editOverlay" class="edit-overlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="edit-modal">
+    <div id="editModalTitle" class="edit-modal-title"></div>
+    <div class="edit-modal-hint">
+      📋 將最新 AI 看法貼入此處，支援 **粗體** 語法。<br>
+      合作夥伴財報公布後（如 LendingClub、SoFi、Ally 等），可在各 AI 服務詢問對 PGY 影響，再貼入更新。
+    </div>
+    <textarea id="editModalTA" placeholder="貼上或輸入最新 AI 看法..."></textarea>
+    <div class="edit-modal-foot">
+      <div id="editModalTs" class="edit-modal-ts"></div>
+      <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+      <button class="btn-save" onclick="saveEditModal()">儲存更新</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// AI 看法手動刷新（localStorage 持久化）
+// ════════════════════════════════════════════════════════════════
+var _editKey = null;
+
+function openEditModal(key, title, currentText) {
+  _editKey = key;
+  document.getElementById('editModalTitle').textContent = '✏️ 更新：' + title;
+  document.getElementById('editModalTA').value = (currentText || '').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim();
+  var ts = localStorage.getItem('ai_view_ts_' + key);
+  document.getElementById('editModalTs').textContent = ts ? '上次更新：' + ts : '尚未手動更新';
+  document.getElementById('editOverlay').classList.add('open');
+  setTimeout(function(){ document.getElementById('editModalTA').focus(); }, 80);
+}
+
+function closeEditModal() {
+  document.getElementById('editOverlay').classList.remove('open');
+  _editKey = null;
+}
+
+function _applyText(key, text) {
+  var el = document.getElementById('ai-view-' + key);
+  if (!el) return;
+  el.innerHTML = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+function saveEditModal() {
+  if (!_editKey) return;
+  var text = document.getElementById('editModalTA').value.trim();
+  if (!text) { closeEditModal(); return; }
+  var ts = new Date().toLocaleString('zh-TW');
+  localStorage.setItem('ai_view_' + _editKey, text);
+  localStorage.setItem('ai_view_ts_' + _editKey, ts);
+  _applyText(_editKey, text);
+  // 更新時間戳 badge
+  var tsBadge = document.getElementById('ai-ts-' + _editKey);
+  if (tsBadge) tsBadge.textContent = '更新 ' + ts;
+  closeEditModal();
+}
+
+function loadSavedAiViews() {
+  // 走勢觀點 4 個 AI 卡 + 辯論交鋒
+  ['trend-gemini','trend-gpt','trend-claude','trend-grok','trend-debate'].forEach(function(key) {
+    var text = localStorage.getItem('ai_view_' + key);
+    if (!text) return;
+    _applyText(key, text);
+    var ts = localStorage.getItem('ai_view_ts_' + key);
+    var badge = document.getElementById('ai-ts-' + key);
+    if (badge && ts) badge.textContent = '更新 ' + ts;
+  });
+  // 辯論區（共識）- debate-exchange & debate-consensus 在 renderDebate 裡已處理
+  // 這裡只需處理共識 id
+  var consText = localStorage.getItem('ai_view_debate-consensus');
+  if (consText) _applyText('debate-consensus', consText);
+}
+
+// ESC 關閉 modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEditModal();
+});
+
+// 頁面載入後恢復走勢觀點區的已存儲內容
+window.addEventListener('load', function() { loadSavedAiViews(); });
 </script>
 
 </body>
