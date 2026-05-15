@@ -1399,7 +1399,12 @@ async function _callGemini(apiKey, system, userMsg, maxTok) {
     throw new Error((err.error && err.error.message) || 'HTTP '+resp.status);
   }
   var data = await resp.json();
-  return data.candidates[0].content.parts[0].text.trim();
+  if (!data.candidates || !data.candidates.length) {
+    throw new Error('API 回傳空結果（可能被內容過濾）');
+  }
+  var parts = data.candidates[0].content.parts;
+  var textPart = parts.find(function(p){ return p.text && !p.thought; }) || parts[0];
+  return textPart.text.trim();
 }
 
 // ── 即時新聞抓取（提供 AI 分析背景）────────────────────────────
