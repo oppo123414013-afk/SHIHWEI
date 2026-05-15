@@ -444,8 +444,19 @@ document.getElementById('mkt-sel').addEventListener('change', function(){
                         '輸入上櫃代號，如 6488 / 3711 / 8299';
 });
 
-// 預設顯示引導
-document.getElementById('status-area').innerHTML='<div class="status-bar">選擇市場，輸入股票代號後按「查詢」，或點擊上方快速選股</div>';
+// 預設顯示引導 / URL 參數自動搜尋
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var sym = params.get('symbol') || params.get('sym') || '';
+  if (sym) {
+    sym = sym.toUpperCase();
+    document.getElementById('sym-input').value = sym;
+    document.getElementById('mkt-sel').value = 'us';
+    setTimeout(function(){ doSearch(sym, 'us', false); }, 100);
+  } else {
+    document.getElementById('status-area').innerHTML='<div class="status-bar">選擇市場，輸入股票代號後按「查詢」，或點擊上方快速選股</div>';
+  }
+})();
 </script>
 </body>
 </html>

@@ -160,6 +160,18 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
 
+/* ── PGY 品牌背景圖案 ── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(88,166,255,.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(63,185,80,.04) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(188,140,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 8 L38 24 L54 24 L42 34 L46 50 L30 40 L14 50 L18 34 L6 24 L22 24 Z' stroke='%2358a6ff' stroke-width='.4' stroke-opacity='.06'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:90px 90px}
+.wrap{position:relative;z-index:1}
+
 /* ── AI 刷新按鈕 & 編輯 Modal ── */
 .refresh-all-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--g);background:rgba(63,185,80,.12);color:var(--g);transition:all .2s;user-select:none;white-space:nowrap}
 .refresh-all-btn:hover:not([disabled]){background:rgba(63,185,80,.28);box-shadow:0 0 14px rgba(63,185,80,.35);transform:translateY(-1px)}
@@ -206,7 +218,13 @@ html{scroll-behavior:smooth}
   <a href="#thesis">投資論點</a>
   <a href="#ai-debate">🤖 AI辯論</a>
   <a href="#ai-chat">💬 AI對話</a>
-  <a href="../search.html">🔍 股票搜尋</a>
+  <form id="navSearchForm" onsubmit="navSearch(event)" style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <input id="navSearchInput" type="text" placeholder="輸入代號 AAPL…" autocomplete="off"
+      style="background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:20px;color:var(--t);padding:4px 12px;font-size:12px;width:130px;outline:none;transition:border-color .2s,width .2s"
+      onfocus="this.style.borderColor='#58a6ff';this.style.width='160px'"
+      onblur="this.style.borderColor='';this.style.width='130px'">
+    <button type="submit" style="background:var(--bl);border:none;border-radius:20px;color:#fff;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔍 查</button>
+  </form>
 </nav>
 
 <div class="wrap">
@@ -1281,6 +1299,12 @@ function _hexRgba(hex, a) {
   return 'rgba('+r+','+g+','+b+','+a+')';
 }
 function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function navSearch(e) {
+  e.preventDefault();
+  var sym = (document.getElementById('navSearchInput').value||'').trim().toUpperCase();
+  if (!sym) return;
+  window.open('../search.html?symbol='+encodeURIComponent(sym), '_blank');
+}
 function _md(s) {
   return _esc(s)
     .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
@@ -1544,7 +1568,7 @@ async function autoRefreshDebate(btn) {
   try {
     var text = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日PGY股價約'+price+'。請從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，模擬三位分析師（技術面/基本面/籌碼面）的辯論交鋒，生成4-5個交鋒，聚焦宏觀與消息對PGY的影響。直接輸出，無標題。', 5000);
+      '今日PGY股價約'+price+'。請以 Gemini（技術面量化）、ChatGPT（基本面/敘事）、Grok（市場結構/籌碼）三位 AI 分析師名義，從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，生成4-5個辯論交鋒。格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用「技術面分析師」「基本面分析師」等替代名稱。直接輸出，無標題。', 5000);
     var ts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', text);
     localStorage.setItem('ai_view_ts_trend-debate', ts);
@@ -1552,7 +1576,9 @@ async function autoRefreshDebate(btn) {
     var badge = document.getElementById('ai-ts-trend-debate');
     if (badge) badge.textContent = '🤖 '+ts;
   } catch(e) {
-    if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
+    var cached = localStorage.getItem('ai_view_trend-debate');
+    if (cached && debEl) { _applyText('trend-debate', cached); }
+    else if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
   }
   if (btn) { btn.disabled = false; btn.innerHTML = '⚡ AI更新'; }
 }
@@ -1587,8 +1613,9 @@ async function refreshDebateSection(btn) {
       _applyText(akey, txt);
       agentViews.push(adef.name+'（'+adef.org+'）：「'+txt.replace(/\n/g,' ').substring(0,200)+'」');
     } catch(e) {
-      if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
-      agentViews.push(adef.name+'：（分析失敗）');
+      var cached = localStorage.getItem('ai_view_' + akey);
+      if (cached) { _applyText(akey, cached); agentViews.push(adef.name+'（'+adef.org+'）：「'+cached.replace(/\n/g,' ').substring(0,200)+'」（快取）'); }
+      else { if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>'; agentViews.push(adef.name+'：（分析失敗）'); }
     }
     if (i < agentDefs.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
@@ -1599,12 +1626,14 @@ async function refreshDebateSection(btn) {
     var debText = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
       newsStr + '今日PGY股價約'+price+'。以下是三位分析師觀點：\n'+agentViews.join('\n\n')+
-      '\n\n請從宏觀經濟、消息面、市場情緒三方角度，生成4-5輪辯論交鋒，聚焦宏觀與消息對PGY的影響。直接輸出，無標題。', 8000);
+      '\n\n請以 Gemini（宏觀經濟）、ChatGPT（消息面）、Grok（市場情緒）三位 AI 分析師名義，生成4-5輪辯論交鋒，格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用其他替代名稱。直接輸出，無標題。', 8000);
     localStorage.setItem('ai_view_debate-exchange', debText);
     localStorage.setItem('ai_view_ts_debate-exchange', ts);
-    if (debEl) { debEl.innerHTML = debText.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>'); }
+    if (debEl) { _applyText('debate-exchange', debText); }
   } catch(e) {
-    if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ 辯論生成失敗：'+_esc(e.message)+'</span>';
+    var cachedDeb = localStorage.getItem('ai_view_debate-exchange');
+    if (cachedDeb && debEl) { _applyText('debate-exchange', cachedDeb); }
+    else if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ 辯論生成失敗：'+_esc(e.message)+'</span>';
   }
   if (btn) { btn.disabled = false; btn.innerHTML = '⚡ AI辯論更新'; }
 }
@@ -1653,7 +1682,7 @@ async function autoRefreshAll() {
   try {
     var debText = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日PGY股價約'+price+'。請從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，模擬三位分析師（技術面/基本面/籌碼面）的辯論交鋒，生成4-5個交鋒，聚焦宏觀與消息對PGY的影響。直接輸出，無標題。', 5000);
+      '今日PGY股價約'+price+'。請以 Gemini（技術面量化）、ChatGPT（基本面/敘事）、Grok（市場結構/籌碼）三位 AI 分析師名義，從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，生成4-5個辯論交鋒。格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用「技術面分析師」「基本面分析師」等替代名稱。直接輸出，無標題。', 5000);
     var dts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', debText);
     localStorage.setItem('ai_view_ts_trend-debate', dts);
