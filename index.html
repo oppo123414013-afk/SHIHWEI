@@ -344,6 +344,17 @@ html{scroll-behavior:smooth}
         </tbody>
       </table>
     </div>
+    <!-- 即時 PGY 消息欄（Yahoo Finance RSS，60秒自動刷新） -->
+    <div style="margin-top:12px;background:var(--s2);border:1px solid rgba(88,166,255,.25);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--bl)">📡 即時 PGY 消息</span>
+        <span id="abs-news-status" style="font-size:11px;color:var(--m)">載入中…</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--m)">每 60 秒自動更新 · Yahoo Finance</span>
+      </div>
+      <div id="abs-news-list" style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--m)">
+        <div style="color:var(--m);font-style:italic">抓取中…</div>
+      </div>
+    </div>
   </div>
 
   <!-- ANALYST + RISK -->
@@ -582,6 +593,55 @@ if(yoyCtx){
   tryRest(0);
   // 每 10 秒：若 WebSocket 沒收到資料則啟動 REST 備援
   setInterval(function(){if(!wsLive)tryRest(0);}, 10000);
+})();
+
+// ── 即時 PGY 消息（Yahoo Finance RSS，60秒自動刷新）──────────────
+(function(){
+  var proxy = 'https://corsproxy.io/?';
+  var rss = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=PGY&region=US&lang=en-US';
+
+  function timeAgo(date) {
+    var sec = Math.floor((Date.now() - date) / 1000);
+    if (sec < 60) return sec + ' 秒前';
+    if (sec < 3600) return Math.floor(sec/60) + ' 分鐘前';
+    if (sec < 86400) return Math.floor(sec/3600) + ' 小時前';
+    return Math.floor(sec/86400) + ' 天前';
+  }
+
+  function fetchAbsNews() {
+    var url = proxy + encodeURIComponent(rss);
+    fetch(url, {signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined})
+      .then(function(r){ return r.text(); })
+      .then(function(xml){
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, 'text/xml');
+        var items = doc.querySelectorAll('item');
+        var list = document.getElementById('abs-news-list');
+        var status = document.getElementById('abs-news-status');
+        if (!items.length || !list) return;
+        var html = '';
+        var count = Math.min(items.length, 6);
+        for (var i = 0; i < count; i++) {
+          var title = (items[i].querySelector('title')||{}).textContent || '';
+          var link  = (items[i].querySelector('link')||{}).textContent || '#';
+          var pubDate = (items[i].querySelector('pubDate')||{}).textContent || '';
+          var ago = pubDate ? timeAgo(new Date(pubDate)) : '';
+          html += '<a href="'+link+'" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(48,54,61,.5);text-decoration:none;color:inherit;transition:color .2s" onmouseover="this.style.color=\'#58a6ff\'" onmouseout="this.style.color=\'\'">'
+            + '<span style="flex:1;line-height:1.5">'+title+'</span>'
+            + (ago ? '<span style="color:var(--m);font-size:11px;white-space:nowrap;margin-top:2px">'+ago+'</span>' : '')
+            + '</a>';
+        }
+        list.innerHTML = html || '<div style="color:var(--m)">暫無最新消息</div>';
+        if (status) status.textContent = '更新 ' + new Date().toLocaleTimeString('zh-TW');
+      })
+      .catch(function(){
+        var status = document.getElementById('abs-news-status');
+        if (status) status.textContent = '⚠ 暫時無法取得';
+      });
+  }
+
+  fetchAbsNews();
+  setInterval(fetchAbsNews, 60000);
 })();
 </script>
 </body>
