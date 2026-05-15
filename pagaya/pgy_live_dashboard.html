@@ -160,9 +160,19 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
 
+/* ── PGY 品牌背景圖案 ── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(88,166,255,.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(63,185,80,.04) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(188,140,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 8 L38 24 L54 24 L42 34 L46 50 L30 40 L14 50 L18 34 L6 24 L22 24 Z' stroke='%2358a6ff' stroke-width='.4' stroke-opacity='.06'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:90px 90px}
+.wrap{position:relative;z-index:1}
+
 /* ── AI 刷新按鈕 & 編輯 Modal ── */
-.ai-refresh-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bl);background:rgba(88,166,255,.15);color:var(--bl);transition:all .2s;margin-left:auto;flex-shrink:0;user-select:none;white-space:nowrap;letter-spacing:.3px}
-.ai-refresh-btn:hover{background:rgba(88,166,255,.35);box-shadow:0 0 14px rgba(88,166,255,.4);transform:translateY(-1px)}
 .refresh-all-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--g);background:rgba(63,185,80,.12);color:var(--g);transition:all .2s;user-select:none;white-space:nowrap}
 .refresh-all-btn:hover:not([disabled]){background:rgba(63,185,80,.28);box-shadow:0 0 14px rgba(63,185,80,.35);transform:translateY(-1px)}
 .refresh-all-btn[disabled]{opacity:.5;cursor:not-allowed}
@@ -208,7 +218,13 @@ html{scroll-behavior:smooth}
   <a href="#thesis">投資論點</a>
   <a href="#ai-debate">🤖 AI辯論</a>
   <a href="#ai-chat">💬 AI對話</a>
-  <a href="../search.html">🔍 股票搜尋</a>
+  <form id="navSearchForm" onsubmit="navSearch(event)" style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <input id="navSearchInput" type="text" placeholder="輸入代號 AAPL…" autocomplete="off"
+      style="background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:20px;color:var(--t);padding:4px 12px;font-size:12px;width:130px;outline:none;transition:border-color .2s,width .2s"
+      onfocus="this.style.borderColor='#58a6ff';this.style.width='160px'"
+      onblur="this.style.borderColor='';this.style.width='130px'">
+    <button type="submit" style="background:var(--bl);border:none;border-radius:20px;color:#fff;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔍 查</button>
+  </form>
 </nav>
 
 <div class="wrap">
@@ -239,18 +255,13 @@ html{scroll-behavior:smooth}
 <div id="live" class="sec">
   <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
   <div class="card" style="padding:20px">
-    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · TradingView 即時盤中圖</div>
-    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px">
-      <iframe
-        src="https://s.tradingview.com/widgetembed/?symbol=NASDAQ%3APGY&interval=5&theme=dark&style=1&locale=zh_TW&toolbar_bg=%23161b22&hide_side_toolbar=1&allow_symbol_change=0&autosize=1"
-        style="width:100%;height:100%;border:0"
-        frameborder="0"
-        allowtransparency="true"
-        scrolling="no"
-      ></iframe>
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · Yahoo Finance 1 分鐘線</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px;position:relative">
+      <canvas id="intradayChart" style="width:100%;height:100%"></canvas>
+      <div id="intraday-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px">⏳ 載入走勢中…</div>
     </div>
     <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
-      <span>TradingView 盤中走勢 · 即時更新</span>
+      <span>Yahoo Finance 1m · 自動更新</span>
     </div>
   </div>
 </div>
@@ -1120,9 +1131,10 @@ function initCharts() {
   }
 }
 
-// ── 走勢圖統計（TradingView iframe 自動刷新，僅補充前收/今高/今低）
+// ── 走勢圖（Yahoo Finance 1m 資料 → Chart.js）──────────────────
+var _intradayChartInstance = null;
+
 function fetchIntradayChart() {
-  // TradingView iframe 自動更新，此函式只補充底部統計數字
   var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
   var proxies = [
     'https://corsproxy.io/?' + encodeURIComponent(url),
@@ -1130,7 +1142,11 @@ function fetchIntradayChart() {
   ];
 
   function tryProxy(idx) {
-    if (idx >= proxies.length) return;
+    if (idx >= proxies.length) {
+      var ld = document.getElementById('intraday-loading');
+      if (ld) ld.textContent = '⚠ 走勢資料暫時無法取得';
+      return;
+    }
     fetchTimeout(proxies[idx], 8000)
       .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(raw) {
@@ -1138,14 +1154,82 @@ function fetchIntradayChart() {
         var res = inner && inner.chart && inner.chart.result && inner.chart.result[0];
         if (!res) throw new Error('no result');
         var meta = res.meta || {};
+        var timestamps = (res.timestamp || []);
+        var closes = (res.indicators && res.indicators.quote && res.indicators.quote[0] && res.indicators.quote[0].close) || [];
         var prev = meta.chartPreviousClose || meta.previousClose || null;
+
+        // 濾掉 null 資料點，只取有效分鐘線
+        var labels = [], prices = [];
+        for (var i = 0; i < timestamps.length; i++) {
+          if (closes[i] == null) continue;
+          var d = new Date(timestamps[i] * 1000);
+          labels.push(d.toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', hour12:false}));
+          prices.push(parseFloat(closes[i].toFixed(2)));
+        }
+
+        // 決定顏色：今收 vs 前收
+        var lastPrice = prices[prices.length - 1] || 0;
+        var isUp = prev ? lastPrice >= prev : true;
+        var lineColor = isUp ? '#3fb950' : '#f85149';
+        var fillColor = isUp ? 'rgba(63,185,80,0.12)' : 'rgba(248,81,73,0.12)';
+
+        // 畫 Chart.js
+        var canvas = document.getElementById('intradayChart');
+        var ld = document.getElementById('intraday-loading');
+        if (!canvas) return;
+        if (ld) ld.style.display = 'none';
+
+        if (_intradayChartInstance) { _intradayChartInstance.destroy(); }
+        _intradayChartInstance = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: prices,
+              borderColor: lineColor,
+              backgroundColor: fillColor,
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                mode: 'index', intersect: false,
+                callbacks: { label: function(ctx){ return '$' + ctx.parsed.y.toFixed(2); } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#8b949e', maxTicksLimit: 8, maxRotation: 0, font: {size:10} },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+              },
+              y: {
+                position: 'right',
+                ticks: { color: '#8b949e', font: {size:10},
+                  callback: function(v){ return '$' + v.toFixed(2); }
+                },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+              }
+            }
+          }
+        });
+
+        // 底部統計
         var info = document.getElementById('intraday-info');
         if (info) {
           info.innerHTML = [
             prev ? '<span>前收 <b>$' + prev.toFixed(2) + '</b></span>' : '',
             meta.regularMarketDayHigh ? '<span>今高 <b style="color:var(--g)">$' + meta.regularMarketDayHigh.toFixed(2) + '</b></span>' : '',
-            meta.regularMarketDayLow  ? '<span>今低 <b style="color:var(--r)">$' + meta.regularMarketDayLow.toFixed(2)  + '</b></span>' : '',
-            '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>'
+            meta.regularMarketDayLow  ? '<span>今低 <b style="color:var(--r)">$' + meta.regularMarketDayLow.toFixed(2) + '</b></span>' : '',
+            '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>',
+            '<span style="color:var(--m)">Yahoo Finance · 1m</span>'
           ].filter(Boolean).join('');
         }
       })
@@ -1215,6 +1299,12 @@ function _hexRgba(hex, a) {
   return 'rgba('+r+','+g+','+b+','+a+')';
 }
 function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function navSearch(e) {
+  e.preventDefault();
+  var sym = (document.getElementById('navSearchInput').value||'').trim().toUpperCase();
+  if (!sym) return;
+  window.open('../search.html?symbol='+encodeURIComponent(sym), '_blank');
+}
 function _md(s) {
   return _esc(s)
     .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
@@ -1237,7 +1327,6 @@ function renderDebate(d) {
           '<div style="font-size:11px;color:var(--m)">' + _esc(a.org) + '</div></div>' +
           '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">' +
             (savedTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedTs + '</span>' : '') +
-            '<button class="ai-refresh-btn" onclick="openEditModal(\'' + key + '\',\'' + _esc(a.name) + ' 投資論點\',document.getElementById(\'ai-view-' + key + '\').innerText)">🔄 刷新看法</button>' +
           '</div>' +
         '</div>' +
         '<div id="ai-view-' + key + '" style="font-size:13px;color:var(--m);line-height:1.8">' +
@@ -1263,7 +1352,6 @@ function renderDebate(d) {
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">' +
       '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m)">🥊 關鍵爭議點辯論</div>' +
       (savedDebateTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedDebateTs + '</span>' : '') +
-      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-exchange\',\'關鍵爭議點辯論\',document.getElementById(\'ai-view-debate-exchange\').innerText)">🔄 刷新看法</button>' +
     '</div>' +
     debateInner + '</div>';
 
@@ -1273,7 +1361,6 @@ function renderDebate(d) {
     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
       '<h3 style="margin-bottom:0">🏁 三大 AI 最終共識 · 分歧 · 操作建議</h3>' +
       (savedConsensusTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedConsensusTs + '</span>' : '') +
-      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-consensus\',\'三大 AI 最終共識\',document.getElementById(\'ai-view-debate-consensus\').innerText)">🔄 刷新看法</button>' +
     '</div>' +
     '<div id="ai-view-debate-consensus">' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">' +
@@ -1296,8 +1383,9 @@ function renderDebate(d) {
   var el = document.getElementById('ai-debate');
   if (el) {
     el.innerHTML =
-      '<div class="sec-ttl">🤖 AI 三方綜合投資論點辯論 ' +
+      '<div class="sec-ttl" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">🤖 AI 三方綜合投資論點辯論 ' +
         '<span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">更新 ' + _esc(d.updated) + ' · ' + _esc(d.context) + '</span>' +
+        '<button id="refreshDebateBtn" class="refresh-all-btn" style="margin-left:auto;font-size:12px;padding:5px 14px" onclick="refreshDebateSection(this)">⚡ AI辯論更新</button>' +
       '</div>' + agentsHtml + debateHtml + consensusHtml;
   }
 }
@@ -1366,40 +1454,54 @@ var _chatting = false;
 var _afterKeyAction = null;
 
 var _AI_PERSONAS = [
-  { key:'trend-gemini', tsId:'ai-ts-trend-gemini', name:'Gemini', color:'#4285f4', icon:'✦', org:'量化視角',
-    system:'你是 Gemini，Google DeepMind 量化分析師。請用繁體中文，以數據驅動的量化風格回答，重點在估值指標、技術面、機構資金流向。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從 EV/EBITDA（目前~2.8×，同業中位~8.5×）、技術指標（RSI、52週相對位置14%）、機構連續2季淨買進三個角度，寫出今日3句走勢觀點，最後一句給目標價範圍。不要標題，直接輸出。'; }
+  { key:'trend-gemini', tsId:'ai-ts-trend-gemini', name:'Gemini', color:'#4285f4', icon:'✦', org:'技術分析',
+    system:'你是量化技術分析師，用繁體中文，聚焦價格行為與技術指標，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。從今日K線型態、RSI位置、均線支撐壓力、成交量變化，寫3句今日技術面走勢觀點，最後給近期關鍵支撐與壓力位。直接輸出，無標題。'; }
   },
   { key:'trend-gpt', tsId:'ai-ts-trend-gpt', name:'ChatGPT', color:'#10a37f', icon:'◆', org:'基本面視角',
-    system:'你是 ChatGPT，OpenAI 基本面與敘事分析師。請用繁體中文，以清晰的成長故事和基本面邏輯回答，強調業務飛輪和長期價值。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從數據飛輪護城河、Q1 2026 EPS $0.73 超預期265%、H2 新夥伴入網與 BNPL 三路並進（Klarna+Sezzle+Flex Pay）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+    system:'你是基本面分析師，用繁體中文，結合當日股價動向與公司基本面邏輯，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。結合今日股價表現與PGY基本面（Q1 EPS $0.73超預期265%、5季GAAP盈利、EV/EBITDA~2.8×），寫3句今日走勢觀點。直接輸出，無標題。'; }
   },
-  { key:'trend-grok', tsId:'ai-ts-trend-grok', name:'Grok', color:'#e11d48', icon:'⊗', org:'市場結構視角',
-    system:'你是 Grok，xAI 市場結構與籌碼分析師。請用繁體中文，以直接犀利的市場流量和籌碼邏輯回答，重點在成交量、空頭結構、催化劑需求。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從日均成交量偏低（$30-50M，納斯達克「隱形股」）、空頭~18% float（潛在回補燃料）、需催化劑觸發（Klarna IPO、Q2財報、機構路演）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+  { key:'trend-grok', tsId:'ai-ts-trend-grok', name:'Grok', color:'#e11d48', icon:'⊗', org:'市場結構',
+    system:'你是市場籌碼分析師，用繁體中文，聚焦成交量、空頭結構、市場情緒，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。從今日成交量異動、空頭~18% float結構、市場情緒，寫3句今日籌碼走勢觀點。直接輸出，無標題。'; }
   }
 ];
 
-async function _callGemini(apiKey, system, userMsg, maxTok) {
+async function _callGemini(apiKey, system, userMsg, maxTok, _retry) {
   var fullMsg = system ? system + '\n\n' + userMsg : userMsg;
+  var body = JSON.stringify({
+    contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
+    generationConfig: { maxOutputTokens: maxTok || 5000, temperature: 0.7 }
+  });
   var resp = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
-        generationConfig: { maxOutputTokens: maxTok || 400, temperature: 0.7 },
-        thinkingConfig: { thinkingBudget: 0 }
-      })
-    }
+    'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey),
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body }
   );
   if (!resp.ok) {
     var err = await resp.json().catch(function(){ return {error:{message:'HTTP '+resp.status}}; });
-    throw new Error((err.error && err.error.message) || 'HTTP '+resp.status);
+    var msg = (err.error && err.error.message) || 'HTTP '+resp.status;
+    // 429 + retry hint → wait and retry once (RPM limit, not daily limit)
+    if (resp.status === 429 && !_retry) {
+      var m = msg.match(/retry in ([\d.]+)s/i);
+      if (m) {
+        var wait = Math.ceil(parseFloat(m[1])) + 2;
+        // only auto-retry for short waits (≤65s = RPM window, not daily quota)
+        if (wait <= 65) {
+          await new Promise(function(r){ setTimeout(r, wait * 1000); });
+          return _callGemini(apiKey, system, userMsg, maxTok, true);
+        }
+      }
+    }
+    throw new Error(msg);
   }
   var data = await resp.json();
-  return data.candidates[0].content.parts[0].text.trim();
+  if (!data.candidates || !data.candidates.length) {
+    throw new Error('API 回傳空結果（可能被內容過濾）');
+  }
+  var parts = data.candidates[0].content.parts;
+  var textPart = parts.find(function(p){ return p.text && !p.thought; }) || parts[0];
+  return textPart.text.trim();
 }
 
 // ── 即時新聞抓取（提供 AI 分析背景）────────────────────────────
@@ -1465,8 +1567,8 @@ async function autoRefreshDebate(btn) {
   }).join('\n\n');
   try {
     var text = await _callGemini(apiKey,
-      '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 600);
+      '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
+      '今日PGY股價約'+price+'。請以 Gemini（技術面量化）、ChatGPT（基本面/敘事）、Grok（市場結構/籌碼）三位 AI 分析師名義，從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，生成4-5個辯論交鋒。格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用「技術面分析師」「基本面分析師」等替代名稱。直接輸出，無標題。', 5000);
     var ts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', text);
     localStorage.setItem('ai_view_ts_trend-debate', ts);
@@ -1474,9 +1576,66 @@ async function autoRefreshDebate(btn) {
     var badge = document.getElementById('ai-ts-trend-debate');
     if (badge) badge.textContent = '🤖 '+ts;
   } catch(e) {
-    if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
+    var cached = localStorage.getItem('ai_view_trend-debate');
+    if (cached && debEl) { _applyText('trend-debate', cached); }
+    else if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
   }
   if (btn) { btn.disabled = false; btn.innerHTML = '⚡ AI更新'; }
+}
+
+// ── AI 辯論區塊刷新（宏觀/消息面三方辯論） ──────────────────────
+async function refreshDebateSection(btn) {
+  var apiKey = localStorage.getItem('pgy_gemini_api_key');
+  if (!apiKey) { openApiKeyModal('refresh'); return; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 生成中…'; }
+  var price = (document.getElementById('price')||{}).textContent || '─';
+  var date = new Date().toLocaleDateString('zh-TW');
+  var news = await fetchRecentPGYNews();
+  var newsStr = news ? '【今日最新 PGY 相關新聞】\n' + news + '\n\n' : '';
+  // 生成三方各自論點
+  var agentViews = [];
+  var agentDefs = [
+    { name:'Gemini', org:'宏觀經濟', color:'#4285f4', system:'你是宏觀經濟分析師，用繁體中文，聚焦Fed政策、信貸市場、全球風險情緒對金融科技股的影響，言簡意賅。' },
+    { name:'ChatGPT', org:'消息面', color:'#10a37f', system:'你是消息面分析師，用繁體中文，聚焦最新新聞事件、產業動態、監管動向對PGY的影響，言簡意賅。' },
+    { name:'Grok', org:'市場情緒', color:'#e11d48', system:'你是市場情緒分析師，用繁體中文，聚焦當前市場風險偏好、信貸利差、AI估值情緒對PGY的影響，言簡意賅。' }
+  ];
+  var ts = new Date().toLocaleString('zh-TW');
+  for (var i = 0; i < agentDefs.length; i++) {
+    var adef = agentDefs[i];
+    var akey = 'debate-' + adef.name.toLowerCase();
+    var el = document.getElementById('ai-view-' + akey);
+    if (el) el.innerHTML = '<span style="color:var(--m);font-style:italic">⏳ '+adef.name+' 分析中…</span>';
+    try {
+      var txt = await _callGemini(apiKey, adef.system,
+        newsStr + '今天'+date+'，PGY收'+price+'。從'+adef.org+'角度，分析今日宏觀/消息面對PGY的影響，給出3句核心論點。直接輸出，無標題。', 5000);
+      localStorage.setItem('ai_view_' + akey, txt);
+      localStorage.setItem('ai_view_ts_' + akey, ts);
+      _applyText(akey, txt);
+      agentViews.push(adef.name+'（'+adef.org+'）：「'+txt.replace(/\n/g,' ').substring(0,200)+'」');
+    } catch(e) {
+      var cached = localStorage.getItem('ai_view_' + akey);
+      if (cached) { _applyText(akey, cached); agentViews.push(adef.name+'（'+adef.org+'）：「'+cached.replace(/\n/g,' ').substring(0,200)+'」（快取）'); }
+      else { if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>'; agentViews.push(adef.name+'：（分析失敗）'); }
+    }
+    if (i < agentDefs.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
+  }
+  // 生成辯論交鋒
+  var debEl = document.getElementById('ai-view-debate-exchange');
+  if (debEl) debEl.innerHTML = '<span style="color:var(--m);font-style:italic">⏳ 生成辯論交鋒中…</span>';
+  try {
+    var debText = await _callGemini(apiKey,
+      '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
+      newsStr + '今日PGY股價約'+price+'。以下是三位分析師觀點：\n'+agentViews.join('\n\n')+
+      '\n\n請以 Gemini（宏觀經濟）、ChatGPT（消息面）、Grok（市場情緒）三位 AI 分析師名義，生成4-5輪辯論交鋒，格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用其他替代名稱。直接輸出，無標題。', 8000);
+    localStorage.setItem('ai_view_debate-exchange', debText);
+    localStorage.setItem('ai_view_ts_debate-exchange', ts);
+    if (debEl) { _applyText('debate-exchange', debText); }
+  } catch(e) {
+    var cachedDeb = localStorage.getItem('ai_view_debate-exchange');
+    if (cachedDeb && debEl) { _applyText('debate-exchange', cachedDeb); }
+    else if (debEl) debEl.innerHTML = '<span style="color:var(--r)">❌ 辯論生成失敗：'+_esc(e.message)+'</span>';
+  }
+  if (btn) { btn.disabled = false; btn.innerHTML = '⚡ AI辯論更新'; }
 }
 
 // ── 一鍵更新全部走勢觀點 ────────────────────────────────────────
@@ -1510,7 +1669,7 @@ async function autoRefreshAll() {
     } catch(e) {
       if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
     }
-    if (i < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
+    if (i < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
   // 最後生成辯論交鋒
   if (btn) btn.innerHTML = '⏳ 生成辯論中…';
@@ -1522,8 +1681,8 @@ async function autoRefreshAll() {
   }).join('\n\n');
   try {
     var debText = await _callGemini(apiKey,
-      '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 500);
+      '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
+      '今日PGY股價約'+price+'。請以 Gemini（技術面量化）、ChatGPT（基本面/敘事）、Grok（市場結構/籌碼）三位 AI 分析師名義，從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，生成4-5個辯論交鋒。格式每行必須為：**Gemini→ChatGPT：** 觀點 或 **Grok→Gemini：** 觀點 等，發言者必須用 Gemini / ChatGPT / Grok 三個名稱，不可使用「技術面分析師」「基本面分析師」等替代名稱。直接輸出，無標題。', 5000);
     var dts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', debText);
     localStorage.setItem('ai_view_ts_trend-debate', dts);
@@ -1557,16 +1716,17 @@ async function submitAiQuestion() {
   var newsStr = news ? '\n\n【今日最新 PGY 相關新聞（Yahoo Finance）】\n' + news + '\n請結合以上新聞回答。' : '';
   if (btn) btn.innerHTML = '⏳ 思考中…';
   result.innerHTML = '<div style="color:var(--m);font-style:italic;padding:16px 0">🤖 三大 AI 正在分析，請稍候…</div>';
-  var ctx = 'PGY（Pagaya Technologies）背景：AI驅動信貸科技平台，Q1 2026 EPS $0.73（超預期265%），5季連續GAAP盈利，EV/EBITDA約2.8×，股價約'+price+'。' + newsStr;
+  var ctx = 'PGY股價約'+price+'，Q1 EPS $0.73（超預期265%），EV/EBITDA~2.8×。' + newsStr;
   // Step 1: 三大AI各自回答（循序，避免超頻）
   var responses = {};
   for (var ci = 0; ci < _AI_PERSONAS.length; ci++) {
     var ccfg = _AI_PERSONAS[ci];
     if (btn) btn.innerHTML = '⏳ '+ccfg.name+' 思考中…';
     try {
-      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system, ctx+'\n\n用戶問題：'+q+'\n\n針對此問題從你的角色視角給出2-3句精簡分析觀點。若有今日新聞請結合新聞回答。', 300);
+      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system,
+        ctx+'\n\n用戶問：「'+q+'」\n\n請直接回答這個問題，理解用戶的具體意圖，用你的角色專長給出針對性的2-3句回覆，不要給通用分析。', 3000);
     } catch(e) { responses[ccfg.name] = '（分析失敗：'+e.message+'）'; }
-    if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
+    if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
   // 建立初始回應卡片
   var initialHtml = _AI_PERSONAS.map(function(cfg) {
@@ -1584,8 +1744,8 @@ async function submitAiQuestion() {
   var debatePrompt = ctx+'\n\n用戶問題：「'+q+'」\n\n';
   _AI_PERSONAS.forEach(function(cfg){ debatePrompt += cfg.name+'（'+cfg.org+'）：「'+(responses[cfg.name]||'─')+'」\n\n'; });
   debatePrompt += '請模擬這三個分析師的辯論交鋒。格式（每行一個交鋒）：\n[發言者 → 回應對象]：...\n共4-5個交鋒，每個1-2句話，聚焦觀點衝突或補充。直接輸出，無需額外說明。';
-  var debateText = await _callGemini(apiKey, '你是中立辯論主持人，負責生成三個AI分析師之間精彩的辯論交鋒。用繁體中文。', debatePrompt, 700)
-    .catch(function(e){ return '（辯論生成失敗：'+e.message+'）'; });
+  var debateText = await _callGemini(apiKey, '你是聊天主持人，用繁體中文總結三方觀點的共識與分歧，語氣自然，像在聊天。', debatePrompt, 5000)
+    .catch(function(e){ return '（辯論生成失敗：' + e.message + '）'; });
   // 解析辯論上色
   var debateHtml = debateText.split('\n').filter(function(l){ return l.trim(); }).map(function(line) {
     var m = line.match(/^\[(.+?)\s*[→>]\s*(.+?)\][:：]\s*(.*)/);
@@ -1652,9 +1812,17 @@ function closeEditModal() {
 function _applyText(key, text) {
   var el = document.getElementById('ai-view-' + key);
   if (!el) return;
+  var speakerColors = { 'Gemini':'#4285f4', 'ChatGPT':'#10a37f', 'GPT':'#10a37f', 'Grok':'#e11d48' };
   el.innerHTML = text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, function(_, inner) {
+      for (var name in speakerColors) {
+        if (inner.indexOf(name) === 0) {
+          return '<strong style="color:' + speakerColors[name] + '">' + inner + '</strong>';
+        }
+      }
+      return '<strong style="color:var(--t)">' + inner + '</strong>';
+    })
     .replace(/\n/g,'<br>');
 }
 
