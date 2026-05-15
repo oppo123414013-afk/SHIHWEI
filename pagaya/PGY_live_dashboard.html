@@ -1783,9 +1783,17 @@ function closeEditModal() {
 function _applyText(key, text) {
   var el = document.getElementById('ai-view-' + key);
   if (!el) return;
+  var speakerColors = { 'Gemini':'#4285f4', 'ChatGPT':'#10a37f', 'GPT':'#10a37f', 'Grok':'#e11d48' };
   el.innerHTML = text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--t)">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, function(_, inner) {
+      for (var name in speakerColors) {
+        if (inner.indexOf(name) === 0) {
+          return '<strong style="color:' + speakerColors[name] + '">' + inner + '</strong>';
+        }
+      }
+      return '<strong style="color:var(--t)">' + inner + '</strong>';
+    })
     .replace(/\n/g,'<br>');
 }
 
