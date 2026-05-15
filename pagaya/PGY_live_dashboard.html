@@ -1376,22 +1376,32 @@ var _AI_PERSONAS = [
   }
 ];
 
-async function _callGemini(apiKey, system, userMsg, maxTok) {
+async function _callGemini(apiKey, system, userMsg, maxTok, _retry) {
   var fullMsg = system ? system + '\n\n' + userMsg : userMsg;
+  var body = JSON.stringify({
+    contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
+    generationConfig: { maxOutputTokens: maxTok || 5000, temperature: 0.7 }
+  });
   var resp = await fetch(
     'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
-        generationConfig: { maxOutputTokens: maxTok || 5000, temperature: 0.7 }
-      })
-    }
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body }
   );
   if (!resp.ok) {
     var err = await resp.json().catch(function(){ return {error:{message:'HTTP '+resp.status}}; });
-    throw new Error((err.error && err.error.message) || 'HTTP '+resp.status);
+    var msg = (err.error && err.error.message) || 'HTTP '+resp.status;
+    // 429 + retry hint → wait and retry once (RPM limit, not daily limit)
+    if (resp.status === 429 && !_retry) {
+      var m = msg.match(/retry in ([\d.]+)s/i);
+      if (m) {
+        var wait = Math.ceil(parseFloat(m[1])) + 2;
+        // only auto-retry for short waits (≤65s = RPM window, not daily quota)
+        if (wait <= 65) {
+          await new Promise(function(r){ setTimeout(r, wait * 1000); });
+          return _callGemini(apiKey, system, userMsg, maxTok, true);
+        }
+      }
+    }
+    throw new Error(msg);
   }
   var data = await resp.json();
   if (!data.candidates || !data.candidates.length) {
@@ -1512,7 +1522,7 @@ async function refreshDebateSection(btn) {
       if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
       agentViews.push(adef.name+'：（分析失敗）');
     }
-    if (i < agentDefs.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
+    if (i < agentDefs.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
   // 生成辯論交鋒
   var debEl = document.getElementById('ai-view-debate-exchange');
@@ -1562,7 +1572,7 @@ async function autoRefreshAll() {
     } catch(e) {
       if (el) el.innerHTML = '<span style="color:var(--r)">❌ '+_esc(e.message)+'</span>';
     }
-    if (i < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
+    if (i < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
   // 最後生成辯論交鋒
   if (btn) btn.innerHTML = '⏳ 生成辯論中…';
@@ -1619,7 +1629,7 @@ async function submitAiQuestion() {
       responses[ccfg.name] = await _callGemini(apiKey, ccfg.system,
         ctx+'\n\n用戶問：「'+q+'」\n\n請直接回答這個問題，理解用戶的具體意圖，用你的角色專長給出針對性的2-3句回覆，不要給通用分析。', 3000);
     } catch(e) { responses[ccfg.name] = '（分析失敗：'+e.message+'）'; }
-    if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
+    if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 5000); });
   }
   // 建立初始回應卡片
   var initialHtml = _AI_PERSONAS.map(function(cfg) {
