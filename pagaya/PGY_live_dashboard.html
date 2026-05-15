@@ -237,18 +237,13 @@ html{scroll-behavior:smooth}
 <div id="live" class="sec">
   <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
   <div class="card" style="padding:20px">
-    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · TradingView 即時盤中圖</div>
-    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px">
-      <iframe
-        src="https://s.tradingview.com/widgetembed/?symbol=NASDAQ%3APGY&interval=5&theme=dark&style=1&locale=zh_TW&toolbar_bg=%23161b22&hide_side_toolbar=1&allow_symbol_change=0&autosize=1"
-        style="width:100%;height:100%;border:0"
-        frameborder="0"
-        allowtransparency="true"
-        scrolling="no"
-      ></iframe>
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">PGY 今日走勢圖 · Yahoo Finance 1 分鐘線</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px;position:relative">
+      <canvas id="intradayChart" style="width:100%;height:100%"></canvas>
+      <div id="intraday-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px">⏳ 載入走勢中…</div>
     </div>
     <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
-      <span>TradingView 盤中走勢 · 即時更新</span>
+      <span>Yahoo Finance 1m · 自動更新</span>
     </div>
   </div>
 </div>
@@ -1118,9 +1113,10 @@ function initCharts() {
   }
 }
 
-// ── 走勢圖統計（TradingView iframe 自動刷新，僅補充前收/今高/今低）
+// ── 走勢圖（Yahoo Finance 1m 資料 → Chart.js）──────────────────
+var _intradayChartInstance = null;
+
 function fetchIntradayChart() {
-  // TradingView iframe 自動更新，此函式只補充底部統計數字
   var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
   var proxies = [
     'https://corsproxy.io/?' + encodeURIComponent(url),
@@ -1128,7 +1124,11 @@ function fetchIntradayChart() {
   ];
 
   function tryProxy(idx) {
-    if (idx >= proxies.length) return;
+    if (idx >= proxies.length) {
+      var ld = document.getElementById('intraday-loading');
+      if (ld) ld.textContent = '⚠ 走勢資料暫時無法取得';
+      return;
+    }
     fetchTimeout(proxies[idx], 8000)
       .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(raw) {
@@ -1136,14 +1136,82 @@ function fetchIntradayChart() {
         var res = inner && inner.chart && inner.chart.result && inner.chart.result[0];
         if (!res) throw new Error('no result');
         var meta = res.meta || {};
+        var timestamps = (res.timestamp || []);
+        var closes = (res.indicators && res.indicators.quote && res.indicators.quote[0] && res.indicators.quote[0].close) || [];
         var prev = meta.chartPreviousClose || meta.previousClose || null;
+
+        // 濾掉 null 資料點，只取有效分鐘線
+        var labels = [], prices = [];
+        for (var i = 0; i < timestamps.length; i++) {
+          if (closes[i] == null) continue;
+          var d = new Date(timestamps[i] * 1000);
+          labels.push(d.toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', hour12:false}));
+          prices.push(parseFloat(closes[i].toFixed(2)));
+        }
+
+        // 決定顏色：今收 vs 前收
+        var lastPrice = prices[prices.length - 1] || 0;
+        var isUp = prev ? lastPrice >= prev : true;
+        var lineColor = isUp ? '#3fb950' : '#f85149';
+        var fillColor = isUp ? 'rgba(63,185,80,0.12)' : 'rgba(248,81,73,0.12)';
+
+        // 畫 Chart.js
+        var canvas = document.getElementById('intradayChart');
+        var ld = document.getElementById('intraday-loading');
+        if (!canvas) return;
+        if (ld) ld.style.display = 'none';
+
+        if (_intradayChartInstance) { _intradayChartInstance.destroy(); }
+        _intradayChartInstance = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: prices,
+              borderColor: lineColor,
+              backgroundColor: fillColor,
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                mode: 'index', intersect: false,
+                callbacks: { label: function(ctx){ return '$' + ctx.parsed.y.toFixed(2); } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#8b949e', maxTicksLimit: 8, maxRotation: 0, font: {size:10} },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+              },
+              y: {
+                position: 'right',
+                ticks: { color: '#8b949e', font: {size:10},
+                  callback: function(v){ return '$' + v.toFixed(2); }
+                },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+              }
+            }
+          }
+        });
+
+        // 底部統計
         var info = document.getElementById('intraday-info');
         if (info) {
           info.innerHTML = [
             prev ? '<span>前收 <b>$' + prev.toFixed(2) + '</b></span>' : '',
             meta.regularMarketDayHigh ? '<span>今高 <b style="color:var(--g)">$' + meta.regularMarketDayHigh.toFixed(2) + '</b></span>' : '',
-            meta.regularMarketDayLow  ? '<span>今低 <b style="color:var(--r)">$' + meta.regularMarketDayLow.toFixed(2)  + '</b></span>' : '',
-            '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>'
+            meta.regularMarketDayLow  ? '<span>今低 <b style="color:var(--r)">$' + meta.regularMarketDayLow.toFixed(2) + '</b></span>' : '',
+            '<span>更新 ' + new Date().toLocaleTimeString('zh-TW') + '</span>',
+            '<span style="color:var(--m)">Yahoo Finance · 1m</span>'
           ].filter(Boolean).join('');
         }
       })
