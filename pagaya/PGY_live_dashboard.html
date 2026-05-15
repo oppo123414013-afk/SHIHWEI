@@ -1389,7 +1389,7 @@ async function _callGemini(apiKey, system, userMsg, maxTok) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
-        generationConfig: { maxOutputTokens: maxTok || 400, temperature: 0.7 }
+        generationConfig: { maxOutputTokens: maxTok || 1000, temperature: 0.7 }
       })
     }
   );
@@ -1470,7 +1470,7 @@ async function autoRefreshDebate(btn) {
   try {
     var text = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 600);
+      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 1200);
     var ts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', text);
     localStorage.setItem('ai_view_ts_trend-debate', ts);
@@ -1527,7 +1527,7 @@ async function autoRefreshAll() {
   try {
     var debText = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 500);
+      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 1200);
     var dts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', debText);
     localStorage.setItem('ai_view_ts_trend-debate', dts);
