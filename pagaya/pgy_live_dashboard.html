@@ -1221,6 +1221,22 @@ function fetchIntradayChart() {
           }
         });
 
+        // 同步更新漲跌分析（用走勢圖 meta 餵給 applyQuote，解決 v7 CORS 失敗問題）
+        var chartPrice = meta.regularMarketPrice || lastPrice;
+        var chartPrev  = prev || meta.chartPreviousClose || chartPrice;
+        if (chartPrice && typeof applyQuote === 'function') {
+          applyQuote({
+            regularMarketPrice: chartPrice,
+            regularMarketChange: chartPrice - chartPrev,
+            regularMarketChangePercent: ((chartPrice - chartPrev) / chartPrev) * 100,
+            regularMarketDayHigh: meta.regularMarketDayHigh || chartPrice,
+            regularMarketDayLow:  meta.regularMarketDayLow  || chartPrice,
+            regularMarketVolume:  meta.regularMarketVolume  || 0,
+            regularMarketPreviousClose: chartPrev,
+            marketState: meta.marketState || 'REGULAR'
+          });
+        }
+
         // 底部統計
         var info = document.getElementById('intraday-info');
         if (info) {
