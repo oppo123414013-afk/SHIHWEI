@@ -1841,6 +1841,14 @@ function saveEditModal() {
 }
 
 function loadSavedAiViews() {
+  // 清除含舊格式錯誤發言者名稱的快取（主持人/分析師 → 應為 Gemini/ChatGPT/Grok）
+  ['trend-debate','debate-exchange'].forEach(function(key) {
+    var cached = localStorage.getItem('ai_view_' + key);
+    if (cached && (cached.indexOf('主持人') >= 0 || cached.indexOf('面分析師') >= 0)) {
+      localStorage.removeItem('ai_view_' + key);
+      localStorage.removeItem('ai_view_ts_' + key);
+    }
+  });
   // 走勢觀點 4 個 AI 卡 + 辯論交鋒
   ['trend-gemini','trend-gpt','trend-grok','trend-debate'].forEach(function(key) {
     var text = localStorage.getItem('ai_view_' + key);
