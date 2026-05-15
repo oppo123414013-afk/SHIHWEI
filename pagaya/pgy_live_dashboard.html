@@ -1291,6 +1291,16 @@ function fetchIntradayChart() {
     }
     if(hu)hu.textContent='· 即時串流 '+new Date().toLocaleTimeString('zh-TW');
     setText('mkt-status',isMarketOpen()?'🟢 美股開盤中 · 即時串流':'⏸ 美股已收盤 · 收盤價');
+    // 同步更新漲跌分析區（WebSocket 無 CORS，是最可靠的資料來源）
+    if(typeof applyQuote==='function'){
+      var prev=d.ch?d.price-d.ch:d.price;
+      applyQuote({
+        regularMarketPrice:d.price, regularMarketChange:d.ch,
+        regularMarketChangePercent:d.pct, regularMarketPreviousClose:prev,
+        regularMarketDayHigh:d.price, regularMarketDayLow:d.price,
+        regularMarketVolume:0, marketState:isMarketOpen()?'REGULAR':'CLOSED'
+      });
+    }
   }
   function startWS(){
     try{
