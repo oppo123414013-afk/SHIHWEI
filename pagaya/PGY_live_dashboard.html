@@ -1237,7 +1237,7 @@ function renderDebate(d) {
           '<div style="font-size:11px;color:var(--m)">' + _esc(a.org) + '</div></div>' +
           '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">' +
             (savedTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedTs + '</span>' : '') +
-            '<button class="ai-refresh-btn" onclick="openEditModal(\'' + key + '\',\'' + _esc(a.name) + ' 投資論點\',document.getElementById(\'ai-view-' + key + '\').innerText)">🔄 刷新看法</button>' +
+            '<button class="ai-refresh-btn" onclick="openEditModal(\'' + key + '\',\'' + _esc(a.name) + ' 投資論點\',document.getElementById(\'ai-view-' + key + '\').innerText)">刷新看法</button>' +
           '</div>' +
         '</div>' +
         '<div id="ai-view-' + key + '" style="font-size:13px;color:var(--m);line-height:1.8">' +
@@ -1263,7 +1263,7 @@ function renderDebate(d) {
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">' +
       '<div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m)">🥊 關鍵爭議點辯論</div>' +
       (savedDebateTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedDebateTs + '</span>' : '') +
-      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-exchange\',\'關鍵爭議點辯論\',document.getElementById(\'ai-view-debate-exchange\').innerText)">🔄 刷新看法</button>' +
+      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-exchange\',\'關鍵爭議點辯論\',document.getElementById(\'ai-view-debate-exchange\').innerText)">刷新看法</button>' +
     '</div>' +
     debateInner + '</div>';
 
@@ -1273,7 +1273,7 @@ function renderDebate(d) {
     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
       '<h3 style="margin-bottom:0">🏁 三大 AI 最終共識 · 分歧 · 操作建議</h3>' +
       (savedConsensusTs ? '<span style="font-size:10px;color:var(--m)">更新 ' + savedConsensusTs + '</span>' : '') +
-      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-consensus\',\'三大 AI 最終共識\',document.getElementById(\'ai-view-debate-consensus\').innerText)">🔄 刷新看法</button>' +
+      '<button class="ai-refresh-btn" onclick="openEditModal(\'debate-consensus\',\'三大 AI 最終共識\',document.getElementById(\'ai-view-debate-consensus\').innerText)">刷新看法</button>' +
     '</div>' +
     '<div id="ai-view-debate-consensus">' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">' +
@@ -1366,17 +1366,17 @@ var _chatting = false;
 var _afterKeyAction = null;
 
 var _AI_PERSONAS = [
-  { key:'trend-gemini', tsId:'ai-ts-trend-gemini', name:'Gemini', color:'#4285f4', icon:'✦', org:'量化視角',
-    system:'你是 Gemini，Google DeepMind 量化分析師。請用繁體中文，以數據驅動的量化風格回答，重點在估值指標、技術面、機構資金流向。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從 EV/EBITDA（目前~2.8×，同業中位~8.5×）、技術指標（RSI、52週相對位置14%）、機構連續2季淨買進三個角度，寫出今日3句走勢觀點，最後一句給目標價範圍。不要標題，直接輸出。'; }
+  { key:'trend-gemini', tsId:'ai-ts-trend-gemini', name:'Gemini', color:'#4285f4', icon:'✦', org:'技術分析',
+    system:'你是量化技術分析師，用繁體中文，聚焦價格行為與技術指標，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。從今日K線型態、RSI位置、均線支撐壓力、成交量變化，寫3句今日技術面走勢觀點，最後給近期關鍵支撐與壓力位。直接輸出，無標題。'; }
   },
   { key:'trend-gpt', tsId:'ai-ts-trend-gpt', name:'ChatGPT', color:'#10a37f', icon:'◆', org:'基本面視角',
-    system:'你是 ChatGPT，OpenAI 基本面與敘事分析師。請用繁體中文，以清晰的成長故事和基本面邏輯回答，強調業務飛輪和長期價值。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從數據飛輪護城河、Q1 2026 EPS $0.73 超預期265%、H2 新夥伴入網與 BNPL 三路並進（Klarna+Sezzle+Flex Pay）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+    system:'你是基本面分析師，用繁體中文，結合當日股價動向與公司基本面邏輯，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。結合今日股價表現與PGY基本面（Q1 EPS $0.73超預期265%、5季GAAP盈利、EV/EBITDA~2.8×），寫3句今日走勢觀點。直接輸出，無標題。'; }
   },
-  { key:'trend-grok', tsId:'ai-ts-trend-grok', name:'Grok', color:'#e11d48', icon:'⊗', org:'市場結構視角',
-    system:'你是 Grok，xAI 市場結構與籌碼分析師。請用繁體中文，以直接犀利的市場流量和籌碼邏輯回答，重點在成交量、空頭結構、催化劑需求。',
-    trendQ:function(p,d){ return '今天是'+d+'，PGY 股價約'+p+'。從日均成交量偏低（$30-50M，納斯達克「隱形股」）、空頭~18% float（潛在回補燃料）、需催化劑觸發（Klarna IPO、Q2財報、機構路演）角度，寫出今日3句走勢觀點。不要標題，直接輸出。'; }
+  { key:'trend-grok', tsId:'ai-ts-trend-grok', name:'Grok', color:'#e11d48', icon:'⊗', org:'市場結構',
+    system:'你是市場籌碼分析師，用繁體中文，聚焦成交量、空頭結構、市場情緒，言簡意賅。',
+    trendQ:function(p,d){ return '今天'+d+'，PGY收'+p+'。從今日成交量異動、空頭~18% float結構、市場情緒，寫3句今日籌碼走勢觀點。直接輸出，無標題。'; }
   }
 ];
 
@@ -1389,7 +1389,7 @@ async function _callGemini(apiKey, system, userMsg, maxTok) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
-        generationConfig: { maxOutputTokens: maxTok || 8000, temperature: 0.7 }
+        generationConfig: { maxOutputTokens: maxTok || 3500, temperature: 0.7 }
       })
     }
   );
@@ -1469,8 +1469,8 @@ async function autoRefreshDebate(btn) {
   }).join('\n\n');
   try {
     var text = await _callGemini(apiKey,
-      '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 12000);
+      '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
+      '今日PGY股價約'+price+'。請從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，模擬三位分析師（技術面/基本面/籌碼面）的辯論交鋒，生成4-5個交鋒，聚焦宏觀與消息對PGY的影響。直接輸出，無標題。', 5000);
     var ts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', text);
     localStorage.setItem('ai_view_ts_trend-debate', ts);
@@ -1526,8 +1526,8 @@ async function autoRefreshAll() {
   }).join('\n\n');
   try {
     var debText = await _callGemini(apiKey,
-      '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 12000);
+      '你是辯論主持人，用繁體中文，格式每行：**發言者→對象：** 觀點（1-2句）',
+      '今日PGY股價約'+price+'。請從宏觀經濟（Fed利率走向、信貸市場、整體風險情緒）與最新消息面（新聞事件、產業動態）角度，模擬三位分析師（技術面/基本面/籌碼面）的辯論交鋒，生成4-5個交鋒，聚焦宏觀與消息對PGY的影響。直接輸出，無標題。', 5000);
     var dts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', debText);
     localStorage.setItem('ai_view_ts_trend-debate', dts);
@@ -1561,14 +1561,15 @@ async function submitAiQuestion() {
   var newsStr = news ? '\n\n【今日最新 PGY 相關新聞（Yahoo Finance）】\n' + news + '\n請結合以上新聞回答。' : '';
   if (btn) btn.innerHTML = '⏳ 思考中…';
   result.innerHTML = '<div style="color:var(--m);font-style:italic;padding:16px 0">🤖 三大 AI 正在分析，請稍候…</div>';
-  var ctx = 'PGY（Pagaya Technologies）背景：AI驅動信貸科技平台，Q1 2026 EPS $0.73（超預期265%），5季連續GAAP盈利，EV/EBITDA約2.8×，股價約'+price+'。' + newsStr;
+  var ctx = 'PGY股價約'+price+'，Q1 EPS $0.73（超預期265%），EV/EBITDA~2.8×。' + newsStr;
   // Step 1: 三大AI各自回答（循序，避免超頻）
   var responses = {};
   for (var ci = 0; ci < _AI_PERSONAS.length; ci++) {
     var ccfg = _AI_PERSONAS[ci];
     if (btn) btn.innerHTML = '⏳ '+ccfg.name+' 思考中…';
     try {
-      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system, ctx+'\n\n用戶問題：'+q+'\n\n針對此問題從你的角色視角給出2-3句精簡分析觀點。若有今日新聞請結合新聞回答。', 4000);
+      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system,
+        ctx+'\n\n用戶問：「'+q+'」\n\n請直接回答這個問題，理解用戶的具體意圖，用你的角色專長給出針對性的2-3句回覆，不要給通用分析。', 3000);
     } catch(e) { responses[ccfg.name] = '（分析失敗：'+e.message+'）'; }
     if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
   }
@@ -1588,7 +1589,7 @@ async function submitAiQuestion() {
   var debatePrompt = ctx+'\n\n用戶問題：「'+q+'」\n\n';
   _AI_PERSONAS.forEach(function(cfg){ debatePrompt += cfg.name+'（'+cfg.org+'）：「'+(responses[cfg.name]||'─')+'」\n\n'; });
   debatePrompt += '請模擬這三個分析師的辯論交鋒。格式（每行一個交鋒）：\n[發言者 → 回應對象]：...\n共4-5個交鋒，每個1-2句話，聚焦觀點衝突或補充。直接輸出，無需額外說明。';
-  var debateText = await _callGemini(apiKey, '你是中立辯論主持人，負責生成三個AI分析師之間精彩的辯論交鋒。用繁體中文。', debatePrompt, 12000)
+  var debateText = await _callGemini(apiKey, '你是聊天主持人，用繁體中文總結三方觀點的共識與分歧，語氣自然，像在聊天。', debatePrompt, 5000)
     .catch(function(e){ return '（辯論生成失敗：' + e.message + '）'; });
   // 解析辯論上色
   var debateHtml = debateText.split('\n').filter(function(l){ return l.trim(); }).map(function(line) {
