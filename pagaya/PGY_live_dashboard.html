@@ -1389,7 +1389,7 @@ async function _callGemini(apiKey, system, userMsg, maxTok) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: fullMsg }] }],
-        generationConfig: { maxOutputTokens: maxTok || 1000, temperature: 0.7 }
+        generationConfig: { maxOutputTokens: maxTok || 8000, temperature: 0.7 }
       })
     }
   );
@@ -1470,7 +1470,7 @@ async function autoRefreshDebate(btn) {
   try {
     var text = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 1200);
+      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 12000);
     var ts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', text);
     localStorage.setItem('ai_view_ts_trend-debate', ts);
@@ -1527,7 +1527,7 @@ async function autoRefreshAll() {
   try {
     var debText = await _callGemini(apiKey,
       '你是辯論主持人，用繁體中文生成三個AI分析師之間的辯論交鋒。格式每行：**發言者→對象：** 觀點（1-2句）',
-      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 1200);
+      '今日 PGY 股價約'+price+'。\n\n三大AI今日走勢觀點：\n\n'+views+'\n\n請生成4-5個精彩辯論交鋒，聚焦觀點衝突與補充。直接輸出，無需標題。', 12000);
     var dts = new Date().toLocaleString('zh-TW');
     localStorage.setItem('ai_view_trend-debate', debText);
     localStorage.setItem('ai_view_ts_trend-debate', dts);
@@ -1568,7 +1568,7 @@ async function submitAiQuestion() {
     var ccfg = _AI_PERSONAS[ci];
     if (btn) btn.innerHTML = '⏳ '+ccfg.name+' 思考中…';
     try {
-      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system, ctx+'\n\n用戶問題：'+q+'\n\n針對此問題從你的角色視角給出2-3句精簡分析觀點。若有今日新聞請結合新聞回答。', 300);
+      responses[ccfg.name] = await _callGemini(apiKey, ccfg.system, ctx+'\n\n用戶問題：'+q+'\n\n針對此問題從你的角色視角給出2-3句精簡分析觀點。若有今日新聞請結合新聞回答。', 4000);
     } catch(e) { responses[ccfg.name] = '（分析失敗：'+e.message+'）'; }
     if (ci < _AI_PERSONAS.length - 1) await new Promise(function(r){ setTimeout(r, 2000); });
   }
@@ -1588,8 +1588,8 @@ async function submitAiQuestion() {
   var debatePrompt = ctx+'\n\n用戶問題：「'+q+'」\n\n';
   _AI_PERSONAS.forEach(function(cfg){ debatePrompt += cfg.name+'（'+cfg.org+'）：「'+(responses[cfg.name]||'─')+'」\n\n'; });
   debatePrompt += '請模擬這三個分析師的辯論交鋒。格式（每行一個交鋒）：\n[發言者 → 回應對象]：...\n共4-5個交鋒，每個1-2句話，聚焦觀點衝突或補充。直接輸出，無需額外說明。';
-  var debateText = await _callGemini(apiKey, '你是中立辯論主持人，負責生成三個AI分析師之間精彩的辯論交鋒。用繁體中文。', debatePrompt, 700)
-    .catch(function(e){ return '（辯論生成失敗：'+e.message+'）'; });
+  var debateText = await _callGemini(apiKey, '你是中立辯論主持人，負責生成三個AI分析師之間精彩的辯論交鋒。用繁體中文。', debatePrompt, 12000)
+    .catch(function(e){ return '（辯論生成失敗：' + e.message + '）'; });
   // 解析辯論上色
   var debateHtml = debateText.split('\n').filter(function(l){ return l.trim(); }).map(function(line) {
     var m = line.match(/^\[(.+?)\s*[→>]\s*(.+?)\][:：]\s*(.*)/);
