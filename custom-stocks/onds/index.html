@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONDS 即時監控中心 — Ondas Inc.</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* ── Nav ── */
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#0d1f2d,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,166,87,.10),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(63,185,80,.07),transparent 70%)}
+.ticker{font-size:13px;color:var(--o);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,166,87,.15);border:1px solid rgba(255,166,87,.4);color:var(--o);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--o);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+
+/* ── Why panel ── */
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+/* ── News ── */
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--o);background:rgba(255,166,87,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--o);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(255,166,87,.1);border-color:var(--o)}
+
+/* ── Section ── */
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── Card ── */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+/* ── Progress ── */
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+
+/* ── Flow ── */
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--o);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+/* ── Range ── */
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--o),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+/* ── Items ── */
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+/* ── Bar chart ── */
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+/* ── Rating ── */
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+/* ── Upside ── */
+.ubox{background:linear-gradient(135deg,rgba(255,166,87,.1),rgba(63,185,80,.05));border:1px solid rgba(255,166,87,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--o)}
+.ulbl{font-size:13px;color:var(--m)}
+
+/* ── Misc ── */
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+/* ── ONDS 品牌背景 ── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,166,87,.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 75%, rgba(63,185,80,.04) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(188,140,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Ccircle cx='35' cy='35' r='18' stroke='%23ffa657' stroke-width='.4' stroke-opacity='.05'/%3E%3Ccircle cx='35' cy='35' r='8' stroke='%233fb950' stroke-width='.4' stroke-opacity='.05'/%3E%3Cline x1='35' y1='17' x2='35' y2='7' stroke='%23ffa657' stroke-width='.4' stroke-opacity='.06'/%3E%3Cline x1='35' y1='53' x2='35' y2='63' stroke='%23ffa657' stroke-width='.4' stroke-opacity='.06'/%3E%3Cline x1='17' y1='35' x2='7' y2='35' stroke='%23ffa657' stroke-width='.4' stroke-opacity='.06'/%3E%3Cline x1='53' y1='35' x2='63' y2='35' stroke='%23ffa657' stroke-width='.4' stroke-opacity='.06'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:100px 100px}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../index.html" style="font-weight:700;color:var(--o);margin-right:8px">← 分析中心</a>
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#news">📰 即時新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#contracts">重大合約</a>
+  <a href="#model">商業模式</a>
+  <a href="#segments">業務板塊</a>
+  <a href="#tech">技術面</a>
+  <a href="#analyst">分析師</a>
+  <a href="#cat">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#outlook">展望</a>
+  <a href="#thesis">投資論點</a>
+  <a href="#ai-debate">🤖 AI辯論</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: ONDS</div>
+  <div class="co-name">Ondas Inc.</div>
+  <div class="tagline">自主無人機 · 私有無線網路 · 多域國防與工業自動化 · 美國</div>
+  <div class="live-row" style="align-items:center;gap:16px;flex-wrap:wrap">
+    <div class="live-badge"><span class="ldot"></span>資料截止 2026-05-15</div>
+    <span style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$10.72</span>
+    <span style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:var(--g)">▲ +21.1%</span>
+  </div>
+  <div style="margin-top:5px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--m)">美股收盤 · 財報後單日暴漲</span>
+    <span style="font-size:11px;color:var(--m)">52週高 $15.28 / 低 $0.76 · 年增 +1,084%</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bo">🚁 自主無人機主承包商</span>
+    <span class="badge bg">🚀 Q1營收+1,065% YoY</span>
+    <span class="badge bb">💰 現金$1.48B 零負債</span>
+    <span class="badge bp">📡 FullMAX 私有網路</span>
+    <span class="badge" style="background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)">🛡️ 邊境防護主承包商</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div class="g4" style="margin-bottom:20px">
+  <div class="card co"><div class="ctitle">Q1 2026 營收</div><div class="cval">$50.1M</div><div class="csub">YoY <span class="hg">+1,065%</span></div></div>
+  <div class="card cg"><div class="ctitle">毛利率</div><div class="cval">49%</div><div class="csub">前季 42% <span class="hg">+7ppts</span></div></div>
+  <div class="card cb"><div class="ctitle">積壓訂單</div><div class="cval">$457M</div><div class="csub">含 Mistral / World View</div></div>
+  <div class="card cp"><div class="ctitle">現金儲備</div><div class="cval">$1.48B</div><div class="csub">零長期負債</div></div>
+</div>
+
+<!-- ══ 漲跌分析 ════════════════════════════════════════════════════ -->
+<div id="why" class="why">
+  <div class="why-hd">
+    📊 今日漲跌分析
+    <span class="why-badge" style="background:rgba(63,185,80,.2);color:var(--g)">財報後暴漲 +21.1%</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">主要驅動因素：</strong>2026-05-14 發布 Q1 2026 財報，營收 $50.1M 年增 +1,065%，超越公司原始指引 $38–40M 達 25%。全年指引上調至至少 $390M（+670% YoY），$457M 積壓訂單提供強力能見度支撐。
+    <ul style="margin-top:8px">
+      <li>毛利率從 35%（Q1'25）→ 49%（Q1'26），國防高毛利訂單占比快速提升</li>
+      <li>$10 億股票融資完成後現金充沛，投資人對執行能力信心提升</li>
+      <li>政府自主邊境防護系統 $2,000 萬初始 PO 後續訂單預期升溫</li>
+    </ul>
+  </div>
+  <div class="why-foot">
+    <div>前日收盤：<span>~$8.85</span></div>
+    <div>單日振幅：<span>+$1.87</span></div>
+    <div>52週低點：<span>$0.76</span></div>
+    <div>分析師目標均值：<span style="color:var(--o)">$19.83</span></div>
+  </div>
+
+  <!-- AI 三方觀點 -->
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">+21.1% 單日漲幅配合財報超預期 25%，符合「預期差 × 量能」共振公式。目前股價 $10.72 對應全年指引 $390M，P/S 僅約 0.5×，在國防無人機賽道中明顯低估。<strong style="color:var(--t)">RSI 短期進入超買區間（估約75），需觀察 $8.85 前高能否轉為支撐。</strong>若後續 Q2 積壓訂單轉化加速，下一個技術目標為 52 週高點 $15.28。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">ONDS 的敘事已從「小型無人機概念股」升級為「多域自主系統整合商」，Mistral（航太）+ World View（高空偵察）+ OAS（邊境/工業無人機）+ Ondas Networks（通訊）形成完整垂直整合生態。<strong style="color:var(--t)">這次財報是轉型成功的第一個量化確認，$457M 積壓訂單代表未來 3–4 個季度的業績能見度已鎖定。</strong>分析師均值目標 $19.83 vs 現價 $10.72，隱含空間 +85%，6 位分析師 0 賣出，敘事完整度高。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">+21% 單日大漲後，籌碼面的關鍵問題是：這是散戶追漲還是機構進場？需觀察後續 3–5 個交易日量能是否維持在 $30M+。<strong style="color:var(--t)">$10 億美元股票融資後浮動股數大增，若沒有機構持續買盤，過多的供給可能壓制股價回升速度。</strong>短線建議觀察 $8.85–$9.50 支撐區是否守住，中線看政府後續合約公告能否帶動下一波動能。ONDS 目前仍是「需要催化劑解鎖」的潛力股。</div>
+    </div>
+
+    <div style="background:rgba(255,166,87,.06);border:1px solid rgba(255,166,87,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--o);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意垂直整合敘事，但 World View 和 Mistral 的整合時間軸未明確，若整合出現摩擦，Q2–Q3 可能出現期望落差，這是最大的執行風險。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>$457M 積壓訂單中相當比例來自政府合約，政府合約通常有明確時間表且違約風險低，這本身就是執行確定性的最強保證。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都忽略了最核心的結構性問題——ONDS 在 $10 億融資後市值才 ~$20 億，日均成交量相對浮動股來說仍偏低。<strong style="color:var(--t)">機構持倉比例才是下一步估值修復的真正開關。</strong><br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>認同流動性觀點，但政府邊境防護後續大額 PO（目標數千台無人機）一旦公告，媒體曝光度將帶來機構注意力，這不是缺席而是倒計時。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 即時新聞 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/ONDS/news/" target="_blank" rel="noopener">📰 Yahoo Finance ONDS 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/onds/news/" target="_blank" rel="noopener">📊 StockAnalysis ONDS ↗</a>
+    <a class="nlink-btn" href="https://ir.ondas.com/press-releases" target="_blank" rel="noopener">📢 官方新聞稿 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/ONDS/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://ir.ondas.com/press-releases/detail/306/ondas-reports-record-first-quarter-2026-financial-results" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🏆 Ondas 發布創歷史記錄 Q1 2026 財報，上調全年營收預測至 $3.9 億</div>
+      <div class="nmeta">2026-05-14 · ir.ondas.com · 營收 $50.1M (+1,065% YoY) · 指引上調 · 積壓訂單 $457M</div>
+    </a>
+    <a class="nitem" href="https://ir.ondas.com/press-releases/detail/283/ondas-receives-20-million-initial-purchase-order-as-prime" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">🛡️ Ondas 獲 $2,000 萬初始採購訂單，擔任國家自主邊境防護計畫主承包商</div>
+      <div class="nmeta">2026-03 · ir.ondas.com · 多相位計畫 · 最終部署數千台自主無人機</div>
+    </a>
+    <a class="nitem" href="https://www.ondas.com/post/ondas-secures-10-million-in-new-autonomous-systems-orders" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🚁 Ondas 新增 $1,000 萬自主系統訂單，全球多域國防需求加速</div>
+      <div class="nmeta">2026-05 · ondas.com · 多域防禦訂單 · 全球擴張</div>
+    </a>
+    <a class="nitem" href="https://ir.ondas.com/press-releases/detail/261/ondas-wins-strategic-government-tender-to-develop-and" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">✅ Ondas 贏得策略性政府招標，開發和部署自主邊境防護系統</div>
+      <div class="nmeta">2025 · ir.ondas.com · 國防策略合約 · 里程碑事件</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 重要事件時間軸 ════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 重要事件時間軸 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">里程碑追蹤 · 合約催化劑</span></div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column">
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">Q2 末<br>即將</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--y)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">邊境防護系統後續採購訂單 <span class="badge bo">催化劑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">初始 $2,000萬 PO 之後的後續擴大訂單，規模可能達 $5,000萬+</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-08<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--m)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Q2 2026 財報</div><div style="font-size:12px;color:var(--m);margin-top:2px">Mistral / World View 整合進度首次量化 · EBITDA 改善關鍵</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">05-14<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Q1 2026 財報 <span class="badge bg">營收 +1,065%</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">$50.1M 超指引 25% · 指引上調至 $390M · 股價翌日 +21.1%</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-03<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">邊境防護 $2,000萬初始 PO <span class="badge bg">主承包商</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">多相位計畫，最終目標部署數千台自主無人機</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-01<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--o)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">$10 億美元股票融資完成 <span class="badge bo">資本里程碑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">零長期負債 · 現金 $1.48B · 公司更名為 Ondas Inc.</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-Q1<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--p)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">收購 Mistral（航太防禦）<span class="badge bp">戰略擴張</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">強化國防航太能力 · 積壓訂單擴增</div></div>
+      </div>
+
+      <div style="display:flex;gap:14px;padding:11px 0">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-Q1<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--bl)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">收購 World View（高空偵察平台）<span class="badge bb">多域延伸</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">平流層氣球偵察 · 衛星替代方案 · 積壓訂單貢獻</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表現 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">財務表現</div>
+
+  <!-- Q1 詳細財務 -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Q1 2026 vs Q1 2025 財務明細</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">指標</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">Q1 2026</th>
+          <th style="text-align:right;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">Q1 2025</th>
+          <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">YoY</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">總營收</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$50.1M</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">$4.25M</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+1,065%</span></td></tr>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">環比成長</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">+66%</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">—</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">vs Q4'25</span></td></tr>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">毛利率</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g);font-weight:700">49%</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">35%</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+14ppts</span></td></tr>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">調整後 EBITDA</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--r);font-weight:600">-$10.9M</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--r)">-$7.5M</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tr2">擴大虧損</span></td></tr>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">GAAP 淨利潤</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--p);font-weight:700">$362.9M*</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--r)">虧損</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bp">非現金</span></td></tr>
+          <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">現金儲備</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$1.48B</td><td style="text-align:right;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">—</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">零負債</span></td></tr>
+          <tr><td style="padding:9px 10px">積壓訂單</td><td style="text-align:right;padding:9px 10px;color:var(--o);font-weight:700">$457M</td><td style="text-align:right;padding:9px 10px">—</td><td style="text-align:center;padding:9px 10px"><span class="badge bo">大幅躍升</span></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--m);padding:8px 10px;background:rgba(188,140,255,.06);border-radius:6px;border-left:3px solid var(--p)">* GAAP 淨利 $362.9M 主要為非現金會計利益（收購公允價值調整），非核心業務現金盈利。</div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">2026 全年業績指引</div>
+      <div style="display:flex;flex-direction:column;gap:0;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">全年總營收</div><div style="font-size:11px;color:var(--m);margin-top:2px">2025 全年：~$51M</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--g)">至少 $390M</div><div style="margin-top:3px"><span class="badge bg">上調</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">YoY 成長率</div><div style="font-size:11px;color:var(--m);margin-top:2px">由收購+自然成長驅動</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--g)">+670%</div><div style="margin-top:3px"><span class="badge bg">十倍速擴張</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">積壓訂單</div><div style="font-size:11px;color:var(--m);margin-top:2px">Mistral + World View 加持</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--o)">$457M+</div><div style="margin-top:3px"><span class="badge bo">能見度支撐</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0">
+          <div><div style="font-size:13px;color:var(--m)">調整後 EBITDA</div><div style="font-size:11px;color:var(--m);margin-top:2px">Q2 仍偏高，H2 改善</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--y)">持續虧損→改善</div><div style="margin-top:3px"><span class="badge" style="background:rgba(210,153,34,.2);color:var(--y)">投資期</span></div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:rgba(255,166,87,.06);border:1px solid rgba(255,166,87,.2);border-radius:8px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">全年指引中值</div>
+        <div style="font-size:22px;font-weight:700;color:var(--o)">$390M+</div>
+        <div style="font-size:11px;color:var(--m)">P/S ≈ 0.5× · 國防無人機賽道中明顯低估</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 指引進度條 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle">📊 2026 全年指引追蹤</div>
+    <div class="g3" style="margin-top:12px;gap:12px">
+      <div><div class="pw"><div class="pl"><span>全年營收目標</span><span style="color:var(--g)">$390M+</span></div><div class="pb"><div class="pf fg" style="width:13%"></div></div></div><div style="font-size:11px;color:var(--m)">Q1 完成 $50.1M（13%），正軌</div></div>
+      <div><div class="pw"><div class="pl"><span>積壓訂單能見度</span><span style="color:var(--o)">$457M</span></div><div class="pb"><div class="pf fo" style="width:85%"></div></div></div><div style="font-size:11px;color:var(--m)">訂單積壓 / 全年目標 ≈ 85%（超強）</div></div>
+      <div><div class="pw"><div class="pl"><span>毛利率改善</span><span style="color:var(--bl)">49%</span></div><div class="pb"><div class="pf fb" style="width:70%"></div></div></div><div style="font-size:11px;color:var(--m)">Q1'25 35% → Q1'26 49%，持續優化中</div></div>
+    </div>
+  </div>
+
+  <!-- 季度營收圖 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle">季度營收走勢（百萬美元）</div>
+    <canvas id="revenueChart" style="margin-top:12px;max-height:200px"></canvas>
+    <div style="font-size:11px;color:var(--m);margin-top:6px;text-align:right">Q2–Q4 2026E 為分析師估計值（基於 $390M 全年指引）</div>
+  </div>
+</div>
+
+<!-- ══ 重大合約 ════════════════════════════════════════════════════ -->
+<div id="contracts" class="sec">
+  <div class="sec-ttl">🏗️ 重大合約 / 融資記錄 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">2026 YTD · 積壓訂單 $457M+</span></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>日期</th><th>事件</th><th>規模</th><th>類型</th><th>備註</th></tr></thead>
+      <tbody>
+        <tr><td>2026-01</td><td>$10 億股票融資（ATM + 定增）</td><td style="color:var(--g);font-weight:700">$1,000M</td><td><span class="tag tn">融資</span></td><td>零長期負債 · 彈藥充足</td></tr>
+        <tr><td>2026-Q1</td><td>World View 收購（高空偵察平台）</td><td style="color:var(--p);font-weight:700">戰略性</td><td><span class="tag tp">收購</span></td><td>平流層偵察 · 積壓訂單貢獻</td></tr>
+        <tr><td>2026-Q1</td><td>Mistral 收購（航太防禦）</td><td style="color:var(--p);font-weight:700">戰略性</td><td><span class="tag tp">收購</span></td><td>強化國防航太能力</td></tr>
+        <tr><td>2026-03</td><td>政府自主邊境防護系統初始 PO</td><td style="color:var(--o);font-weight:700">$20M</td><td><span class="tag tb">政府合約</span></td><td>主承包商 · 多相位 · 最終數千台無人機</td></tr>
+        <tr><td>2026-05</td><td>新增自主系統訂單</td><td style="color:var(--bl);font-weight:700">$10M</td><td><span class="tag ta">訂單</span></td><td>多域國防需求 · 全球擴張</td></tr>
+        <tr style="font-weight:700"><td>2026 合計積壓</td><td>全部積壓訂單</td><td style="color:var(--o);font-weight:700">$457M+</td><td><span class="tag tb">積壓總計</span></td><td>含 Mistral / World View / 政府合約</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 重要里程碑說明 -->
+  <div style="margin-top:12px;background:var(--s2);border:1px solid rgba(255,166,87,.25);border-radius:10px;padding:14px 16px">
+    <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:8px">📌 邊境防護計畫的量級潛力</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.75">初始 $2,000 萬 PO 只是多相位計畫的第一步。OAS 將架構、開發並整合一套覆蓋固定與移動環境的全面無人機自主邊境防護系統。若最終計畫部署「數千台」無人機，以單台均價 $2–5 萬美元估算，總合約規模可達 <strong style="color:var(--o)">$5,000萬至數億美元</strong>，是目前積壓訂單之外的潛在重大增量。</div>
+  </div>
+</div>
+
+<!-- ══ 商業模式 ════════════════════════════════════════════════════ -->
+<div id="model" class="sec">
+  <div class="sec-ttl">商業模式</div>
+  <div class="card">
+    <div style="font-size:14px;color:var(--m);margin-bottom:18px">Ondas 是 <strong style="color:var(--t)">自主系統垂直整合商</strong>，自主開發無人機（OAS）、私有無線網路（Networks）、並提供融資方案（Capital），形成「硬體 + 通訊 + 金融」一站式生態，客戶切換成本極高。</div>
+    <div class="flow">
+      <div class="fstep"><div><div class="ft">① 客戶需求：政府 / 鐵路 / 電力公用事業</div><div class="fd">國防邊境防護、鐵路監控、電力線巡檢、油氣管線監測——傳統人工成本高、效率低</div></div></div>
+      <div class="fstep"><div><div class="ft">② Ondas Autonomous Systems (OAS) 提供無人機</div><div class="fd">Optimus / Scout / Raider 三大平台，AI 驅動、持續遠程作業、無需人工干預</div></div></div>
+      <div class="fstep"><div><div class="ft">③ Ondas Networks 提供 FullMAX 私有無線網路</div><div class="fd">無人機需要超低延遲、高可靠通訊——FullMAX 專為任務關鍵 IoT 設計，解決傳統網路頻寬限制</div></div></div>
+      <div class="fstep"><div><div class="ft">④ Ondas Capital 提供融資方案</div><div class="fd">降低客戶部署門檻，加速無人機系統採用，增加黏著度與長期合約比例</div></div></div>
+      <div class="fstep"><div><div class="ft">⑤ 客戶獲得：全自主運維生態系</div><div class="fd">一個供應商提供無人機 + 網路 + 融資，客戶無需整合多家供應商，轉換成本極高</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 業務板塊 ════════════════════════════════════════════════════ -->
+<div id="segments" class="sec">
+  <div class="sec-ttl">業務板塊與合作夥伴生態</div>
+  <div class="g3">
+    <div class="card co">
+      <div style="font-size:20px;margin-bottom:8px">🚁</div>
+      <div style="font-weight:700;margin-bottom:4px">Ondas Autonomous Systems</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">Optimus、Scout、Raider 三大平台 · AI 驅動連續作業 · 邊境防護主承包商 · 反無人機能力 · Anno.ai / Drone Fight Group 合作</div>
+    </div>
+    <div class="card cb">
+      <div style="font-size:20px;margin-bottom:8px">📡</div>
+      <div style="font-weight:700;margin-bottom:4px">Ondas Networks</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">FullMAX 私有授權無線寬頻 · 任務關鍵 IoT · Class I 鐵路 · 電力公用事業 · 油氣 · 政府 · 無人機通訊骨幹</div>
+    </div>
+    <div class="card cp">
+      <div style="font-size:20px;margin-bottom:8px">💰</div>
+      <div style="font-weight:700;margin-bottom:4px">Ondas Capital</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">設備融資方案 · 降低部署門檻 · 增加長期合約比例 · 提升客戶黏著度 · 月租型商業模式</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle">合作夥伴 / 客戶生態系</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+      <thead><tr>
+        <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">類別</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">合作夥伴 / 客戶</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">角色</th>
+        <th style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">重要性</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">政府 / 國防</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">匿名主要政府機構</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">邊境防護主承包</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">⭐⭐⭐⭐⭐</td></tr>
+        <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">AI / 感測</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">Anno.ai</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">AI 視覺感測整合</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">⭐⭐⭐⭐</td></tr>
+        <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">反無人機</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">Drone Fight Group</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">C-UAS 能力整合</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">⭐⭐⭐⭐</td></tr>
+        <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">工業 IoT</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">Class I 鐵路業者</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">FullMAX 網路客戶</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">⭐⭐⭐</td></tr>
+        <tr><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">高空偵察</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">World View（整合中）</td><td style="padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">平流層氣球偵察</td><td style="text-align:center;padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.5)">⭐⭐⭐⭐</td></tr>
+        <tr><td style="padding:9px 10px">航太防禦</td><td style="padding:9px 10px;font-weight:600">Mistral（整合中）</td><td style="padding:9px 10px">航太防禦系統</td><td style="text-align:center;padding:9px 10px">⭐⭐⭐⭐</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ 技術面 ════════════════════════════════════════════════════ -->
+<div id="tech" class="sec">
+  <div class="sec-ttl">📈 技術面分析（截至 2026-05-15）</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">技術指標（估算值）</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+        <thead><tr>
+          <th style="padding:7px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">指標</th>
+          <th style="text-align:right;padding:7px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">數值</th>
+          <th style="text-align:center;padding:7px 10px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px">訊號</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">RSI (14)</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--y)">~75</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tb">⚠️ 超買</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">MA5</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">~$9.20</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">📗 Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">MA20</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">~$6.80</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">📗 Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">MA50</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">~$4.50</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">📗 Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">MA200</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">~$2.10</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">📗 Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">MACD</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g)">正值</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">📗 Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">整體 MA 訊號</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">5 Buy / 0 Sell</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="tag tn">Strong Buy</span></td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5)">支撐位</td><td style="text-align:right;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);font-weight:600">$8.85 / $7.80</td><td style="text-align:center;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--m)">財報前高 / 盤整底</td></tr>
+          <tr><td style="padding:8px 10px">壓力位</td><td style="text-align:right;padding:8px 10px;font-weight:600">$12.00 / $15.28</td><td style="text-align:center;padding:8px 10px;color:var(--m)">整數關 / 52週高</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">股價目標區間</div>
+      <div class="trange">
+        <div style="font-size:12px;color:var(--m);margin-bottom:16px">現價 vs 分析師目標（美元）</div>
+        <div class="rtrack">
+          <div class="rfill" style="left:0%;width:54%"></div>
+          <div class="rmark" style="left:0%;color:var(--m)">$0<div class="rlbl">52週低</div></div>
+          <div class="rmark" style="left:54%;color:var(--o)">$10.72<div class="rlbl">現價</div></div>
+          <div class="rmark" style="left:80%;color:var(--g)">$19.83<div class="rlbl">均值目標</div></div>
+          <div class="rmark" style="left:100%;color:var(--p)">$25<div class="rlbl">最高目標</div></div>
+        </div>
+        <div style="height:40px"></div>
+      </div>
+      <div class="ubox" style="margin-top:16px">
+        <div><div class="unum">+85%</div><div class="ulbl">現價至分析師均值目標潛在空間</div></div>
+        <div style="text-align:right">
+          <div style="font-size:13px;color:var(--m)">均值目標</div>
+          <div style="font-size:22px;font-weight:700;color:var(--o)">$19.83</div>
+          <div style="font-size:12px;color:var(--m)">最低 $16 · 最高 $25</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--m);padding:8px;background:rgba(210,153,34,.06);border-radius:6px">⚠️ 技術指標為估算值，建議以 Yahoo Finance / TradingView 即時資料為準</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級</div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">共識評級分布（6 位分析師）</div>
+      <div class="rbar" style="margin:16px 0">
+        <div class="rseg" style="width:100%;background:#2ea043">Strong Buy 100%</div>
+      </div>
+      <div class="ilist" style="gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:6px">
+          <span style="font-size:13px">Strong Buy</span><span style="font-size:20px;font-weight:700;color:var(--g)">6</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:6px">
+          <span style="font-size:13px">Buy</span><span style="font-size:20px;font-weight:700;color:var(--m)">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:6px">
+          <span style="font-size:13px">Hold / Sell</span><span style="font-size:20px;font-weight:700;color:var(--m)">0</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--m)">買入人數 / 賣出人數</div>
+        <div style="font-size:18px;font-weight:700;color:var(--g)">6 / 0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">分析師目標價摘要</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px">
+          <span style="font-size:13px;color:var(--m)">均值目標</span>
+          <span style="font-size:22px;font-weight:700;color:var(--o)">$19.83</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px">
+          <span style="font-size:13px;color:var(--m)">最高目標</span>
+          <span style="font-size:18px;font-weight:700;color:var(--g)">$25.00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px">
+          <span style="font-size:13px;color:var(--m)">最低目標</span>
+          <span style="font-size:18px;font-weight:700;color:var(--bl)">$16.00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px">
+          <span style="font-size:13px;color:var(--m)">現價（05-15）</span>
+          <span style="font-size:18px;font-weight:700">$10.72</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,166,87,.08);border:1px solid rgba(255,166,87,.25);border-radius:8px">
+          <span style="font-size:13px;color:var(--m)">均值潛在漲幅</span>
+          <span style="font-size:22px;font-weight:800;color:var(--o)">+85%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ════════════════════════════════════════════════════ -->
+<div id="cat" class="sec">
+  <div class="sec-ttl">🚀 成長催化劑</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">🛡️</div><div class="ibdy"><div class="ittl">邊境防護後續訂單 <span class="sev sh">高影響</span></div><div class="idsc">初始 $2,000萬 PO 是多相位計畫第一步，後續數千台無人機部署訂單若公告，可能超過 $1–5 億</div></div></div>
+    <div class="iitem"><div class="iico">📊</div><div class="ibdy"><div class="ittl">Q2 2026 財報（2026-08 預計） <span class="sev sh">高影響</span></div><div class="idsc">Mistral / World View 整合首次量化，EBITDA 改善趨勢是否出現，是股價能否站穩 $15+ 的關鍵</div></div></div>
+    <div class="iitem"><div class="iico">🌐</div><div class="ibdy"><div class="ittl">全球多域國防合約擴張 <span class="sev sh">高影響</span></div><div class="idsc">美國以外政府對邊境防護、基礎設施監控的需求加速，ONDS 多域能力具競爭優勢</div></div></div>
+    <div class="iitem"><div class="iico">🏭</div><div class="ibdy"><div class="ittl">鐵路 / 電力工業 FullMAX 滲透 <span class="sev sm">中影響</span></div><div class="idsc">Class I 鐵路和電力公用事業市場數十億美元，FullMAX 替代傳統私有網路有長期成長空間</div></div></div>
+    <div class="iitem"><div class="iico">🎯</div><div class="ibdy"><div class="ittl">World View 高空偵察商業化 <span class="sev sm">中影響</span></div><div class="idsc">平流層氣球可替代部分低軌衛星功能，邊境、海洋、農業監測市場廣泛，整合後可開拓新客群</div></div></div>
+    <div class="iitem"><div class="iico">💰</div><div class="ibdy"><div class="ittl">機構投資人注意力提升 <span class="sev sl">低→中影響</span></div><div class="idsc">$10 億融資後浮動股增加，若 Q2 財報繼續超預期，媒體曝光帶動機構建倉，估值修復加速</div></div></div>
+  </div>
+</div>
+
+<!-- ══ 風險 ════════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 風險提示</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">⚡</div><div class="ibdy"><div class="ittl">執行整合風險 <span class="sev sh">高風險</span></div><div class="idsc">短期連續收購 Mistral、World View，系統整合與人才留存若出現問題，可能影響訂單交付與毛利率</div></div></div>
+    <div class="iitem"><div class="iico">🏛️</div><div class="ibdy"><div class="ittl">政府合約集中風險 <span class="sev sh">高風險</span></div><div class="idsc">訂單積壓高度依賴少數政府客戶，若計畫延遲或預算削減，將重創業績能見度</div></div></div>
+    <div class="iitem"><div class="iico">📉</div><div class="ibdy"><div class="ittl">EBITDA 轉盈時間不確定 <span class="sev sm">中風險</span></div><div class="idsc">調整後 EBITDA 仍為負值，Q2 預期持續虧損；若轉盈時間延後，市場情緒可能轉向</div></div></div>
+    <div class="iitem"><div class="iico">📊</div><div class="ibdy"><div class="ittl">股本稀釋風險 <span class="sev sm">中風險</span></div><div class="idsc">$10 億股票融資大量增發新股，若業績成長不足以消化稀釋效應，EPS 恢復速度較慢</div></div></div>
+    <div class="iitem"><div class="iico">🚀</div><div class="ibdy"><div class="ittl">競爭加劇 <span class="sev sl">低風險（短期）</span></div><div class="idsc">Shield AI、AeroVironment 等大型玩家競標壓力長期存在；但 ONDS 垂直整合護城河短期仍強</div></div></div>
+  </div>
+</div>
+
+<!-- ══ 展望 ════════════════════════════════════════════════════════ -->
+<div id="outlook" class="sec">
+  <div class="sec-ttl">🎯 展望</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">多頭論點 🟢</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">Q1 2026 財報：+1,065% YoY，遠超指引 25%</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">$457M 積壓訂單鎖定 3–4 季度業績能見度</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">現金 $1.48B + 零負債，執行能力有保障</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">毛利率快速提升（35% → 49%），業務結構優化</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">6 位分析師全數 Strong Buy，0 賣出</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">全球國防無人機需求加速，政策順風</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">空頭論點 🔴</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">Adj. EBITDA 虧損擴大（-$7.5M → -$10.9M）</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">收購整合摩擦風險（Mistral / World View）</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">$10 億融資大量稀釋，EPS 恢復慢</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">政府合約延遲風險（預算審核、政策變動）</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">機構持倉比例低，流動性有限</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--r);font-size:16px;margin-top:1px">●</span><div style="font-size:13px">RSI 超買，短線回調風險</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ════════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="thesis" style="background:linear-gradient(135deg,rgba(255,166,87,.08),rgba(63,185,80,.08));border:1px solid rgba(255,166,87,.2)">
+    <h3>🎯 核心投資論點</h3>
+    <p>Ondas Inc. 正處於從「小型無人機概念股」到「多域自主系統整合商」的轉型確認期。Q1 2026 財報是第一個硬數據確認——<strong>$50.1M 營收年增 +1,065%，毛利率 49%，$457M 積壓訂單</strong>，遠超市場預期。</p>
+    <p style="margin-top:12px">公司的護城河來自垂直整合：同時提供<strong>無人機（OAS）+ 通訊網路（FullMAX）+ 融資（Capital）</strong>的一站式解決方案，客戶切換成本極高。政府邊境防護主承包商地位 + World View 高空偵察能力 + Mistral 航太防禦知識庫，構成其他純無人機廠商難以複製的複合護城河。</p>
+    <p style="margin-top:12px">核心論點風險在於：整合執行能力 + EBITDA 轉盈時間表。若 Q2–Q3 2026 EBITDA 持續改善，且後續政府合約公告如期，現價 $10.72 距均值目標 $19.83 的 <strong>+85% 空間</strong>有望逐步實現。</p>
+  </div>
+</div>
+
+<!-- ══ AI 辯論 ════════════════════════════════════════════════════ -->
+<div id="ai-debate" class="sec">
+  <div class="sec-ttl">🤖 AI 辯論交鋒 — ONDS 完整分析</div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+
+    <div style="background:var(--s);border:1px solid rgba(66,133,244,.35);border-radius:10px;padding:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="width:10px;height:10px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:700;color:#4285f4">Gemini — 量化分析視角</span>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.85">
+        從量化角度，ONDS 最讓人注意的是<strong style="color:var(--t)">營收超預期幅度（25%）+ 指引上調幅度（+670% YoY）的組合</strong>，這在小型國防科技股中極為罕見。$457M 積壓訂單 / 全年指引 $390M ≈ 1.17×，積壓覆蓋率超過 100%，代表全年指引幾乎已有硬訂單支撐。<br>
+        技術面：單日 +21.1% 後 RSI 約 75，短線需要時間消化。中期看，若以 $390M 全年營收計算，P/S 約 0.5×，在國防無人機賽道是明顯低估。量化評分：<strong style="color:var(--g)">多頭信號強，但需等待回調建立更好的進場位置。</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--s);border:1px solid rgba(16,163,127,.35);border-radius:10px;padding:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="width:10px;height:10px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:700;color:#10a37f">ChatGPT — 基本面 / 敘事視角</span>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.85">
+        ONDS 的敘事轉型是這次投資機會的核心。2025 年以前它是「有概念、無業績」的無人機小型股；2026 年 Q1 財報後，它已是「有業績、有積壓、有合約」的國防科技整合商。<strong style="color:var(--t)">這個敘事升級通常帶來估值倍數的跳升，而不只是股價線性上漲。</strong><br>
+        垂直整合生態（無人機 + 網路 + 融資）創造了真正的差異化護城河。政府主承包商地位賦予 ONDS 系統整合者角色，這在國防採購中通常意味著長期、高黏著度的合約關係。分析師 6/0 Strong Buy 是市場對敘事的最佳佐證。
+      </div>
+    </div>
+
+    <div style="background:var(--s);border:1px solid rgba(225,29,72,.35);border-radius:10px;padding:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:700;color:#e11d48">Grok — 市場結構 / 籌碼視角</span>
+      </div>
+      <div style="font-size:13px;color:var(--m);line-height:1.85">
+        我更關注 $10 億融資後的籌碼結構問題。大量新股發行意味著更多浮動股，若沒有持續的機構買盤，每次反彈都會面臨供給壓力。<strong style="color:var(--t)">ONDS 目前仍是「需要催化劑解鎖的隱形股」——業績很好，但機構注意力有限。</strong><br>
+        最關鍵的觀察指標不是 RSI，而是：① 後 3 週的日均成交量是否維持在 $30M+ ② SEC 13F 下季報告中機構持倉是否增加。這兩個指標出現前，估值修復的速度會比基本面暗示的更慢。短線操作建議：等待 $8.85–9.50 回測支撐再加倉，以減少成本。
+      </div>
+    </div>
+
+    <div style="background:rgba(255,166,87,.05);border:1px solid rgba(255,166,87,.2);border-radius:10px;padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:10px">✅ 三方共識</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);margin-top:3px">✓</span><div style="font-size:13px;color:var(--m)">ONDS Q1 財報確認基本面轉型，不再是純概念股</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);margin-top:3px">✓</span><div style="font-size:13px;color:var(--m)">$457M 積壓訂單提供 2026 全年業績強力支撐</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--g);margin-top:3px">✓</span><div style="font-size:13px;color:var(--m)">現價 $10.72 vs 目標均值 $19.83，+85% 空間存在</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--y);margin:12px 0 8px">⚡ 三方分歧</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--y);margin-top:3px">≠</span><div style="font-size:13px;color:var(--m)">估值修復速度：Gemini/GPT 較樂觀，Grok 認為機構注意力不足會拖慢速度</div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px"><span style="color:var(--y);margin-top:3px">≠</span><div style="font-size:13px;color:var(--m)">短線操作：Grok 建議等回調，Gemini/GPT 認為長線持有更重要</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin:12px 0 8px">📌 綜合操作建議</div>
+      <div style="font-size:13px;color:var(--m)">長線投資者：現價已有 +85% 空間，若相信垂直整合敘事，可部分建倉並等待 Q2 財報確認。短線操作者：等待 $8.85–$9.50 回測支撐後加倉，設定 $7.50 止損位，目標 $15.28（52週高）。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════════ -->
+<div class="footer">
+  <div>📋 ONDS 即時監控中心 · <a href="https://ir.ondas.com" target="_blank" rel="noopener" style="color:var(--o);text-decoration:none">Ondas Inc. IR</a></div>
+  <div style="margin-top:6px">本頁由 Claude AI 自動生成 · 僅供參考 · 不構成投資建議 · 請以官方資料為準</div>
+  <div style="margin-top:4px">資料截止：2026-05-15 · 分析師目標來源：stockanalysis.com / public.com</div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── 季度營收圖 ──
+(function(){
+  const ctx = document.getElementById('revenueChart');
+  if(!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Q1\'25','Q2\'25','Q3\'25','Q4\'25','Q1\'26','Q2\'26E','Q3\'26E','Q4\'26E'],
+      datasets: [{
+        label: '季度營收 ($M)',
+        data: [4.25, 5.8, 7.2, 30.2, 50.1, 90, 115, 135],
+        backgroundColor: [
+          'rgba(139,148,158,.4)','rgba(139,148,158,.4)','rgba(139,148,158,.4)','rgba(139,148,158,.5)',
+          '#ffa657','rgba(255,166,87,.5)','rgba(255,166,87,.4)','rgba(255,166,87,.35)'
+        ],
+        borderColor: ['transparent','transparent','transparent','transparent','#ffa657','rgba(255,166,87,.7)','rgba(255,166,87,.7)','rgba(255,166,87,.7)'],
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => '$' + ctx.parsed.y + 'M'
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(48,54,61,.5)' }, ticks: { color: '#8b949e', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(48,54,61,.5)' }, ticks: { color: '#8b949e', font: { size: 11 }, callback: v => '$'+v+'M' } }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

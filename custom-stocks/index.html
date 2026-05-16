@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客製化股票監控中心</title>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--o:#ffa657;--p:#bc8cff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle at 20% 30%,rgba(88,166,255,.04) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(63,185,80,.03) 0%,transparent 50%);
+}
+.wrap{max-width:960px;margin:0 auto;padding:48px 20px;position:relative}
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);padding:10px 24px;display:flex;gap:16px;align-items:center}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;transition:color .2s}
+.nav a:hover,.nav a.active{color:var(--t)}
+.nav .logo{font-weight:700;color:var(--bl);margin-right:8px;font-size:14px}
+header{text-align:center;margin-bottom:48px}
+header h1{font-size:32px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--t),var(--m));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{font-size:14px;color:var(--m)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.stock-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;padding:24px;text-decoration:none;display:block;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.stock-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.stock-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.stock-card.onds{border-left:4px solid var(--o)}
+.stock-card.onds::before{background:linear-gradient(135deg,rgba(255,166,87,.06),transparent)}
+.stock-card.onds:hover{border-color:var(--o);box-shadow:0 8px 32px rgba(255,166,87,.15)}
+.stock-card.onds::before{opacity:1}
+.stock-card.pgy{border-left:4px solid var(--bl)}
+.stock-card.pgy:hover{border-color:var(--bl);box-shadow:0 8px 32px rgba(88,166,255,.15)}
+.add-card{background:transparent;border:2px dashed var(--bd);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;color:var(--m);font-size:14px;transition:border-color .2s,color .2s;cursor:default}
+.add-card:hover{border-color:var(--m);color:var(--t)}
+.ticker-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.stock-name{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--t)}
+.stock-desc{font-size:12px;color:var(--m);margin-bottom:16px;line-height:1.5}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.stat-row{display:flex;gap:16px;padding-top:14px;border-top:1px solid var(--bd)}
+.stat{flex:1}
+.stat-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:16px;font-weight:700;margin-top:2px}
+.arrow{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;margin-top:12px}
+.arrow-icon{font-size:14px;transition:transform .2s}
+.stock-card:hover .arrow-icon{transform:translateX(4px)}
+.updated{font-size:10px;color:var(--m);margin-top:6px}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+footer{text-align:center;color:var(--m);font-size:12px;margin-top:60px;padding-top:20px;border-top:1px solid var(--bd)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../index.html" class="logo">← 分析中心</a>
+  <a href="../pagaya/pgy_live_dashboard.html">PGY 監控</a>
+  <a href="." class="active" style="color:var(--t)">客製化股票</a>
+</nav>
+
+<div class="wrap">
+  <header>
+    <div style="font-size:28px;margin-bottom:12px">📊</div>
+    <h1>客製化股票監控中心</h1>
+    <p>個人化選股 · 深度分析 · AI 三方觀點 · 即時監控</p>
+  </header>
+
+  <div class="section-title" style="margin-bottom:20px">已建立的股票 Dashboard</div>
+
+  <div class="grid">
+
+    <!-- ONDS -->
+    <a class="stock-card onds" href="onds/">
+      <div class="ticker-tag" style="color:var(--o)">NASDAQ: ONDS</div>
+      <div class="stock-name">Ondas Inc.</div>
+      <div class="stock-desc">自主無人機 · 私有無線網路 · 多域國防與工業自動化</div>
+      <div class="badges">
+        <span class="badge bo">🚁 無人機</span>
+        <span class="badge bg">+1,065% YoY</span>
+        <span class="badge bp">$457M 積壓</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-label">收盤價</div>
+          <div class="stat-val" style="color:var(--o)">$10.72</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">分析師目標</div>
+          <div class="stat-val" style="color:var(--g)">$19.83</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">潛在空間</div>
+          <div class="stat-val" style="color:var(--g)">+85%</div>
+        </div>
+      </div>
+      <div class="arrow" style="color:var(--o)">開啟 Dashboard <span class="arrow-icon">→</span></div>
+      <div class="updated">更新於 2026-05-16 · Strong Buy 6/6</div>
+    </a>
+
+    <!-- 新增佔位 -->
+    <div class="add-card">
+      <div style="font-size:32px;opacity:.3">＋</div>
+      <div>下一支客製化股票</div>
+      <div style="font-size:12px;opacity:.6">使用「客製化股票Dashboard流程樣板.md」建立</div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  客製化股票監控中心 · 由 Claude AI 協助建立 · 僅供參考，不構成投資建議
+</footer>
+
+</body>
+</html>
