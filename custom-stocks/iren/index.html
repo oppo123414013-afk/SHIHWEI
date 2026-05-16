@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IREN 監控中心 — IREN Limited</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#1a1000,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(255,166,87,.15),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,166,87,.08),transparent 70%)}
+.ticker{font-size:13px;color:var(--o);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,166,87,.15);border:1px solid rgba(255,166,87,.4);color:var(--o);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--o);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.btl{background:rgba(57,211,83,.15);color:var(--tl);border:1px solid rgba(57,211,83,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--o);background:rgba(255,166,87,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--o);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(255,166,87,.1);border-color:var(--o)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+.cy{border-left:3px solid var(--y)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--o);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(255,166,87,.07) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(255,166,87,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(63,185,80,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--o);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:600;color:var(--m);margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#analyst">分析師</a>
+  <a href="#catalyst">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#bullbear">多空對比</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: IREN</div>
+  <div class="co-name">IREN Limited</div>
+  <div class="tagline">比特幣挖礦 · AI GPU 資料中心 · 可再生能源 · 澳洲/加拿大</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>資料截止 2026-05-15</div>
+    <span style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$53.69</span>
+    <span style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(255,166,87,.15);border:1px solid rgba(255,166,87,.4);color:var(--o)">日內 $53.04–$57.46</span>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--m)">美股收盤 · 比特幣+AI雙業務平台</span>
+    <span style="font-size:11px;color:var(--m)">52週：估 $8 低 / $65 高 · 比特幣週期性大波動</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bo">⛏️ 比特幣+AI雙引擎</span>
+    <span class="badge bb">🖥️ 目標150K GPUs</span>
+    <span class="badge bg">💰 $3.7B ARR目標</span>
+    <span class="badge btl">🌱 可再生能源驅動</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card co">
+    <div class="ctitle">目標年度ARR（2026末）</div>
+    <div class="cval" style="color:var(--o)">$3.7B</div>
+    <div class="csub">比特幣+AI雙引擎合計目標</div>
+  </div>
+  <div class="card cb">
+    <div class="ctitle">目標 GPU 部署規模</div>
+    <div class="cval" style="color:var(--bl)">150K</div>
+    <div class="csub">AI 雲端算力 GPU 數量</div>
+  </div>
+  <div class="card cp">
+    <div class="ctitle">收購 Mirantis</div>
+    <div class="cval" style="color:var(--p)">$630M</div>
+    <div class="csub">雲端管理平台戰略收購</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">分析師目標均值</div>
+    <div class="cval" style="color:var(--g)">$66.2</div>
+    <div class="csub">11位覆蓋 · 9 Buy / 2 Sell</div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 + 辯論 ════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(255,166,87,.2);color:var(--o)">比特幣+AI雙飛輪 vs 整合執行風險</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>IREN Limited 從澳洲純比特幣礦工起步，現正積極轉型為「比特幣挖礦 + AI GPU 雲端算力」雙業務平台。2026 年宣布以約 $630M 收購 Mirantis（雲端管理平台），同時設定 150,000 GPU 部署目標與 $3.7B ARR 目標（2026 年底）。公司擁有可再生能源自建資料中心優勢，並在澳洲與加拿大持有能源基礎設施。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>$53.69</span></div>
+    <div>目標ARR：<span class="ho">$3.7B</span></div>
+    <div>GPU目標：<span class="hb">150K</span></div>
+    <div>Mirantis收購：<span class="hp">$630M</span></div>
+    <div>分析師目標均值：<span class="hg">$66.2</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（量化分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">量化看 $3.7B ARR 目標的可行性：IREN Q3 2026 單季營收 $144.8M，年化約 $580M，距離 $3.7B 目標還需成長約 <strong style="color:var(--t)">6.4倍</strong>。若 AI GPU 業務以 150K GPU × 平均每 GPU $2–3/小時 × 利用率 70% 計算，年度 GPU 雲端收入潛力約 $1.8–2.7B。比特幣挖礦側需比特幣維持 $80,000+ 且算力持續擴張。兩業務加總在最樂觀情境下有達標空間，但時間表與執行力是最大變數——收購 Mirantis 的整合需要 12–18 個月才能看到明顯的協同效應。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/雙飛輪邏輯）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">IREN 的「比特幣+AI」雙飛輪邏輯具有獨特優勢：<strong style="color:var(--t)">（1）資料中心共用基礎設施</strong>——比特幣挖礦與 AI GPU 算力都需要大量電力、散熱與連接，IREN 自建資料中心可以動態調配資源，在比特幣收益差時轉向 AI 租算力，反之亦然；<strong style="color:var(--t)">（2）可再生能源護城河</strong>——AI 資料中心最缺的是可再生能源認證電力，IREN 的能源基礎設施正好填補這個需求，對 ESG 敏感的雲端客戶有吸引力；<strong style="color:var(--t)">（3）Mirantis 的 Kubernetes 管理能力</strong>可讓 IREN 提供更完整的企業級 AI 雲端服務，而非單純 GPU 算力出租。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（風險/整合複雜度）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">兩個業務整合的複雜性遠超市場認知：比特幣挖礦是高度標準化、算力即商品的業務；AI GPU 雲端是需要企業級 SLA、技術支持和軟體生態的服務業務——<strong style="color:var(--t)">這兩個業務在銷售團隊、客戶類型、合約結構上幾乎完全不同。</strong>Mirantis 收購帶來軟體能力，但 $630M 對一家淨損 $247.8M/季的公司是沉重負擔。同時，GPU 採購競爭激烈，NVIDIA H100/H200 的稀缺性意味著 150K GPU 目標不是錢的問題，而是能否拿到貨的問題。負 EBITDA 環境下追求激進擴張，資本消耗風險極高。</div>
+    </div>
+
+    <div style="background:rgba(255,166,87,.06);border:1px solid rgba(255,166,87,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--o);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>雙飛輪的資源共用邏輯成立，但動態調配的實際難度被低估——比特幣礦機（ASIC）和 AI GPU 完全不同，無法共享硬體，只能共享電力和場地，實際的靈活性有限。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>同意硬體不能共享，但電力 + 冷卻 + 土地才是資料中心最貴的成本，共享這些固定資本已經能顯著攤低兩個業務的單位成本。Mirantis 帶來的 Kubernetes 編排能力則是 AI 業務真正的差異化。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都在談業務邏輯，但當前財報是季虧損 $247.8M——<strong style="color:var(--t)">請問這個燒錢速度再加上 $630M 的 Mirantis 收購，資產負債表能撐多久？</strong>若比特幣跌破 $60,000，挖礦側現金流轉負，整個轉型計畫會立即承壓。<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>IREN 可透過增發股票和可轉換債券融資，但 Grok 的現金流警示有效——投資者應緊盯 2026Q4 的 EBITDA 改善軌跡，以及 AI 業務簽約 GPU 使用率是否達到 60%+ 才能判斷轉型是否成功。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/IREN/news/" target="_blank" rel="noopener">📰 Yahoo Finance IREN 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/iren/" target="_blank" rel="noopener">📊 StockAnalysis IREN ↗</a>
+    <a class="nlink-btn" href="https://iren.com/investors/news" target="_blank" rel="noopener">📢 IREN 投資人新聞 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/IREN/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://iren.com/investors/news" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">🏢 IREN 宣布收購 Mirantis 約 $630M：加速企業級 AI 雲端管理平台能力</div>
+      <div class="nmeta">2026 · iren.com · Kubernetes 管理 · 企業AI雲端 · 轉型關鍵</div>
+    </a>
+    <a class="nitem" href="https://iren.com/investors/news" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">🖥️ IREN 設定 150,000 GPU 部署目標：AI 算力規模化路線圖揭示</div>
+      <div class="nmeta">2026 · iren.com · H100/H200 GPU · AI 雲端算力 · 150K目標</div>
+    </a>
+    <a class="nitem" href="https://finance.yahoo.com/quote/IREN/" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">💰 IREN 設定 $3.7B ARR 目標（2026末）：比特幣挖礦+AI GPU 雙引擎合計</div>
+      <div class="nmeta">2026 · 年度ARR目標 · 可再生能源驅動 · 澳洲/加拿大資料中心</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/iren/" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">📊 分析師：IREN 目標均值 $66.2，11 位覆蓋（9 Buy / 2 Sell），高目標 $90</div>
+      <div class="nmeta">2026-05 · 11位分析師覆蓋 · Buy 主導 · 高 $90 / 低 $45</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 事件時間軸 ════════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 關鍵事件時間軸</div>
+  <div class="card">
+    <div class="flow">
+      <div class="fstep">
+        <div>
+          <div class="ft">⛏️ 比特幣第四次減半（2024-04）</div>
+          <div class="fd">區塊獎勵從 6.25 BTC 降至 3.125 BTC，礦工收入減半。IREN 憑藉低電力成本存活，加速擴張算力份額，在弱礦工退出後反而壯大。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🚀 比特幣牛市 + AI 算力需求爆發（2025）</div>
+          <div class="fd">比特幣突破 $80,000–$100,000，挖礦利潤大增；同期 AI 資料中心 GPU 算力需求爆發，IREN 宣布雙業務戰略轉型，股價大幅上漲。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🏢 宣布收購 Mirantis 約 $630M（2026）</div>
+          <div class="fd">收購雲端管理平台 Mirantis，獲取 Kubernetes 企業級管理能力，從純 GPU 算力出租升級至全棧 AI 雲端服務提供商。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">📊 Q3 2026 財報：營收 $144.8M，淨損 $247.8M（2026-05）</div>
+          <div class="fd">單季營收創歷史新高，但淨損顯著擴大，主因收購相關費用與 AI 業務擴張資本支出。EPS -$0.74。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🎯 $3.7B ARR 目標 + 150K GPU 目標（2026末）</div>
+          <div class="fd">管理層設定年底 ARR 目標，需比特幣挖礦穩定貢獻 + AI 業務快速放量。兩個業務需同時達標才能實現。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表格 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">📋 財務數據</div>
+  <div class="g2">
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--o)">損益表摘要</div>
+      <table>
+        <thead><tr><th>指標</th><th>數值</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td>Q3 2026 營收</td><td style="color:var(--o);font-weight:700">$144.8M</td><td><span class="tag tb">季度新高</span></td></tr>
+          <tr><td>Q3 2026 EPS</td><td style="color:var(--r);font-weight:700">-$0.74</td><td><span class="tag tr2">虧損</span></td></tr>
+          <tr><td>Q3 2026 淨損</td><td style="color:var(--r);font-weight:700">-$247.8M</td><td><span class="tag tr2">收購+擴張費用</span></td></tr>
+          <tr><td>2026全年收入預測</td><td style="color:var(--o);font-weight:700">$958.4M</td><td><span class="tag tb">分析師預估</span></td></tr>
+          <tr><td>EBITDA</td><td style="color:var(--r);font-weight:700">負值</td><td><span class="tag tr2">擴張期</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--o)">業務目標與進展</div>
+      <table>
+        <thead><tr><th>指標</th><th>目標</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>年度ARR目標</td><td style="color:var(--o);font-weight:700">$3.7B</td><td><span class="tag tb">2026末</span></td></tr>
+          <tr><td>GPU部署目標</td><td style="color:var(--bl);font-weight:700">150,000</td><td><span class="tag ta">執行中</span></td></tr>
+          <tr><td>Mirantis 收購</td><td style="color:var(--p);font-weight:700">~$630M</td><td><span class="tag tp">整合中</span></td></tr>
+          <tr><td>分析師目標均值</td><td style="color:var(--g);font-weight:700">$66.2</td><td><span class="tag tn">9 Buy 2 Sell</span></td></tr>
+          <tr><td>目前股價</td><td style="color:var(--t);font-weight:700">$53.69</td><td><span class="tag tb">距目標+23%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">🎯 分析師評級與目標價</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+      <div>
+        <div style="font-size:28px;font-weight:800;color:var(--g)">Buy 主導</div>
+        <div style="font-size:13px;color:var(--m);margin-top:2px">11 位分析師覆蓋 · 9 Buy / 2 Sell</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--o)">$66.2 <span style="font-size:14px;color:var(--m)">均值</span></div>
+        <div style="font-size:13px;color:var(--m)">現價 $53.69 → 隱含 <span class="hg">+23.3%</span></div>
+      </div>
+    </div>
+
+    <!-- 評級分佈 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--m);margin-bottom:8px">評級分佈</div>
+      <div class="rbar">
+        <div class="rseg fg" style="width:81.8%">9 Buy (81.8%)</div>
+        <div class="rseg fr2" style="width:18.2%">2 Sell</div>
+      </div>
+    </div>
+
+    <!-- 目標價區間視覺化 -->
+    <div class="trange">
+      <div style="font-size:12px;color:var(--m);margin-bottom:4px">目標價區間視覺化</div>
+      <div class="rtrack" style="margin:28px 8px">
+        <div class="rfill" style="left:0%;width:100%"></div>
+        <!-- 低目標 $45 -->
+        <div class="rmark" style="left:0%;color:var(--r)">$45 <span style="font-size:9px">低</span></div>
+        <div class="rlbl" style="left:0%">低</div>
+        <!-- 現價 $53.69 → (53.69-45)/(90-45) = 19.3% -->
+        <div class="rmark" style="left:19.3%;color:var(--o)">$53.69 <span style="font-size:9px">現價</span></div>
+        <!-- 均值 $66.2 → (66.2-45)/(90-45) = 47.1% -->
+        <div class="rmark" style="left:47.1%;color:var(--t)">$66.2 <span style="font-size:9px">均值</span></div>
+        <!-- 高目標 $90 -->
+        <div class="rmark" style="left:100%;color:var(--g)">$90 <span style="font-size:9px">高</span></div>
+        <div class="rlbl" style="left:100%">高</div>
+      </div>
+    </div>
+
+    <table style="margin-top:16px">
+      <thead><tr><th>機構</th><th>評級</th><th>目標價</th><th>備註</th></tr></thead>
+      <tbody>
+        <tr><td>代表性Buy分析師</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g);font-weight:700">$90</td><td style="color:var(--m);font-size:12px">最樂觀情境（AI業務全面放量）</td></tr>
+        <tr><td>共識均值</td><td><span class="tag tn">Buy</span></td><td style="color:var(--o);font-weight:700">$66.2</td><td style="color:var(--m);font-size:12px">11位分析師平均目標</td></tr>
+        <tr><td>Sell 分析師</td><td><span class="tag tr2">Sell</span></td><td style="color:var(--r);font-weight:700">$45</td><td style="color:var(--m);font-size:12px">整合風險 + 燒錢速度憂慮</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ 催化劑 + 風險 ════════════════════════════════════════════ -->
+<div class="g2" style="margin-bottom:20px">
+  <div id="catalyst" class="sec" style="margin-bottom:0">
+    <div class="sec-ttl">🚀 催化劑</div>
+    <div class="ilist">
+      <div class="iitem">
+        <div class="iico">₿</div>
+        <div class="ibdy">
+          <div class="ittl">比特幣價格上漲</div>
+          <div class="idsc">BTC 突破 $100,000 大幅增加挖礦側現金流，降低雙業務整合財務壓力</div>
+        </div>
+        <div class="sev sh">高</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">🖥️</div>
+        <div class="ibdy">
+          <div class="ittl">AI GPU 算力需求爆發</div>
+          <div class="idsc">企業 AI 訓練/推論需求持續增長，IREN GPU 雲端使用率達到 60%+ 轉正</div>
+        </div>
+        <div class="sev sh">高</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">🏢</div>
+        <div class="ibdy">
+          <div class="ittl">Mirantis 整合完成</div>
+          <div class="idsc">軟體 + 硬體整合後提供完整企業AI雲端方案，開始貢獻正 EBITDA</div>
+        </div>
+        <div class="sev sm">中</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">🎯</div>
+        <div class="ibdy">
+          <div class="ittl">$3.7B ARR 目標里程碑</div>
+          <div class="idsc">任何接近目標的進展數字都會成為股價強力催化劑</div>
+        </div>
+        <div class="sev sm">中</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="risk" class="sec" style="margin-bottom:0">
+    <div class="sec-ttl">⚠️ 主要風險</div>
+    <div class="ilist">
+      <div class="iitem">
+        <div class="iico">📉</div>
+        <div class="ibdy">
+          <div class="ittl">比特幣價格波動</div>
+          <div class="idsc">BTC 跌破 $60,000 可能使挖礦側現金流轉負，加劇整體財務壓力</div>
+        </div>
+        <div class="sev sh">高</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">⚔️</div>
+        <div class="ibdy">
+          <div class="ittl">GPU 採購競爭激烈</div>
+          <div class="idsc">H100/H200/B200 稀缺，大型雲端巨頭優先拿貨，150K GPU 目標能否達成存疑</div>
+        </div>
+        <div class="sev sh">高</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">💸</div>
+        <div class="ibdy">
+          <div class="ittl">EBITDA 負值 + 燒錢風險</div>
+          <div class="idsc">季淨損 $247.8M，$630M 收購在負 EBITDA 環境下資本消耗極高</div>
+        </div>
+        <div class="sev sh">高</div>
+      </div>
+      <div class="iitem">
+        <div class="iico">🔗</div>
+        <div class="ibdy">
+          <div class="ittl">Mirantis 整合執行風險</div>
+          <div class="idsc">礦業 + AI 雲端 + 企業軟體三種文化整合難度高，客戶重疊度低</div>
+        </div>
+        <div class="sev sm">中</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 多空對比 ════════════════════════════════════════════════════ -->
+<div id="bullbear" class="sec">
+  <div class="sec-ttl">⚖️ 多空對比</div>
+  <div class="g2">
+    <div class="card" style="border-left:3px solid var(--g)">
+      <div style="font-size:14px;font-weight:700;color:var(--g);margin-bottom:12px">📈 多方論點</div>
+      <div class="pw">
+        <div class="pl"><span>雙業務護城河（挖礦+AI）</span><span style="color:var(--g)">強</span></div>
+        <div class="pb"><div class="pf fg" style="width:85%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>可再生能源 + 自建資料中心優勢</span><span style="color:var(--g)">中強</span></div>
+        <div class="pb"><div class="pf fg" style="width:70%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>分析師 9 Buy 共識支持</span><span style="color:var(--g)">中</span></div>
+        <div class="pb"><div class="pf fg" style="width:60%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>比特幣牛市順風</span><span style="color:var(--g)">強</span></div>
+        <div class="pb"><div class="pf fg" style="width:80%"></div></div>
+      </div>
+      <ul style="font-size:12px;color:var(--m);margin-top:12px;padding-left:16px;line-height:2">
+        <li>垂直整合能源+算力護城河深</li>
+        <li>比特幣挖礦現金流支持AI側擴張</li>
+        <li>Mirantis 帶來企業軟體能力升級</li>
+        <li>ARR 目標若達成估值重估空間大</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:3px solid var(--r)">
+      <div style="font-size:14px;font-weight:700;color:var(--r);margin-bottom:12px">📉 空方論點</div>
+      <div class="pw">
+        <div class="pl"><span>季淨損 $247.8M 燒錢速度</span><span style="color:var(--r)">高風險</span></div>
+        <div class="pb"><div class="pf fr2" style="width:90%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>$3.7B ARR 目標執行難度</span><span style="color:var(--r)">極高</span></div>
+        <div class="pb"><div class="pf fr2" style="width:85%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>GPU 拿貨能力存疑</span><span style="color:var(--r)">高</span></div>
+        <div class="pb"><div class="pf fr2" style="width:75%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>比特幣波動風險</span><span style="color:var(--r)">高</span></div>
+        <div class="pb"><div class="pf fr2" style="width:80%"></div></div>
+      </div>
+      <ul style="font-size:12px;color:var(--m);margin-top:12px;padding-left:16px;line-height:2">
+        <li>礦業+AI雲端+企業軟體整合難度高</li>
+        <li>電力成本上漲壓縮挖礦利潤</li>
+        <li>GPU 採購被大廠優先壟斷</li>
+        <li>比特幣熊市可能中斷整個轉型計畫</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ════════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 投資論點</div>
+  <div class="card" style="border-left:3px solid var(--o)">
+    <div style="font-size:15px;font-weight:700;color:var(--o);margin-bottom:12px">IREN：從礦工轉型「比特幣挖礦 + AI GPU 雲端」雙業務平台</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.85">
+      <p style="margin-bottom:10px">IREN Limited 的投資核心命題是：<strong style="color:var(--t)">一家傳統比特幣礦業公司，正在以激進速度轉型為 AI 時代的計算基礎設施提供商</strong>。其優勢在於自建的可再生能源驅動資料中心，這是 AI 資料中心最稀缺的資源之一；Mirantis 收購則補充了企業軟體管理層，使 IREN 能夠提供從硬體算力到雲端管理的完整方案。</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--t)">關鍵論點：</strong>比特幣挖礦業務在牛市中產生穩定現金流，為 AI 業務的大規模資本支出提供緩衝；AI GPU 業務若能達到 150K GPU × 70% 利用率，年度收入潛力接近 $2B，加上挖礦側，$3.7B ARR 目標在最樂觀情境下有達標可能。</p>
+      <p><strong style="color:var(--t)">最大風險：</strong>整合執行失敗。礦業、AI 雲端、企業軟體三個業務文化、銷售策略、客戶群體幾乎完全不同；同時在 EBITDA 負值環境下追求激進目標，若比特幣市場同步轉弱，資本消耗速度可能超過市場預期。<strong style="color:var(--o)">投資 IREN 本質上是在押注「比特幣維持高位 + AI GPU 需求持續 + 管理層高效整合 Mirantis」三個條件同時成立。</strong></p>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:var(--s2);border-radius:8px;padding:10px 16px;text-align:center">
+        <div style="font-size:11px;color:var(--m)">現價</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t)">$53.69</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:10px 16px;text-align:center">
+        <div style="font-size:11px;color:var(--m)">目標均值</div>
+        <div style="font-size:18px;font-weight:700;color:var(--g)">$66.2</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:10px 16px;text-align:center">
+        <div style="font-size:11px;color:var(--m)">空間</div>
+        <div style="font-size:18px;font-weight:700;color:var(--o)">+23.3%</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:10px 16px;text-align:center">
+        <div style="font-size:11px;color:var(--m)">ARR目標</div>
+        <div style="font-size:18px;font-weight:700;color:var(--o)">$3.7B</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>IREN Limited (NASDAQ: IREN) 監控中心 · 資料截止 <strong>2026-05-15</strong></div>
+  <div style="margin-top:6px">本頁僅供資訊參考，不構成投資建議。投資有風險，決策前請做充分研究。</div>
+  <div style="margin-top:6px"><a href="../../index.html" style="color:var(--o);text-decoration:none">← 返回分析中心</a> · <a href="../" style="color:var(--m);text-decoration:none">客製化股票列表</a></div>
+</div>
+
+</div><!-- /.wrap -->
+</body>
+</html>

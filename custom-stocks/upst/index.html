@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPST 監控中心 — Upstart Holdings</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#0d1a2d,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(88,166,255,.12),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(63,185,80,.07),transparent 70%)}
+.ticker{font-size:13px;color:var(--bl);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);color:var(--bl);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--bl);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--bl);background:rgba(88,166,255,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--bl);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(88,166,255,.1);border-color:var(--bl)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--bl);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.ubox{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(63,185,80,.05));border:1px solid rgba(88,166,255,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--bl)}
+.ulbl{font-size:13px;color:var(--m)}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(88,166,255,.07) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(88,166,255,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(63,185,80,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--bl);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:600;color:var(--m);margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#analyst">分析師</a>
+  <a href="#catalyst">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: UPST</div>
+  <div class="co-name">Upstart Holdings</div>
+  <div class="tagline">AI 信貸評估平台 · B2B · 美國個人 / 汽車 / 住宅貸款</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>資料截止 2026-05-15</div>
+    <span style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$28.06</span>
+    <span style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);color:var(--bl)">52週 $18–$45</span>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--m)">美股收盤 · 宏觀敏感型 AI 金融科技</span>
+    <span style="font-size:11px;color:var(--m)">52週：約 $18 低 / $45 高 · 波動幅度大</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bb">🤖 AI 放貸核心</span>
+    <span class="badge bg">📈 貸款量+61% YoY</span>
+    <span class="badge bo">💰 $4B 新資本承諾</span>
+    <span class="badge" style="background:rgba(57,211,83,.15);color:var(--tl);border:1px solid rgba(57,211,83,.3)">📋 全年指引維持</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cb">
+    <div class="ctitle">Q1 2026 貸款撮合量</div>
+    <div class="cval" style="color:var(--bl)">+61%</div>
+    <div class="csub">YoY 大幅反彈 · 宏觀轉好先行</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">Q1 2026 營收</div>
+    <div class="cval" style="color:var(--g)">+44%</div>
+    <div class="csub">YoY · 手續費收入驅動</div>
+  </div>
+  <div class="card co">
+    <div class="ctitle">新承諾資本</div>
+    <div class="cval" style="color:var(--o)">$4B+</div>
+    <div class="csub">銀行 / 信用合作社新承諾</div>
+  </div>
+  <div class="card cp">
+    <div class="ctitle">分析師目標均值</div>
+    <div class="cval" style="color:var(--p)">$45.84</div>
+    <div class="csub">現價隱含 <span class="hg">+63%</span> 空間</div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 + 辯論 ════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(88,166,255,.2);color:var(--bl)">Q1 2026 貸款量+61% YoY</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>Upstart 於 Q1 2026 發布財報，貸款撮合量 YoY +61%，營收 +44% YoY，同時宣告 $4B+ 新承諾資本（來自銀行與信用合作社合作夥伴），汽車貸款與住宅貸款業務持續擴張，全年指引維持。UPST 不持有貸款本身，僅收取撮合手續費，是純粹的 AI 信貸基礎設施平台。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>$28.06</span></div>
+    <div>貸款量 YoY：<span class="hg">+61%</span></div>
+    <div>新資本承諾：<span class="hg">$4B+</span></div>
+    <div>分析師目標均值：<span style="color:var(--bl)">$45.84</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">貸款撮合量 +61% YoY 的量化意義：UPST 商業模式核心是「撮合量 × 平均手續費率」，61% 的貸款量增長在費率穩定的前提下直接轉化為約 44% 的營收增長（費率略有壓縮）。<strong style="color:var(--t)">$4B 新承諾資本代表合作銀行願意在平台上部署更多信貸，是對 AI 模型表現的機構背書。</strong>若 2026 年 Fed 降息 2–3 碼，信貸需求彈性估計可額外拉動貸款量 20–30%，即 2026 全年貸款量潛在達到 +80–90% YoY，對應營收增速可達 60%+。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/護城河）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">Upstart 的 AI 信用模型護城河來自三個維度：<strong style="color:var(--t)">（1）數據飛輪</strong>——每筆貸款都在訓練模型，已處理超過 300 萬筆貸款的歷史數據，傳統 FICO 分數無法複製這個維度的特徵工程；<strong style="color:var(--t)">（2）違約預測精準度</strong>——Upstart 聲稱比傳統信用評分違約率低 53%，這是銀行合作夥伴的核心採購動機；<strong style="color:var(--t)">（3）合規護城河</strong>——通過 CFPB 審查的 AI 信用模型具有先發者優勢，新進者需要同樣長期的合規驗證。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/利率敏感度）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">UPST 是市場上對利率最敏感的股票之一。2022–2023 年 Fed 升息週期中，UPST 從 $400 跌至 $12，跌幅超 97%，這不是誇張，而是商業模式的本質反映——高利率環境下個人貸款需求崩潰，UPST 撮合量直接歸零。<strong style="color:var(--t)">現在 $28 的股價其實已內含一定的降息預期，若 Fed 暫停降息或重啟升息，股價可能快速回到 $18–20 支撐。</strong>順風時可能飛漲，逆風時跌幅驚人，這是高 beta 資產的本質——只適合有明確宏觀判斷的交易者。</div>
+    </div>
+
+    <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>數據飛輪論述邏輯完整，但 UPST 的訓練數據主要來自美國個人無擔保貸款，跨品類擴展至汽車和住宅貸款時，數據特徵分佈差異大，模型遷移能力尚未被規模驗證。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>同意存在跨品類挑戰，但 $4B 新承諾資本有相當比例來自汽車和住宅貸款夥伴，這本身就是合作銀行對模型遷移能力的提前背書——沒有銀行會在沒看到測試數據的情況下承諾 $4B。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都在討論護城河，但忽略了最核心的問題——<strong style="color:var(--t)">UPST 的 GAAP 盈利能力何時能穩定？</strong>每次宏觀逆風期，UPST 都在燒錢。若利率維持現水位 18 個月，UPST 的現金儲備夠撐多久？<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>UPST 在 2021 高峰期已建立充足現金儲備，且輕資產模式（不持有貸款）使其在貸款量下滑時費用具有一定彈性，比傳統銀行的固定成本結構更有韌性。2026 年若降息啟動，FCF 轉正時間軸顯著縮短。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/UPST/news/" target="_blank" rel="noopener">📰 Yahoo Finance UPST 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/upst/" target="_blank" rel="noopener">📊 StockAnalysis UPST ↗</a>
+    <a class="nlink-btn" href="https://ir.upstart.com" target="_blank" rel="noopener">📢 Upstart 投資人關係 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/UPST/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://ir.upstart.com" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🏆 Upstart Q1 2026 財報：貸款撮合量 +61% YoY，$4B+ 新承諾資本，汽車/住宅貸款擴張</div>
+      <div class="nmeta">2026-05 · ir.upstart.com · 營收 +44% YoY · 全年指引維持</div>
+    </a>
+    <a class="nitem" href="https://ir.upstart.com" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🚗 Upstart 汽車貸款業務加速：新增銀行合作夥伴，Auto Retail 模式持續滲透</div>
+      <div class="nmeta">2026 · upstart.com · 汽車信貸 AI 評估 · 線上 + 實體車行整合</div>
+    </a>
+    <a class="nitem" href="https://ir.upstart.com" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">💰 $4B 新承諾資本：銀行與信用合作社大幅擴大在 Upstart 平台的信貸部署</div>
+      <div class="nmeta">2026-Q1 · 機構資本支持 · 貸款容量擴張 · AI 模型表現背書</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/upst/" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">📊 分析師：UPST 目標價均值 $45.84，8 Buy 強勁共識，高目標 $80 顯示降息情境樂觀預期</div>
+      <div class="nmeta">2026-05 · 22 位分析師覆蓋 · Buy 共識 · 高 $80 / 低 $20</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 事件時間軸 ════════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 關鍵事件時間軸</div>
+  <div class="card">
+    <div class="flow">
+      <div class="fstep">
+        <div>
+          <div class="ft">🏆 Q1 2026 財報：貸款量+61% YoY <span class="tag tn">最新</span></div>
+          <div class="fd">貸款撮合量大幅反彈 +61% YoY，營收 +44% YoY，$4B+ 新承諾資本，汽車/住宅貸款業務擴張，全年指引維持。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">💰 $4B+ 新承諾資本宣告</div>
+          <div class="fd">來自銀行與信用合作社的新承諾資本超過 $4B，代表機構貸款夥伴對 AI 信用模型表現的信心大幅提升。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🚗 汽車貸款 + 住宅貸款業務擴張</div>
+          <div class="fd">從個人無擔保貸款擴展至汽車（Auto Retail）和住宅貸款（HELOC），TAM 從 ~$5T 擴展至 ~$30T+，多元化信貸品類。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">📉 2022–2023 升息寒冬（UPST 從 $400→$12）</div>
+          <div class="fd">Fed 升息週期導致個人貸款需求崩潰，UPST 貸款量骨折，股價從高峰 $400 跌至 $12，跌幅 97%，是商業模式宏觀敏感度的最直接示範。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🚀 上市 IPO（2020）· 股價從 $20→$400</div>
+          <div class="fd">2020 年 NASDAQ IPO，2021 年受益於低利率 + 消費信貸需求爆發，股價飆升至 $400，市值一度超 $340 億。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表格 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">財務數據</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">季度貸款量趨勢</div>
+      <table>
+        <thead><tr><th>季度</th><th>貸款量 YoY</th><th>營收 YoY</th><th>資本承諾</th></tr></thead>
+        <tbody>
+          <tr><td>Q1 2026</td><td style="color:var(--g)">+61%</td><td style="color:var(--g)">+44%</td><td style="color:var(--o)">+$4B</td></tr>
+          <tr><td>Q4 2025</td><td style="color:var(--g)">+43%</td><td style="color:var(--g)">+35%</td><td>—</td></tr>
+          <tr><td>Q3 2025</td><td style="color:var(--g)">+28%</td><td style="color:var(--g)">+20%</td><td>—</td></tr>
+          <tr><td>Q2 2025</td><td style="color:var(--y)">+12%</td><td style="color:var(--y)">+8%</td><td>—</td></tr>
+          <tr><td>Q1 2025</td><td style="color:var(--r)">-18%</td><td style="color:var(--r)">-12%</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">商業模式關鍵指標</div>
+      <table>
+        <thead><tr><th>指標</th><th>狀態</th><th>評估</th></tr></thead>
+        <tbody>
+          <tr><td>貸款持有</td><td>不持有</td><td><span class="tag tn">輕資產</span></td></tr>
+          <tr><td>收入來源</td><td>撮合手續費</td><td><span class="tag ta">Fee-based</span></td></tr>
+          <tr><td>貸款量反彈</td><td style="color:var(--g)">+61% YoY</td><td><span class="tag tn">強勁</span></td></tr>
+          <tr><td>資本承諾</td><td style="color:var(--o)">$4B+</td><td><span class="tag tb">機構支持</span></td></tr>
+          <tr><td>利率敏感度</td><td style="color:var(--r)">極高</td><td><span class="tag tr2">高 Beta</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 貸款量成長視覺圖 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">季度貸款量 YoY 增速（復甦軌跡）</div>
+    <div class="bchart">
+      <div class="bcol">
+        <div class="bval" style="color:var(--r)">-18%</div>
+        <div class="bar" style="height:20%;background:linear-gradient(180deg,rgba(248,81,73,.6),rgba(248,81,73,.3))"></div>
+        <div class="blbl">Q1'25</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--y)">+12%</div>
+        <div class="bar" style="height:30%;background:linear-gradient(180deg,rgba(210,153,34,.6),rgba(210,153,34,.3))"></div>
+        <div class="blbl">Q2'25</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--g)">+28%</div>
+        <div class="bar" style="height:50%;background:linear-gradient(180deg,rgba(63,185,80,.6),rgba(63,185,80,.3))"></div>
+        <div class="blbl">Q3'25</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--g)">+43%</div>
+        <div class="bar" style="height:72%;background:linear-gradient(180deg,rgba(88,166,255,.7),rgba(88,166,255,.4))"></div>
+        <div class="blbl">Q4'25</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--bl)">+61%</div>
+        <div class="bar" style="height:100%;background:linear-gradient(180deg,#58a6ff,rgba(88,166,255,.5))"></div>
+        <div class="blbl">Q1'26 ★</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--m);text-align:center">貸款撮合量 YoY 增速（%）— 加速反彈確認宏觀轉好</div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ══════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">評級分佈（22位分析師）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:36%;background:var(--g)">買入 8</div>
+        <div class="rseg" style="width:27%;background:var(--y)">持有 6</div>
+        <div class="rseg" style="width:5%;background:var(--r)">賣 1</div>
+        <div class="rseg" style="width:32%;background:#30363d;color:var(--m)">其他 7</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;flex-wrap:wrap">
+        <span style="color:var(--g)">● Buy 8</span>
+        <span style="color:var(--y)">● Hold 6</span>
+        <span style="color:var(--r)">● Sell 1</span>
+        <span style="color:var(--m)">● 其他 7</span>
+      </div>
+      <div style="margin-top:14px">
+        <div class="pw">
+          <div class="pl"><span>Buy</span><span class="hg">8 / 22</span></div>
+          <div class="pb"><div class="pf fg" style="width:36%"></div></div>
+        </div>
+        <div class="pw">
+          <div class="pl"><span>Hold</span><span style="color:var(--y)">6 / 22</span></div>
+          <div class="pb"><div class="pf fo" style="width:27%"></div></div>
+        </div>
+        <div class="pw">
+          <div class="pl"><span>Sell</span><span class="hr">1 / 22</span></div>
+          <div class="pb"><div class="pf fr2" style="width:5%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">目標價分析</div>
+      <div class="ubox" style="margin-bottom:12px">
+        <div>
+          <div class="unum">+63%</div>
+          <div class="ulbl">現價 → 均值目標潛在漲幅</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:var(--bl)">$45.84</div>
+          <div style="font-size:12px;color:var(--m)">分析師均值目標</div>
+        </div>
+      </div>
+      <div class="trange">
+        <div style="font-size:12px;color:var(--m);margin-bottom:8px">目標價區間（降息情境分歧大）</div>
+        <div class="rtrack">
+          <div class="rfill" style="left:0%;width:100%"></div>
+          <div class="rmark" style="left:0%;color:var(--r)">$20</div>
+          <div class="rlbl" style="left:0%">低</div>
+          <div class="rmark" style="left:43%;color:var(--bl)">$45.84</div>
+          <div class="rlbl" style="left:43%">均值</div>
+          <div class="rmark" style="left:100%;color:var(--g)">$80</div>
+          <div class="rlbl" style="left:100%">高</div>
+        </div>
+        <div style="margin-top:30px;font-size:11px;color:var(--m);text-align:center">目標價區間 $20–$80 顯示分析師對降息路徑分歧極大，高 beta 特性明顯</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ══════════════════════════════════════════════════════ -->
+<div id="catalyst" class="sec">
+  <div class="sec-ttl">🚀 成長催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🏦</div>
+      <div class="ibdy">
+        <div class="ittl">Fed 降息週期 <span class="sev sh">高影響</span></div>
+        <div class="idsc">UPST 是降息受益程度最高的 FinTech 股之一。每次 Fed 降息 25bp，個人貸款需求歷史上平均反應 +8–12% 的借款申請量，若 2026 降息 2–3 碼，可直接推動貸款量額外增加 20–30%。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🚗</div>
+      <div class="ibdy">
+        <div class="ittl">汽車 / 住宅貸款滲透 <span class="sev sm">中期</span></div>
+        <div class="idsc">汽車貸款市場規模 ~$1.5T，住宅 HELOC 市場 ~$1T+，遠大於個人無擔保貸款。若 UPST 能在這兩個品類複製個人貸款的成功，TAM 擴展 5–10 倍。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏛️</div>
+      <div class="ibdy">
+        <div class="ittl">新銀行夥伴加入 <span class="sev sl">持續</span></div>
+        <div class="idsc">$4B 新承諾資本確認銀行夥伴擴張趨勢，每新增一家銀行夥伴都帶來即時的貸款容量擴張，且具累積效應。信用合作社（Credit Union）這一細分市場滲透仍在早期。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🧠</div>
+      <div class="ibdy">
+        <div class="ittl">AI 模型準確率持續提升 <span class="sev sl">長期</span></div>
+        <div class="idsc">每筆貸款都在強化模型，300 萬+貸款的訓練數據形成複利效應。若違約預測準確率持續領先傳統 FICO 模型，銀行合作夥伴的黏性和資本部署意願將持續提升。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ═════════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">📈</div>
+      <div class="ibdy">
+        <div class="ittl">利率敏感度極高 <span class="sev sh">高</span></div>
+        <div class="idsc">UPST 是市場上利率敏感度最高的股票之一。2022–2023 升息週期中股價從 $400→$12（跌幅 97%）。若 Fed 暫停降息或重啟升息，個人貸款需求快速萎縮，UPST 貸款量可能迅速反轉。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏦</div>
+      <div class="ibdy">
+        <div class="ittl">銀行合作夥伴集中風險 <span class="sev sh">高</span></div>
+        <div class="idsc">若主要銀行合作夥伴（如 Cross River Bank 等）削減信貸部署或終止合作，UPST 貸款量可能出現斷崖式下滑。合作夥伴集中度是最重要的業務風險之一。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📉</div>
+      <div class="ibdy">
+        <div class="ittl">宏觀信用環境惡化 <span class="sev sm">中</span></div>
+        <div class="idsc">若美國失業率上升，個人貸款違約率提高，即使 AI 模型準確，銀行合作夥伴也會收縮信貸投放，UPST 撮合量直接下滑。信用週期是不可控的宏觀變數。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💰</div>
+      <div class="ibdy">
+        <div class="ittl">GAAP 盈利時間表 <span class="sev sm">中</span></div>
+        <div class="idsc">UPST 在高利率期大幅虧損，GAAP 盈利路徑依賴持續的貸款量回升。若成長速度不足以覆蓋固定營運費用，現金消耗壓力可能在宏觀逆風期重現。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ═════════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 投資論點</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--bl);margin-bottom:14px">AI 信貸基礎設施：降息週期的最大受益者，也是宏觀逆風的最大受害者</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.9;margin-bottom:16px">
+      Upstart 和 PGY（Pagaya）的商業模式存在相似性：都是 AI 信貸基礎設施平台，不直接承擔信用風險，以手續費為核心收入。但 UPST 更聚焦美國個人 + 汽車 + 住宅貸款，而 PGY 更傾向機構資產管理側。<br><br>
+      <strong style="color:var(--t)">多頭論點：</strong>Q1 貸款量 +61% 是宏觀轉好的先行指標；$4B 新資本承諾提供貸款容量可見度；汽車和住宅貸款擴張將 TAM 擴展 5–10 倍；AI 數據飛輪持續強化競爭壁壘；分析師目標均值 $45.84，Buy 共識，高目標 $80 對應完整降息情境。<br><br>
+      <strong style="color:var(--t)">空頭論點：</strong>利率敏感度極高（歷史跌幅 97%）；GAAP 盈利時間表不明確；銀行夥伴集中風險；若宏觀轉差，降息預期落空，股價可能快速腰斬。<br><br>
+      <strong style="color:var(--r)">適合對象：</strong>對 Fed 政策有清晰判斷、能承受高波動（Beta > 2）、以 3–6 個月交易週期為主的投資人。長線持有需承受極端波動，需設定嚴格止損。
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">股票 Beta</div>
+        <div style="font-weight:700;color:var(--r)">極高（> 2.0）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">核心驅動</div>
+        <div style="font-weight:700;color:var(--bl)">Fed 降息路徑</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">分析師共識</div>
+        <div style="font-weight:700;color:var(--g)">Buy（$45.84）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">隱含上行</div>
+        <div style="font-weight:700;color:var(--bl)">+63%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+<div class="footer">
+  <div style="margin-bottom:6px">UPST · Upstart Holdings · NASDAQ · AI 信貸評估平台 · FinTech</div>
+  <div>資料截止 2026-05-15 · 本頁僅供研究參考，不構成投資建議</div>
+  <div style="margin-top:4px">分析師評級來源：公開研究報告彙整 · <a href="https://ir.upstart.com" target="_blank" rel="noopener" style="color:var(--bl)">ir.upstart.com</a></div>
+</div>
+
+</div><!-- .wrap -->
+</body>
+</html>

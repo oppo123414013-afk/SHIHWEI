@@ -5,113 +5,257 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>客製化股票監控中心</title>
 <style>
-:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--o:#ffa657;--p:#bc8cff}
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--cy:#00d4ff}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle at 20% 30%,rgba(88,166,255,.04) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(63,185,80,.03) 0%,transparent 50%);
-}
-.wrap{max-width:960px;margin:0 auto;padding:48px 20px;position:relative}
-.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);padding:10px 24px;display:flex;gap:16px;align-items:center}
+  background-image:radial-gradient(circle at 20% 30%,rgba(88,166,255,.04) 0%,transparent 50%),
+  radial-gradient(circle at 80% 70%,rgba(63,185,80,.03) 0%,transparent 50%),
+  radial-gradient(circle at 50% 10%,rgba(255,166,87,.03) 0%,transparent 40%)}
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);padding:10px 24px;display:flex;gap:16px;align-items:center;z-index:100}
 .nav a{color:var(--m);text-decoration:none;font-size:13px;transition:color .2s}
-.nav a:hover,.nav a.active{color:var(--t)}
+.nav a:hover{color:var(--t)}
 .nav .logo{font-weight:700;color:var(--bl);margin-right:8px;font-size:14px}
+.nav .active{color:var(--t);font-weight:600}
+.wrap{max-width:1060px;margin:0 auto;padding:48px 20px;position:relative;z-index:1}
 header{text-align:center;margin-bottom:48px}
-header h1{font-size:32px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--t),var(--m));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .icon{font-size:36px;margin-bottom:12px}
+header h1{font-size:30px;font-weight:800;margin-bottom:8px}
 header p{font-size:14px;color:var(--m)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.stock-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;padding:24px;text-decoration:none;display:block;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
-.stock-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
-.stock-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.stock-card.onds{border-left:4px solid var(--o)}
-.stock-card.onds::before{background:linear-gradient(135deg,rgba(255,166,87,.06),transparent)}
-.stock-card.onds:hover{border-color:var(--o);box-shadow:0 8px 32px rgba(255,166,87,.15)}
-.stock-card.onds::before{opacity:1}
-.stock-card.pgy{border-left:4px solid var(--bl)}
-.stock-card.pgy:hover{border-color:var(--bl);box-shadow:0 8px 32px rgba(88,166,255,.15)}
-.add-card{background:transparent;border:2px dashed var(--bd);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;color:var(--m);font-size:14px;transition:border-color .2s,color .2s;cursor:default}
-.add-card:hover{border-color:var(--m);color:var(--t)}
-.ticker-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.stock-name{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--t)}
-.stock-desc{font-size:12px;color:var(--m);margin-bottom:16px;line-height:1.5}
-.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:40px}
+.stock-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;padding:24px;text-decoration:none;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.stock-card:hover{transform:translateY(-3px)}
+.stock-card.onds{border-left:4px solid var(--o)}.stock-card.onds:hover{box-shadow:0 8px 32px rgba(255,166,87,.18);border-color:var(--o)}
+.stock-card.fig{border-left:4px solid var(--p)}.stock-card.fig:hover{box-shadow:0 8px 32px rgba(188,140,255,.18);border-color:var(--p)}
+.stock-card.upst{border-left:4px solid var(--bl)}.stock-card.upst:hover{box-shadow:0 8px 32px rgba(88,166,255,.18);border-color:var(--bl)}
+.stock-card.iren{border-left:4px solid var(--o)}.stock-card.iren:hover{box-shadow:0 8px 32px rgba(255,166,87,.18);border-color:var(--o)}
+.stock-card.axti{border-left:4px solid var(--g)}.stock-card.axti:hover{box-shadow:0 8px 32px rgba(63,185,80,.18);border-color:var(--g)}
+.stock-card.cohr{border-left:4px solid var(--cy)}.stock-card.cohr:hover{box-shadow:0 8px 32px rgba(0,212,255,.18);border-color:var(--cy)}
+.stock-card.ui{border-left:4px solid var(--y)}.stock-card.ui:hover{box-shadow:0 8px 32px rgba(210,153,34,.18);border-color:var(--y)}
+.ticker-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.stock-name{font-size:18px;font-weight:700;margin-bottom:3px;color:var(--t)}
+.stock-sector{font-size:11px;color:var(--m);margin-bottom:10px}
+.stock-desc{font-size:12px;color:var(--m);margin-bottom:14px;line-height:1.6;flex:1}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.badge{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600}
 .bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
 .bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
 .bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
 .bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
-.stat-row{display:flex;gap:16px;padding-top:14px;border-top:1px solid var(--bd)}
-.stat{flex:1}
-.stat-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.5px}
-.stat-val{font-size:16px;font-weight:700;margin-top:2px}
-.arrow{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;margin-top:12px}
-.arrow-icon{font-size:14px;transition:transform .2s}
-.stock-card:hover .arrow-icon{transform:translateX(4px)}
+.by{background:rgba(210,153,34,.15);color:var(--y);border:1px solid rgba(210,153,34,.3)}
+.bc{background:rgba(0,212,255,.15);color:var(--cy);border:1px solid rgba(0,212,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.stat-row{display:flex;gap:12px;padding-top:12px;border-top:1px solid var(--bd)}
+.stat{flex:1;min-width:0}
+.stat-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-val{font-size:15px;font-weight:700;margin-top:2px}
+.open-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;margin-top:12px;transition:gap .2s}
+.stock-card:hover .open-link{gap:8px}
 .updated{font-size:10px;color:var(--m);margin-top:6px}
-.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-footer{text-align:center;color:var(--m);font-size:12px;margin-top:60px;padding-top:20px;border-top:1px solid var(--bd)}
+.add-card{background:transparent;border:2px dashed var(--bd);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;color:var(--m);transition:border-color .2s,color .2s}
+.add-card:hover{border-color:var(--m);color:var(--t)}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center}
+.stat-card .num{font-size:28px;font-weight:800;margin:4px 0}
+.stat-card .lbl{font-size:11px;color:var(--m)}
+footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <a href="../index.html" class="logo">← 分析中心</a>
-  <a href="../pagaya/pgy_live_dashboard.html">PGY 監控</a>
-  <a href="." class="active" style="color:var(--t)">客製化股票</a>
+  <a href="../pagaya/pgy_live_dashboard.html">PGY</a>
+  <a href="." class="active">客製化股票</a>
 </nav>
 
 <div class="wrap">
+
   <header>
-    <div style="font-size:28px;margin-bottom:12px">📊</div>
+    <div class="icon">📊</div>
     <h1>客製化股票監控中心</h1>
-    <p>個人化選股 · 深度分析 · AI 三方觀點 · 即時監控</p>
+    <p>個人化選股 · 深度分析 · AI 三方觀點 · 即時監控 · 2026-05-16 更新</p>
   </header>
 
-  <div class="section-title" style="margin-bottom:20px">已建立的股票 Dashboard</div>
+  <!-- 總覽統計 -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="lbl">追蹤股票數</div><div class="num" style="color:var(--bl)">7</div><div class="lbl">支股票</div></div>
+    <div class="stat-card"><div class="lbl">產業涵蓋</div><div class="num" style="color:var(--g)">6</div><div class="lbl">個產業</div></div>
+    <div class="stat-card"><div class="lbl">全數 Strong Buy</div><div class="num" style="color:var(--o)">2</div><div class="lbl">支（ONDS/IREN）</div></div>
+    <div class="stat-card"><div class="lbl">最後更新</div><div class="num" style="font-size:16px;color:var(--m)">05-16</div><div class="lbl">2026 年</div></div>
+  </div>
 
+  <!-- 股票列表 -->
+  <div class="sec-ttl">已建立的股票 Dashboard</div>
   <div class="grid">
 
     <!-- ONDS -->
     <a class="stock-card onds" href="onds/">
       <div class="ticker-tag" style="color:var(--o)">NASDAQ: ONDS</div>
       <div class="stock-name">Ondas Inc.</div>
-      <div class="stock-desc">自主無人機 · 私有無線網路 · 多域國防與工業自動化</div>
+      <div class="stock-sector">🚁 國防無人機 · 私有無線網路</div>
+      <div class="stock-desc">自主無人機（OAS）+ FullMAX 私有網路 + 融資（Capital）垂直整合生態，政府自主邊境防護主承包商。</div>
       <div class="badges">
-        <span class="badge bo">🚁 無人機</span>
-        <span class="badge bg">+1,065% YoY</span>
+        <span class="badge bo">+1,065% 營收 YoY</span>
+        <span class="badge bg">6/6 Strong Buy</span>
         <span class="badge bp">$457M 積壓</span>
       </div>
       <div class="stat-row">
-        <div class="stat">
-          <div class="stat-label">收盤價</div>
-          <div class="stat-val" style="color:var(--o)">$10.72</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">分析師目標</div>
-          <div class="stat-val" style="color:var(--g)">$19.83</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">潛在空間</div>
-          <div class="stat-val" style="color:var(--g)">+85%</div>
-        </div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--o)">$10.72</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$19.83</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+85%</div></div>
       </div>
-      <div class="arrow" style="color:var(--o)">開啟 Dashboard <span class="arrow-icon">→</span></div>
-      <div class="updated">更新於 2026-05-16 · Strong Buy 6/6</div>
+      <div class="open-link" style="color:var(--o)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · 財報後 +21.1%</div>
+    </a>
+
+    <!-- FIG -->
+    <a class="stock-card fig" href="fig/">
+      <div class="ticker-tag" style="color:var(--p)">NYSE: FIG</div>
+      <div class="stock-name">Figma Inc.</div>
+      <div class="stock-sector">🎨 設計軟體 · SaaS · 協作平台</div>
+      <div class="stock-desc">設計平台龍頭，協作式設計工具市場領導者。NDR 139% 創 2 年新高，Q1 2026 營收 +46% YoY，指引上調 $55M。</div>
+      <div class="badges">
+        <span class="badge bp">NDR 139%</span>
+        <span class="badge bg">+46% YoY</span>
+        <span class="badge bb">指引上調</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--p)">$22.57</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$50.50</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+124%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--p)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · Hold 共識 · 10 位分析師</div>
+    </a>
+
+    <!-- UPST -->
+    <a class="stock-card upst" href="upst/">
+      <div class="ticker-tag" style="color:var(--bl)">NASDAQ: UPST</div>
+      <div class="stock-name">Upstart Holdings</div>
+      <div class="stock-sector">🤖 AI 信貸平台 · 金融科技</div>
+      <div class="stock-desc">AI 驅動的信貸評估平台，連接借款人與銀行/信用合作社，Q1 貸款量+61% YoY，$4B 新承諾資本到位。</div>
+      <div class="badges">
+        <span class="badge bb">貸款+61% YoY</span>
+        <span class="badge bg">$4B 新資本</span>
+        <span class="badge bo">Buy 共識</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--bl)">$28.06</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$45.84</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+63%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--bl)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · 22 位分析師</div>
+    </a>
+
+    <!-- IREN -->
+    <a class="stock-card iren" href="iren/">
+      <div class="ticker-tag" style="color:var(--o)">NASDAQ: IREN</div>
+      <div class="stock-name">IREN Limited</div>
+      <div class="stock-sector">⛏️ 比特幣挖礦 · AI GPU 資料中心</div>
+      <div class="stock-desc">比特幣挖礦 + AI GPU 雲端雙引擎，目標 150K GPU 部署及 $3.7B 年化 ARR，收購 Mirantis 加速 AI 側業務。</div>
+      <div class="badges">
+        <span class="badge bo">9/11 Buy</span>
+        <span class="badge bg">$3.7B ARR目標</span>
+        <span class="badge bb">150K GPU</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--o)">$53.69</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$66.20</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+23%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--o)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · 11 位分析師</div>
+    </a>
+
+    <!-- AXTI -->
+    <a class="stock-card axti" href="axti/">
+      <div class="ticker-tag" style="color:var(--g)">NASDAQ: AXTI</div>
+      <div class="stock-name">AXT Inc.</div>
+      <div class="stock-sector">💎 化合物半導體基板 · InP 磷化銦</div>
+      <div class="stock-desc">AI 資料中心光互連核心材料供應商，InP 基板為 800G 光收發模組必需品，YTD 漲幅 +600%+，近 ATH $134。</div>
+      <div class="badges">
+        <span class="badge bg">YTD +600%+</span>
+        <span class="badge bo">Q2 轉盈指引</span>
+        <span class="badge br">超過分析師目標</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--g)">$123.78</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--r)">$87.75</div></div>
+        <div class="stat"><div class="stat-label">現超目標</div><div class="stat-val" style="color:var(--r)">+41%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--g)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · ATH $134 · 需謹慎評估估值</div>
+    </a>
+
+    <!-- COHR -->
+    <a class="stock-card cohr" href="cohr/">
+      <div class="ticker-tag" style="color:var(--cy)">NYSE: COHR</div>
+      <div class="stock-name">Coherent Corp.</div>
+      <div class="stock-sector">🔬 光電元件 · 雷射 · AI 資料中心光互連</div>
+      <div class="stock-desc">工程材料 + 光電元件 + 雷射系統三業務，Networking 段受 AI 資料中心驅動季創新高，Q3 營收 $1.81B 超預期。</div>
+      <div class="badges">
+        <span class="badge bc">Q3 $1.81B</span>
+        <span class="badge bg">Buy 81%</span>
+        <span class="badge bb">Q4 指引上調</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--cy)">$382.45</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$376</div></div>
+        <div class="stat"><div class="stat-label">最高目標</div><div class="stat-val" style="color:var(--g)">$425</div></div>
+      </div>
+      <div class="open-link" style="color:var(--cy)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · 12 位分析師 · Rosenblatt $425</div>
+    </a>
+
+    <!-- UI -->
+    <a class="stock-card ui" href="ui/">
+      <div class="ticker-tag" style="color:var(--y)">NYSE: UI</div>
+      <div class="stock-name">Ubiquiti Inc.</div>
+      <div class="stock-sector">📡 企業網路設備 · UniFi 生態</div>
+      <div class="stock-desc">UniFi 企業網路設備龍頭，高毛利直銷模式，創辦人持股 90%+，Q3 EPS $3.88 超預期 +26%，營收 $814.9M 超預期 +12%。</div>
+      <div class="badges">
+        <span class="badge by">EPS +26% 超預期</span>
+        <span class="badge bg">高毛利直銷</span>
+        <span class="badge bo">創辦人 90%+</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--y)">$623.25</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$826</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+32%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--y)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-16 · 5 位分析師 · 3B/2S</div>
     </a>
 
     <!-- 新增佔位 -->
     <div class="add-card">
       <div style="font-size:32px;opacity:.3">＋</div>
-      <div>下一支客製化股票</div>
-      <div style="font-size:12px;opacity:.6">使用「客製化股票Dashboard流程樣板.md」建立</div>
+      <div style="font-weight:600">新增股票</div>
+      <div style="font-size:12px;opacity:.6;text-align:center">依照「製作流程.md」<br>新增下一支客製化股票</div>
     </div>
 
   </div>
+
+  <!-- 說明 -->
+  <div style="background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-top:8px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">📋 使用說明</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--m)">
+      <div>📄 <a href="製作流程.md" style="color:var(--bl);text-decoration:none">製作流程.md</a> — 新增股票 Dashboard 的完整 SOP（5 步驟）</div>
+      <div>📁 每支股票存放於獨立子目錄（如 <code style="background:var(--s2);padding:1px 5px;border-radius:3px;font-size:12px">onds/</code>），主頁為 <code style="background:var(--s2);padding:1px 5px;border-radius:3px;font-size:12px">index.html</code></div>
+      <div>🤖 每個 Dashboard 包含：AI 三方觀點（Gemini/ChatGPT/Grok）、財務分析、技術面、分析師評級、催化劑/風險</div>
+    </div>
+  </div>
+
 </div>
 
 <footer>
-  客製化股票監控中心 · 由 Claude AI 協助建立 · 僅供參考，不構成投資建議
+  客製化股票監控中心 · 7 支股票 · 由 Claude AI 協助建立 · 2026-05-16<br>
+  <span style="margin-top:4px;display:block">僅供個人參考，不構成投資建議</span>
 </footer>
 
 </body>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI 監控中心 — Ubiquiti Inc.</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#130f00,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(210,153,34,.18),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(210,153,34,.09),transparent 70%)}
+.ticker{font-size:13px;color:var(--y);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(210,153,34,.15);border:1px solid rgba(210,153,34,.4);color:var(--y);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--y);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.btl{background:rgba(57,211,83,.15);color:var(--tl);border:1px solid rgba(57,211,83,.3)}
+.by{background:rgba(210,153,34,.15);color:var(--y);border:1px solid rgba(210,153,34,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--y);background:rgba(210,153,34,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--y);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(210,153,34,.1);border-color:var(--y)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+.cy{border-left:3px solid var(--y)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+.fy{background:linear-gradient(90deg,#b08800,#d29922)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+.ty{background:rgba(210,153,34,.2);color:var(--y)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--y);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+.hy{color:var(--y);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(210,153,34,.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(210,153,34,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(88,166,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--y);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:600;color:var(--m);margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#analyst">分析師</a>
+  <a href="#catalyst">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#bullbear">多空對比</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NYSE: UI</div>
+  <div class="co-name">Ubiquiti Inc.</div>
+  <div class="tagline">企業網路設備 · UniFi生態 · 高毛利直銷模式 · 美國</div>
+
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>資料截止 2026-05-15</div>
+    <span style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$623.25</span>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;background:rgba(210,153,34,.15);border:1px solid rgba(210,153,34,.4);color:var(--y)">52週高 ~$650</span>
+      <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:var(--g)">52週低 ~$280 → 大幅回升</span>
+    </div>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--m)">UniFi（企業）· airMAX（服務商）· AmpliFi（消費者）· 創辦人 Robert Pera 持股 90%+</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge by">📡 UniFi生態霸主</span>
+    <span class="badge bg">💰 EPS +26% 超預期</span>
+    <span class="badge bb">🏭 高毛利直銷模式</span>
+    <span class="badge bp">👤 創辦人持股90%+</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cy">
+    <div class="ctitle">Q3 FY2026 EPS</div>
+    <div class="cval" style="color:var(--y)">$3.88</div>
+    <div class="csub">超預期 $3.08（<span class="hg">+26%</span>）· 大幅超越</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">Q3 FY2026 營收</div>
+    <div class="cval" style="color:var(--g)">$814.9M</div>
+    <div class="csub">超預期 $726.8M（<span class="hg">+12%</span>）</div>
+  </div>
+  <div class="card co">
+    <div class="ctitle">分析師均值目標</div>
+    <div class="cval" style="color:var(--o)">$826</div>
+    <div class="csub">高 $980 / 低 $672 · 較現價 +32%</div>
+  </div>
+  <div class="card cb">
+    <div class="ctitle">股價</div>
+    <div class="cval" style="color:var(--bl)">$623.25</div>
+    <div class="csub">52週：$280 低 → $650 高 · 強勢</div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 + 辯論 ════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(210,153,34,.2);color:var(--y)">高品質護城河 vs 高股價流動性折讓</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>Ubiquiti Inc. 是企業網路設備領域的特殊存在——高性價比設計驅動、直銷模式、創辦人 Robert Pera 持股超過 90%，分析師覆蓋極為稀少（約5位）。Q3 FY2026 EPS $3.88 大幅超預期 $3.08（+26%），營收 $814.9M 超預期 $726.8M（+12%）。Q4 FY2026 財報預計 2026-05-08，市場預期 EPS $4.29、營收 $814.3M。分析師均值目標 $826，比現價 $623.25 高出約 32%，但分析師稀少帶來覆蓋折讓。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>$623.25</span></div>
+    <div>Q3 EPS：<span class="hg">$3.88（超預期 +26%）</span></div>
+    <div>Q3 營收：<span class="hg">$814.9M（超預期 +12%）</span></div>
+    <div>分析師均值目標：<span class="ho">$826</span></div>
+    <div>創辦人持股：<span class="hy">Robert Pera 90%+</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（毛利率結構量化 vs 同業）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">數字解構 Ubiquiti 的毛利率優勢：Q3 FY2026 營收 $814.9M，若毛利率維持 35–40% 水準（行業均值約 30–35%），毛利約 $280M–$326M。<strong style="color:var(--t)">關鍵比較：同業 Cisco 毛利率約 65%（但含大量軟體訂閱），Aruba（HP 子公司）約 40–45%。UI 純硬體毛利率 35–40% 屬於高端水準。</strong>直銷模式（無通路費）是主因——傳統廠商通路費占售價 15–20%，UI 通過直銷和社群節省這部分成本，直接反映為更高毛利或更低售價（競爭護城河）。按現價 $623.25 估算，P/E 約 40–45 倍，相對成長率（EPS 年化成長 25–30%），PEG 約 1.5–1.8，在硬體廠商中屬合理偏高。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（直銷+社群生態的護城河分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">Ubiquiti 的護城河由三層互相強化的結構組成：<strong style="color:var(--t)">（1）直銷模式</strong>——跳過傳統 IT 通路，直接面向 IT 管理員和小型 MSP，降低客戶獲取成本，同時建立直接客戶關係；<strong style="color:var(--t)">（2）社群生態（UI Community）</strong>——全球數十萬名 IT 從業者在官方論壇分享配置、解決問題，形成龐大的自助知識庫，大幅降低 Ubiquiti 的支援成本，同時提高新用戶的轉換門檻；<strong style="color:var(--t)">（3）UniFi 生態的設備黏性</strong>——一旦部署 UniFi 網路管理器，後續擴充（AP、交換機、攝影機、門禁）都在同一平台，切換成本極高。這三層結構讓 UI 能維持高毛利同時保持價格競爭力——這在硬體行業非常罕見。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（高股價 $623 + 稀少分析師的流動性折讓）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">UI 的投資風險被嚴重低估，特別是流動性風險：<strong style="color:var(--t)">創辦人 Robert Pera 持股超過 90%</strong>，市場流通股本極小。這意味著：（1）任何大型機構的買進/賣出都可能造成股價劇烈波動；（2）做空難度極高（借券成本高），但一旦基本面惡化，流動性真空會放大下跌幅度；（3）只有約5位分析師覆蓋，<strong style="color:var(--t)">信息不對稱極強</strong>——散戶和小型機構只能依賴公開財報，缺乏機構研究支持。股價 $623 本身就是流動性門檻——每手（100股）需要 $62,300，遠高於一般股票，限制了投資者基礎的廣度。分析師均值 $826 聽起來很吸引，但只有 5 位分析師的共識可靠性遠低於有 20+ 位覆蓋的大型股。</div>
+    </div>
+
+    <div style="background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--y);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→Grok：</strong>同意流動性折讓論點，但這是「雙刃劍」——低流通量在基本面持續超預期時也會放大上漲（正向飛輪）。Q3 EPS +26% 超預期在低流通環境下正是買方稀缺帶動股價快速上漲的典型場景。<br>
+        <strong style="color:#e11d48">Grok→Gemini：</strong>同意上漲時的放大效應，但創辦人 90%+ 持股的真正風險在於：若 Pera 因個人原因（健康、興趣轉移、財務需求）開始減持，沒有機構緩衝的市場會如何反應？這個尾部風險是任何估值模型都無法充分定價的。<br>
+        <strong style="color:#10a37f">GPT→全體：</strong>護城河論點的關鍵是持久性。Cisco、Aruba 在企業高端市場有明顯優勢，但 UI 佔據的是「中端企業和服務商」這個被大廠忽略的甜蜜區間——這個區間足夠大（全球數百萬中小企業），且傳統廠商定價太高很難下沉競爭。<br>
+        <strong style="color:#4285f4">Gemini→全體：</strong>最終結論：UI 是「被低估的高品質企業」，但這個論點要成立的前提是 Robert Pera 持續專注運營。公司質量依賴單一創辦人的程度，在美股中幾乎無出其右——這既是最大優勢，也是最大的不可量化風險。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/UI/news/" target="_blank" rel="noopener">📰 Yahoo Finance UI 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/ui/" target="_blank" rel="noopener">📊 StockAnalysis UI ↗</a>
+    <a class="nlink-btn" href="https://ui.com/blog" target="_blank" rel="noopener">📢 Ubiquiti 官方 Blog ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/UI/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://finance.yahoo.com/quote/UI/news/" target="_blank" rel="noopener" style="border-left-color:var(--y)">
+      <div class="ntitle">🏆 Q3 FY2026 大幅超預期：EPS $3.88（+26%），營收 $814.9M（+12%）</div>
+      <div class="nmeta">2026-02 · 兩項指標均大幅超越市場共識 · 強勁執行力</div>
+    </a>
+    <a class="nitem" href="https://finance.yahoo.com/quote/UI/news/" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">📅 Q4 FY2026 財報（2026-05-08）：預期 EPS $4.29，營收 $814.3M</div>
+      <div class="nmeta">2026-05-08 · 市場預期持續強勁 · 高門檻需再次超越</div>
+    </a>
+    <a class="nitem" href="https://ui.com/blog" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🔧 UniFi Cloud Gateway 新品發布：AI 輔助網路管理功能上線</div>
+      <div class="nmeta">2026-Q1/Q2 · ui.com/blog · 生態持續擴展 · 黏性強化</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/ui/" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">👤 創辦人 Robert Pera 持股 90%+ 維持：治理集中但利益高度一致</div>
+      <div class="nmeta">長期持股 · 無大規模減持信號 · 創辦人驅動文化持續</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 事件時間軸 ════════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 關鍵事件時間軸</div>
+  <div class="flow">
+    <div class="fstep">
+      <div>
+        <div class="ft">Q3 FY2026 財報：大幅雙超預期</div>
+        <div class="fd">EPS $3.88 vs 預期 $3.08（+26% 超預期）；營收 $814.9M vs 預期 $726.8M（+12% 超預期）；執行力強勁</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">Q4 FY2026 財報（2026-05-08）</div>
+        <div class="fd">市場預期 EPS $4.29、營收 $814.3M；若再次超越，將強化成長動能；高基期下超預期難度提升</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">UniFi Cloud Gateway 新品 + AI 輔助網路管理</div>
+        <div class="fd">AI 功能整合強化 UniFi 生態黏性；Cloud Gateway 擴展服務商市場；訂閱制收入潛力提升</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">股價從 52週低 ~$280 回升至 $623.25</div>
+        <div class="fd">年度漲幅超過 120%；52週高約 $650；市場對 EPS 大幅超預期的重新定價</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">企業 WiFi 7 換機週期加速</div>
+        <div class="fd">全球企業 WiFi 升級需求；UniFi WiFi 7 AP 產品線布局；AI 辦公場景帶動企業網路升級</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表格 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">📊 財務摘要</div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>季度</th>
+          <th>營收</th>
+          <th>vs 預期</th>
+          <th>EPS</th>
+          <th>vs 預期</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Q3 FY2026（最新）</strong></td>
+          <td style="color:var(--g);font-weight:700">$814.9M</td>
+          <td><span class="tag tn">+12% 超預期</span></td>
+          <td style="color:var(--y);font-weight:700">$3.88</td>
+          <td><span class="tag tn">+26% 超預期</span></td>
+          <td><span class="tag ty">強勁執行</span></td>
+        </tr>
+        <tr>
+          <td>Q4 FY2026（預期）</td>
+          <td>$814.3M</td>
+          <td><span class="tag ta">市場共識</span></td>
+          <td>$4.29（預期）</td>
+          <td>—</td>
+          <td><span class="tag ta">2026-05-08</span></td>
+        </tr>
+        <tr>
+          <td>Q2 FY2026</td>
+          <td>~$750M</td>
+          <td><span class="tag ta">符合</span></td>
+          <td>~$3.20</td>
+          <td><span class="tag ta">符合</span></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:10px">三大產品線概覽</div>
+      <div class="g3">
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--y)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">UniFi（企業主力）</div>
+          <div style="font-weight:700;color:var(--y)">企業網路管理</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">AP、交換機、路由器、攝影機；生態黏性高；主要成長引擎</div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--bl)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">airMAX（服務商）</div>
+          <div style="font-weight:700;color:var(--bl)">無線寬頻接取</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">ISP/WISP 市場；高性價比無線回程；穩定需求</div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--g)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">AmpliFi（消費者）</div>
+          <div style="font-weight:700;color:var(--g)">家用網路</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">高端家用 WiFi；相對小眾；作為 UniFi 的入門引流</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">👥 分析師評級與目標價</div>
+  <div class="g2">
+    <div class="card">
+      <div style="font-size:13px;color:var(--m);margin-bottom:14px">評級分布（約5位分析師）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:60%;background:linear-gradient(90deg,#2ea043,#3fb950)">Buy 3位</div>
+        <div class="rseg" style="width:40%;background:linear-gradient(90deg,#cf222e,#f85149)">Sell 2位</div>
+      </div>
+      <div style="font-size:12px;color:var(--m);margin-top:10px;padding:10px;background:rgba(210,153,34,.08);border-radius:6px;border:1px solid rgba(210,153,34,.2)">
+        ⚠️ <strong style="color:var(--y)">覆蓋分析師稀少（約5位）</strong>——評級分佈可靠性低於大型股，信息不對稱程度高
+      </div>
+      <div class="pw" style="margin-top:10px">
+        <div class="pl"><span>Buy（看多）</span><span class="hg">3位（60%）</span></div>
+        <div class="pb"><div class="pf fg" style="width:60%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>Sell（看空）</span><span class="hr">2位（40%）</span></div>
+        <div class="pb"><div class="pf fr2" style="width:40%"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--m);margin-bottom:8px">目標價區間（分歧較大）</div>
+      <div class="trange">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--m);margin-bottom:8px">
+          <span>低 $672</span>
+          <span style="color:var(--y);font-weight:700">均值 $826</span>
+          <span style="color:var(--g);font-weight:700">高 $980</span>
+        </div>
+        <div class="rtrack" style="margin:28px 8px 24px">
+          <div class="rfill" style="left:0;width:100%"></div>
+          <div class="rmark" style="left:0;color:var(--r)">$672<div class="rlbl">低</div></div>
+          <div class="rmark" style="left:50%;color:var(--y)">$826<div class="rlbl">均值</div></div>
+          <div class="rmark" style="left:100%;color:var(--g)">$980<div class="rlbl">高</div></div>
+        </div>
+      </div>
+      <table style="margin-top:8px">
+        <thead><tr><th>目標</th><th>評級</th><th>目標價</th><th>vs 現價</th></tr></thead>
+        <tbody>
+          <tr><td>最高目標</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g);font-weight:700">$980</td><td style="color:var(--g)">+57%</td></tr>
+          <tr><td>均值目標</td><td><span class="tag ty">混合</span></td><td style="color:var(--y);font-weight:700">$826</td><td style="color:var(--g)">+32%</td></tr>
+          <tr><td>最低目標</td><td><span class="tag tr2">Sell</span></td><td style="color:var(--r);font-weight:700">$672</td><td style="color:var(--r)">+8%</td></tr>
+          <tr><td>現價</td><td>—</td><td style="color:var(--t);font-weight:700">$623.25</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ════════════════════════════════════════════════════ -->
+<div id="catalyst" class="sec">
+  <div class="sec-ttl">🚀 主要催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🤖</div>
+      <div class="ibdy">
+        <div class="ittl">AI 驅動網路管理升級 <span class="sev sh">高衝擊</span></div>
+        <div class="idsc">UniFi Cloud Gateway AI 輔助功能；網路異常偵測、自動最佳化；AI 工作場景帶動企業升級需求；訂閱制服務收入潛力</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📡</div>
+      <div class="ibdy">
+        <div class="ittl">企業 WiFi 7 換機週期 <span class="sev sh">高衝擊</span></div>
+        <div class="idsc">WiFi 6 → WiFi 7 升級週期正在啟動；UniFi WiFi 7 AP 布局完整；AI 算力需求帶動辦公室和資料中心網路升級</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💰</div>
+      <div class="ibdy">
+        <div class="ittl">訂閱制服務收入增加 <span class="sev sm">中高衝擊</span></div>
+        <div class="idsc">UniFi Cloud 管理服務；從硬體銷售轉向軟硬體混合模式；提升 LTV（客戶終身價值）；改善收入可預測性</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏢</div>
+      <div class="ibdy">
+        <div class="ittl">資料中心網路擴張 <span class="sev sm">中等衝擊</span></div>
+        <div class="idsc">AI 資料中心建設帶動 ToR（架頂式）交換機需求；UniFi 高性價比方案在中小型資料中心具競爭力</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📊</div>
+      <div class="ibdy">
+        <div class="ittl">Q4 FY2026 財報（2026-05-08）再超預期 <span class="sev sm">中高衝擊</span></div>
+        <div class="idsc">市場預期 EPS $4.29；若再次超越（如 Q3 +26%），將觸發分析師目標上調和正向情緒催化</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">👤</div>
+      <div class="ibdy">
+        <div class="ittl">創辦人集中持股 90%+ 治理風險 <span class="sev sh">高</span></div>
+        <div class="idsc">Robert Pera 持股超過 90%，市場流通股本極小；創辦人若減持、健康問題或興趣轉移，流動性真空將放大下跌；公司命運高度依賴單一人物</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📉</div>
+      <div class="ibdy">
+        <div class="ittl">分析師覆蓋稀少（流動性折讓） <span class="sev sh">高</span></div>
+        <div class="idsc">約5位分析師覆蓋，遠低於同規模公司；信息不對稱強；機構研究缺乏；流動性低，大額買賣影響股價；評級可靠性有限</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">⚔️</div>
+      <div class="ibdy">
+        <div class="ittl">競爭壓力（Cisco、Aruba） <span class="sev sm">中等</span></div>
+        <div class="idsc">Cisco 企業高端市場強勢；Aruba（HPE）在中端企業滲透；新創廠商（如 Juniper Mist）AI 原生競爭；雖然 UI 有護城河，但壓力持續存在</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💵</div>
+      <div class="ibdy">
+        <div class="ittl">高股價流動性門檻 <span class="sev sl">中等</span></div>
+        <div class="idsc">每股 $623，每手（100股）需 $62,300；限制散戶投資者基礎廣度；每股高價是流動性折讓的部分原因</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 多空對比 ════════════════════════════════════════════════ -->
+<div id="bullbear" class="sec">
+  <div class="sec-ttl">⚖️ 多空論點對比</div>
+  <div class="g2">
+    <div class="card" style="border-left:3px solid var(--g)">
+      <div style="color:var(--g);font-weight:700;margin-bottom:12px;font-size:15px">🐂 看多論點</div>
+      <div class="ilist">
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">Q3 EPS +26% 超預期，執行力強勁，連續超越市場共識</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">直銷+社群生態護城河深，切換成本高，UniFi 生態黏性極強</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">創辦人 90%+ 持股保障長期利益一致，無「管理層套現」風險</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">分析師均值目標 $826 比現價高 32%，最高目標 $980（+57%）</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">WiFi 7 換機週期 + AI 網路管理 = 雙重催化劑結構</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--r)">
+      <div style="color:var(--r);font-weight:700;margin-bottom:12px;font-size:15px">🐻 看空論點</div>
+      <div class="ilist">
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">創辦人 90%+ 集中持股是不可量化的治理尾部風險</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">僅5位分析師覆蓋，評級可靠性有限，信息不對稱嚴重</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">股價 $623 流動性低，大額買賣造成劇烈波動</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">2位 Sell 評級（40%），分析師意見分歧大</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">Cisco、Aruba 競爭壓力，企業高端市場難以滲透</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 核心投資論點</div>
+  <div class="why">
+    <div class="why-hd">
+      📡 UI：被低估的高品質企業
+      <span class="why-badge" style="background:rgba(210,153,34,.2);color:var(--y)">直銷護城河 + 創辦人利益一致</span>
+    </div>
+    <div class="why-body">
+      <p style="margin-bottom:10px">Ubiquiti 代表了美股中一種獨特的投資機會——高品質企業因流動性折讓（創辦人持股 90%+、分析師覆蓋稀少）被市場系統性低估。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--y)">1. 護城河深度：</strong>直銷模式 + 社群生態 + UniFi 生態黏性構成三層互相強化的護城河。切換成本極高，競爭者難以複製這個靠社群驅動的支援體系。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--y)">2. 利益一致性：</strong>創辦人 Robert Pera 持股 90%+ 確保管理層與股東利益高度一致，無短期套現動機，長期決策導向明確。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--y)">3. 執行力驗證：</strong>Q3 EPS +26% 超預期不是偶然，而是直銷模式下的持續高效執行。分析師均值目標 $826 比現價高 32%，最高目標達 $980。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--r)">核心風險：</strong>創辦人集中持股治理風險（不可量化）、分析師稀少帶來的流動性折讓、Cisco/Aruba 競爭壓力。</p>
+      <p><strong style="color:var(--t)">結論：</strong>UI 適合能接受低流動性、相信 UniFi 生態長期主導中端企業市場的長期投資者。最大的風險不是競爭，而是對 Robert Pera 個人的高度依賴。適合「相信人，不只相信財報」的投資哲學。</p>
+    </div>
+    <div class="why-foot">
+      <div>現價：<span>$623.25</span></div>
+      <div>分析師均值目標：<span class="ho">$826（+32%）</span></div>
+      <div>最高目標：<span class="hg">$980（+57%）</span></div>
+      <div>Q3 EPS 超預期：<span class="hg">+26%</span></div>
+      <div>創辦人持股：<span class="hy">Robert Pera 90%+</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 走勢圖 ════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-ttl">📈 示意走勢（模擬）</div>
+  <div class="card">
+    <canvas id="priceChart" height="200"></canvas>
+  </div>
+</div>
+
+<div class="footer">
+  <p>UI 監控中心 · 資料截止 2026-05-15 · 僅供參考，不構成投資建議</p>
+  <p style="margin-top:6px"><a href="../../index.html" style="color:var(--y);text-decoration:none">← 分析中心</a> · <a href="../" style="color:var(--m);text-decoration:none">客製化股票</a></p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const ctx = document.getElementById('priceChart').getContext('2d');
+const labels = ['52週低 ~$280','Q1 FY26','Q2 FY26','Q3 FY26\nEPS $3.88','現價\n$623.25','均值\n$826','最高\n$980'];
+const data = [280, 380, 480, 560, 623, 826, 980];
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['52週低 ~$280','Q1 FY26','Q2 FY26','Q3 FY26 EPS $3.88','現價 $623.25','均值目標 $826','最高目標 $980'],
+    datasets: [{
+      label: 'UI 股價走勢（示意）',
+      data: data,
+      borderColor: '#d29922',
+      backgroundColor: 'rgba(210,153,34,0.08)',
+      borderWidth: 2.5,
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: ['#f85149','#8b949e','#8b949e','#3fb950','#d29922','#ffa657','#3fb950'],
+      pointRadius: 6,
+      pointHoverRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#8b949e', font: { size: 12 } } },
+      tooltip: {
+        backgroundColor: '#161b22',
+        borderColor: '#30363d',
+        borderWidth: 1,
+        titleColor: '#e6edf3',
+        bodyColor: '#8b949e',
+        callbacks: { label: ctx => ` $${ctx.raw}` }
+      }
+    },
+    scales: {
+      x: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: 'rgba(48,54,61,.4)' } },
+      y: { ticks: { color: '#8b949e', font: { size: 11 }, callback: v => '$'+v }, grid: { color: 'rgba(48,54,61,.4)' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

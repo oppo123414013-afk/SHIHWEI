@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COHR 監控中心 — Coherent Corp.</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353;--cy:#00d4ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#071219,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(0,212,255,.15),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(0,212,255,.08),transparent 70%)}
+.ticker{font-size:13px;color:var(--cy);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.4);color:var(--cy);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--cy);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.btl{background:rgba(57,211,83,.15);color:var(--tl);border:1px solid rgba(57,211,83,.3)}
+.by{background:rgba(210,153,34,.15);color:var(--y);border:1px solid rgba(210,153,34,.3)}
+.bcy{background:rgba(0,212,255,.15);color:var(--cy);border:1px solid rgba(0,212,255,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--cy);background:rgba(0,212,255,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--cy);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(0,212,255,.1);border-color:var(--cy)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+.cy2{border-left:3px solid var(--cy)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+.fcy{background:linear-gradient(90deg,#00a8cc,#00d4ff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+.ty{background:rgba(210,153,34,.2);color:var(--y)}
+.tcy{background:rgba(0,212,255,.2);color:var(--cy)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--cy);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+.hcy{color:var(--cy);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(0,212,255,.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(0,212,255,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(88,166,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--cy);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:600;color:var(--m);margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#analyst">分析師</a>
+  <a href="#catalyst">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#bullbear">多空對比</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NYSE: COHR</div>
+  <div class="co-name">Coherent Corp.</div>
+  <div class="tagline">光電元件 · 雷射系統 · AI資料中心光互連 · 美國/全球</div>
+
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>資料截止 2026-05-15</div>
+    <span style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$382.45</span>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.4);color:var(--cy)">52週高 ~$420</span>
+      <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.4);color:var(--g)">52週低 ~$55 → 大幅反彈</span>
+    </div>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--m)">工程材料 · 光電元件 · 雷射系統 · 三大業務 Networking / Materials / Lasers</span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bcy">🔬 AI光互連龍頭</span>
+    <span class="badge bg">📡 Networking 季創新高</span>
+    <span class="badge bb">💹 Q3 營收 $1.81B</span>
+    <span class="badge bo">🚀 Q4 指引 $1.91B–$2.05B</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cy2">
+    <div class="ctitle">Q3 2026 營收</div>
+    <div class="cval" style="color:var(--cy)">$1.81B</div>
+    <div class="csub">超預期 $1.78B · Networking 季創新高</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">Q4 指引中值</div>
+    <div class="cval" style="color:var(--g)">$1.98B</div>
+    <div class="csub">指引區間 $1.91B–$2.05B · 持續成長</div>
+  </div>
+  <div class="card co">
+    <div class="ctitle">分析師均值目標</div>
+    <div class="cval" style="color:var(--o)">$376</div>
+    <div class="csub">Rosenblatt 目標 $425（最高）</div>
+  </div>
+  <div class="card cb">
+    <div class="ctitle">分析師 Buy 比率</div>
+    <div class="cval" style="color:var(--bl)">81%</div>
+    <div class="csub">12位分析師 · Buy 共識</div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 + 辯論 ════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(0,212,255,.2);color:var(--cy)">Networking 佔比提升 vs 多業務整合複雜度</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>Coherent Corp. 是全球光電元件與雷射系統的主要供應商，三大業務（Networking、Materials、Lasers）中，Networking 段（AI資料中心光收發模組）是主要成長引擎。Q3 2026 營收 $1.81B 超預期，Networking 季創新高，毛利率持續擴張。Q4 指引 $1.91B–$2.05B 再超市場預期，股價從 52週低 $55 大幅反彈至 $382。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>$382.45</span></div>
+    <div>Q3營收：<span class="hcy">$1.81B（超預期）</span></div>
+    <div>Q4指引中值：<span class="hg">$1.98B</span></div>
+    <div>分析師目標均值：<span class="ho">$376.26</span></div>
+    <div>Buy 比率：<span class="hg">81%（12位）</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（Networking 段成長量化分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">數字拆解：COHR Q3 2026 整體營收 $1.81B，其中 Networking 段季創新高。若 Networking 已佔整體 40–50%（估計 $720M–$900M），且毛利率高於其他業務段，則 Networking 佔比每提升 10%，整體毛利率預計改善 150–200bps。管理層 Q4 指引中值 $1.98B，YoY 成長率約 18–22%，若 Networking 維持超線性成長，<strong style="color:var(--t)">2027 全年有望達到 $8.5B–$9B 規模</strong>。相對 81% Buy 共識的 $376 均值目標，現價 $382 已略微超出——意味著上行需要分析師繼續上調目標，Rosenblatt 的 $425 代表還有 +11% 空間。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（光互連在 AI Scaling Law 下的不可替代性）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">從 AI Scaling Law 的視角看 COHR 的結構性機會：<strong style="color:var(--t)">（1）算力擴張驅動光互連需求指數成長</strong>——每個 AI 訓練集群需要成千上萬的 GPU 高速互連，400G→800G→1.6T 升級週期直接拉動光收發器需求量；<strong style="color:var(--t)">（2）COHR 的垂直整合優勢</strong>——從化合物半導體材料（Materials）到光電元件（Networking）的垂直整合，讓 COHR 在供應鏈中擁有罕見的成本控制能力；<strong style="color:var(--t)">（3）800G 是今日主流，1.6T 是明日標配</strong>——每次世代升級，COHR 的 ASP（平均售價）顯著提升，且作為少數具備 1.6T 量產能力的廠商，先發優勢明顯。光互連不是 AI 時代的選配，是算力擴張的物理基礎設施。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（多業務段整合複雜度與估值折讓）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">COHR 的複雜性折讓是市場長期給予的「集團折讓」：<strong style="color:var(--t)">三大業務（Networking、Materials、Lasers）成長速度差距顯著</strong>——Networking 爆發性成長、Materials 穩健、Lasers 需求疲軟。這種不均衡讓管理層的資源配置和市場溝通都更困難。歷史上，II-VI 合併 Coherent 留下的整合問題（ERP 系統整合、文化整合）至今仍是隱憂。<strong style="color:var(--t)">從估值角度看，純光互連標的如 Lumentum 享有更高的倍數，而 COHR 因業務多元性被市場「平均化」——如果 Networking 單獨上市，估值可能高出 30–50%。</strong>投資 COHR 本質上是在買打折的 Networking 業務，同時承擔 Materials 和 Lasers 的拖累風險。</div>
+    </div>
+
+    <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--cy);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意光互連不可替代性論點，但需量化——COHR 在 800G/1.6T 市場的份額是多少？若 Cisco（Inphi收購）、Intel、Marvell 等垂直整合方案蠶食市場，COHR 的 ASP 提升邏輯可能受挑戰。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>COHR 的優勢在於獨立第三方角色——它同時供貨給 Meta、Google、Microsoft、Amazon，而這些超大規模客戶不希望依賴單一供應商自研方案。COHR 的「客戶中立性」本身就是護城河。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>兩位都忽略了近期風險——宏觀資本支出週期。若 2026–2027 年 AI 資本支出放緩（監管、地緣政治、電力限制），COHR 作為硬體供應商將是最快感受衝擊的一層。81% Buy、目標 $376 建立在持續成長假設上，下行情境（資本支出放緩 20%）對應的 COHR 股價可能是 $280–$320。<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>認同下行情境，但 Q4 指引 $1.91B–$2.05B 就是當前可見度的最佳證據——管理層看到的是持續強勁的訂單能見度，而非即將放緩的信號。當前基本面動能支持現價。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/COHR/news/" target="_blank" rel="noopener">📰 Yahoo Finance COHR 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/cohr/" target="_blank" rel="noopener">📊 StockAnalysis COHR ↗</a>
+    <a class="nlink-btn" href="https://ir.coherent.com" target="_blank" rel="noopener">📢 Coherent 投資人關係 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/COHR/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://ir.coherent.com" target="_blank" rel="noopener" style="border-left-color:var(--cy)">
+      <div class="ntitle">🏆 Q3 2026 財報：Networking 段季創新高，整體營收 $1.81B 超預期</div>
+      <div class="nmeta">2026-Q3 · ir.coherent.com · EPS 共識 $1.55 · Q4 指引 $1.91B–$2.05B</div>
+    </a>
+    <a class="nitem" href="https://finance.yahoo.com/quote/COHR/news/" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">📈 Rosenblatt 上調目標至 $425：AI 資料中心光互連需求加速，維持 Buy</div>
+      <div class="nmeta">2026-05 · Rosenblatt Securities · 前目標 $375 → 上調 $425</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/cohr/" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">📡 800G/1.6T 光模組升級週期加速：COHR 訂單能見度強勁</div>
+      <div class="nmeta">2026-05 · AI資料中心擴張 · 超大規模雲端業者資本支出持續</div>
+    </a>
+    <a class="nitem" href="https://ir.coherent.com" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">💹 毛利率持續擴張：Networking 高毛利佔比提升帶動整體利潤率改善</div>
+      <div class="nmeta">2026-Q3 · 三業務段毛利率差異 · Networking 段毛利率最優</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 事件時間軸 ════════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 關鍵事件時間軸</div>
+  <div class="flow">
+    <div class="fstep">
+      <div>
+        <div class="ft">Q3 2026 財報發布 — Networking 季創新高</div>
+        <div class="fd">營收 $1.81B 超預期 $1.78B；Networking 段季度新高；毛利率持續擴張；EPS 共識 $1.55</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">Rosenblatt 上調目標 $375 → $425，維持 Buy</div>
+        <div class="fd">AI 資料中心需求加速為主要上調理由；成為12位分析師中最高目標；均值 $376.26</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">Q4 指引 $1.91B–$2.05B：再超市場預期</div>
+        <div class="fd">中值 $1.98B；持續超越市場共識；管理層對訂單能見度信心強</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">800G/1.6T 升級週期加速</div>
+        <div class="fd">超大規模雲端業者（Meta、Google、Microsoft、Amazon）持續擴張 AI 資料中心；COHR 為核心供應商</div>
+      </div>
+    </div>
+    <div class="fstep">
+      <div>
+        <div class="ft">股價從 52週低 ~$55 反彈至 $382</div>
+        <div class="fd">年度漲幅顯著；52週高約 $420；市場重新定價 AI 光互連龍頭的成長預期</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表格 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">📊 財務摘要</div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>季度</th>
+          <th>營收</th>
+          <th>vs 預期</th>
+          <th>EPS</th>
+          <th>Networking 段</th>
+          <th>毛利率趨勢</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Q3 FY2026（最新）</strong></td>
+          <td style="color:var(--cy);font-weight:700">$1.81B</td>
+          <td><span class="tag tn">超預期 +$30M</span></td>
+          <td>共識 $1.55</td>
+          <td><span class="tag tcy">季創新高</span></td>
+          <td><span class="tag tn">持續擴張</span></td>
+        </tr>
+        <tr>
+          <td>Q4 FY2026（指引）</td>
+          <td style="color:var(--g);font-weight:700">$1.91B–$2.05B</td>
+          <td><span class="tag tn">超市場共識</span></td>
+          <td>—</td>
+          <td><span class="tag tcy">持續成長</span></td>
+          <td><span class="tag tn">預期繼續改善</span></td>
+        </tr>
+        <tr>
+          <td>Q2 FY2026</td>
+          <td>~$1.70B</td>
+          <td><span class="tag ta">符合預期</span></td>
+          <td>—</td>
+          <td><span class="tag tcy">強勁</span></td>
+          <td><span class="tag tn">擴張</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:10px">三大業務段概覽</div>
+      <div class="g3">
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--cy)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">Networking（主成長引擎）</div>
+          <div style="font-weight:700;color:var(--cy)">AI資料中心光收發</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">800G/1.6T 升級週期；毛利率最高；季創新高</div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--bl)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">Materials（穩健）</div>
+          <div style="font-weight:700;color:var(--bl)">半導體材料</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">工程材料；相對穩定；為 Networking 提供基礎</div>
+        </div>
+        <div style="background:var(--s2);border-radius:8px;padding:12px;border-left:3px solid var(--m)">
+          <div style="font-size:12px;color:var(--m);margin-bottom:4px">Lasers（需求疲軟）</div>
+          <div style="font-weight:700;color:var(--m)">工業雷射</div>
+          <div style="font-size:12px;color:var(--m);margin-top:4px">工業雷射需求偏弱；拖累整體表現</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">👥 分析師評級與目標價</div>
+  <div class="g2">
+    <div class="card">
+      <div style="font-size:13px;color:var(--m);margin-bottom:14px">評級分布（12位分析師）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:81%;background:linear-gradient(90deg,#2ea043,#3fb950)">Buy 81%</div>
+        <div class="rseg" style="width:11%;background:linear-gradient(90deg,#b08800,#d29922)">Hold</div>
+        <div class="rseg" style="width:8%;background:linear-gradient(90deg,#cf222e,#f85149)">Sell</div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>Buy（看多）</span><span class="hg">81% (~10位)</span></div>
+        <div class="pb"><div class="pf fg" style="width:81%"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>Hold（中性）</span><span style="color:var(--y)">~11% (~1位)</span></div>
+        <div class="pb"><div class="pf" style="width:11%;background:var(--y)"></div></div>
+      </div>
+      <div class="pw">
+        <div class="pl"><span>Sell（看空）</span><span class="hr">~8% (~1位)</span></div>
+        <div class="pb"><div class="pf fr2" style="width:8%"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--m);margin-bottom:8px">目標價區間</div>
+      <div class="trange">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--m);margin-bottom:8px">
+          <span>低 $300</span>
+          <span style="color:var(--cy);font-weight:700">均值 $376.26</span>
+          <span style="color:var(--g);font-weight:700">Rosenblatt $425</span>
+        </div>
+        <div class="rtrack" style="margin:28px 8px 24px">
+          <div class="rfill" style="left:0;width:100%"></div>
+          <div class="rmark" style="left:0;color:var(--r)">$300<div class="rlbl">低</div></div>
+          <div class="rmark" style="left:50%;color:var(--cy)">$376<div class="rlbl">均值</div></div>
+          <div class="rmark" style="left:100%;color:var(--g)">$425<div class="rlbl">Rosenblatt</div></div>
+        </div>
+      </div>
+      <table style="margin-top:8px">
+        <thead><tr><th>機構</th><th>評級</th><th>目標價</th></tr></thead>
+        <tbody>
+          <tr><td>Rosenblatt</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g);font-weight:700">$425 ↑</td></tr>
+          <tr><td>均值目標</td><td><span class="tag tn">Buy</span></td><td style="color:var(--cy);font-weight:700">$376.26</td></tr>
+          <tr><td>其他機構（均值）</td><td><span class="tag tn">Buy 共識</span></td><td>$350–$420</td></tr>
+          <tr><td>現價</td><td>—</td><td style="color:var(--t);font-weight:700">$382.45</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ════════════════════════════════════════════════════ -->
+<div id="catalyst" class="sec">
+  <div class="sec-ttl">🚀 主要催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">⚡</div>
+      <div class="ibdy">
+        <div class="ittl">AI 資料中心 800G/1.6T 升級週期 <span class="sev sh">高衝擊</span></div>
+        <div class="idsc">每次光模組世代升級帶動 ASP 顯著提升；COHR 是少數具備 1.6T 量產能力的廠商；Meta、Google、Microsoft 持續擴張 AI 算力</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📈</div>
+      <div class="ibdy">
+        <div class="ittl">Networking 佔比持續提升 <span class="sev sh">高衝擊</span></div>
+        <div class="idsc">Networking 段毛利率優於整體；隨佔比提升，整體毛利率結構性改善；每提升 10% 佔比預計改善 150–200bps 毛利率</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💰</div>
+      <div class="ibdy">
+        <div class="ittl">毛利率持續擴張 <span class="sev sh">高衝擊</span></div>
+        <div class="idsc">連續多季毛利率改善；業務組合最佳化（Networking 佔比提升）；規模效益逐漸顯現</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📊</div>
+      <div class="ibdy">
+        <div class="ittl">Q4 指引持續超預期 <span class="sev sm">中高衝擊</span></div>
+        <div class="idsc">$1.91B–$2.05B 指引再次超市場共識；若 Q4 實際營收超出指引上限，將觸發分析師目標大規模上調</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🔬</div>
+      <div class="ibdy">
+        <div class="ittl">分析師目標價持續上調 <span class="sev sm">中等衝擊</span></div>
+        <div class="idsc">Rosenblatt 已從 $375 上調至 $425；若基本面持續超預期，其他機構目標上調將提供正面情緒催化</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🔧</div>
+      <div class="ibdy">
+        <div class="ittl">多業務段整合複雜性 <span class="sev sh">高</span></div>
+        <div class="idsc">II-VI 合併 Coherent 留下的 ERP、文化整合問題；三業務段成長速度差距使管理層資源配置更困難；市場給予「集團折讓」</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">⚔️</div>
+      <div class="ibdy">
+        <div class="ittl">競爭加劇（超大規模垂直整合） <span class="sev sh">高</span></div>
+        <div class="idsc">Intel、Marvell、Cisco（Inphi）等競爭者；超大規模雲端業者自研光模組方案；Lumentum 等純光互連標的</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📉</div>
+      <div class="ibdy">
+        <div class="ittl">宏觀資本支出週期風險 <span class="sev sm">中高</span></div>
+        <div class="idsc">若 AI 資本支出因監管、地緣政治或電力限制放緩，COHR 作為硬體供應商將最快感受衝擊；下行情境股價可能至 $280–$320</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏭</div>
+      <div class="ibdy">
+        <div class="ittl">Lasers 段需求疲軟 <span class="sev sl">中等</span></div>
+        <div class="idsc">工業雷射需求偏弱；拖累整體表現；短期無明顯復甦催化劑</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 多空對比 ════════════════════════════════════════════════ -->
+<div id="bullbear" class="sec">
+  <div class="sec-ttl">⚖️ 多空論點對比</div>
+  <div class="g2">
+    <div class="card" style="border-left:3px solid var(--g)">
+      <div style="color:var(--g);font-weight:700;margin-bottom:12px;font-size:15px">🐂 看多論點</div>
+      <div class="ilist">
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">AI 資料中心 800G/1.6T 升級週期確定性高，COHR 是核心受益者</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">Networking 段毛利率最高，佔比提升直接推動整體利潤率結構改善</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">81% Buy 共識，分析師正在持續上調目標價</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">客戶中立性：同時供貨所有超大規模業者，不依賴單一客戶</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--g);flex-shrink:0;font-weight:700">✓</span>
+          <div style="font-size:13px">Q4 指引 $1.91B–$2.05B 再超市場預期，能見度強</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--r)">
+      <div style="color:var(--r);font-weight:700;margin-bottom:12px;font-size:15px">🐻 看空論點</div>
+      <div class="ilist">
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">多業務段整合遺留問題（II-VI 合併），集團折讓持續存在</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">現價 $382 已略超分析師均值 $376，上行需要持續超預期</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">宏觀資本支出放緩風險：下行情境股價可能至 $280–$320</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">Lasers 段需求疲軟，拖累整體表現與市場情緒</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px;background:var(--s2);border-radius:6px">
+          <span style="color:var(--r);flex-shrink:0;font-weight:700">✗</span>
+          <div style="font-size:13px">競爭者垂直整合（Intel、Marvell、自研方案）長期威脅 ASP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 核心投資論點</div>
+  <div class="why">
+    <div class="why-hd">
+      🔬 COHR：AI 資料中心光互連核心供應商
+      <span class="why-badge" style="background:rgba(0,212,255,.2);color:var(--cy)">800G 升級週期受益者</span>
+    </div>
+    <div class="why-body">
+      <p style="margin-bottom:10px">COHR 是 AI 資料中心光互連的核心供應商。800G 升級潮正在加速，而 1.6T 標準的量產導入將為下一階段成長奠定基礎。COHR 在這個浪潮中具有：</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--cy)">1. 技術廣度：</strong>從半導體材料（Materials）到光電元件（Networking），垂直整合讓 COHR 在供應鏈中擁有罕見的成本控制能力與議價空間。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--cy)">2. 客戶多元性：</strong>同時供貨 Meta、Google、Microsoft、Amazon 等超大規模業者，客戶中立性是競爭護城河。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--cy)">3. 毛利率改善路徑清晰：</strong>Networking 段毛利率最高，隨佔比提升，整體利潤率持續結構性改善，這是可預測的財務路徑。</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--y)">核心風險：</strong>多業務段整合複雜性（集團折讓）、Lasers 段拖累、宏觀資本支出週期敏感性。</p>
+      <p><strong style="color:var(--t)">結論：</strong>COHR 是「打折的 Networking 業務」——因業務多元性被市場低估，但 Networking 段的高速成長和毛利率改善路徑提供了結構性上行空間。適合具備長期視野的投資者，短期需注意現價已略超均值目標的估值壓力。</p>
+    </div>
+    <div class="why-foot">
+      <div>現價：<span>$382.45</span></div>
+      <div>分析師均值目標：<span class="ho">$376.26</span></div>
+      <div>最高目標：<span class="hg">$425（Rosenblatt）</span></div>
+      <div>Buy 共識：<span class="hg">81%（12位）</span></div>
+      <div>Q4 指引中值：<span class="hcy">$1.98B</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 走勢圖 ════════════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-ttl">📈 示意走勢（模擬）</div>
+  <div class="card">
+    <canvas id="priceChart" height="200"></canvas>
+  </div>
+</div>
+
+<div class="footer">
+  <p>COHR 監控中心 · 資料截止 2026-05-15 · 僅供參考，不構成投資建議</p>
+  <p style="margin-top:6px"><a href="../../index.html" style="color:var(--cy);text-decoration:none">← 分析中心</a> · <a href="../" style="color:var(--m);text-decoration:none">客製化股票</a></p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const ctx = document.getElementById('priceChart').getContext('2d');
+// Simulated price recovery from ~$55 to $382
+const labels = ['52W低\n~$55','Q1FY26','Q2FY26','Q3FY26\n$1.81B','目標均\n$376','現價\n$382.45','RB目標\n$425'];
+const data = [55, 120, 200, 280, 376, 382, 425];
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['52週低 ~$55','Q1 FY26','Q2 FY26','Q3 FY26 $1.81B','均值 $376','現價 $382','Rosenblatt $425'],
+    datasets: [{
+      label: 'COHR 股價走勢（示意）',
+      data: data,
+      borderColor: '#00d4ff',
+      backgroundColor: 'rgba(0,212,255,0.08)',
+      borderWidth: 2.5,
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: ['#f85149','#8b949e','#8b949e','#3fb950','#ffa657','#00d4ff','#3fb950'],
+      pointRadius: 6,
+      pointHoverRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#8b949e', font: { size: 12 } } },
+      tooltip: {
+        backgroundColor: '#161b22',
+        borderColor: '#30363d',
+        borderWidth: 1,
+        titleColor: '#e6edf3',
+        bodyColor: '#8b949e',
+        callbacks: { label: ctx => ` $${ctx.raw}` }
+      }
+    },
+    scales: {
+      x: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: 'rgba(48,54,61,.4)' } },
+      y: { ticks: { color: '#8b949e', font: { size: 11 }, callback: v => '$'+v }, grid: { color: 'rgba(48,54,61,.4)' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
