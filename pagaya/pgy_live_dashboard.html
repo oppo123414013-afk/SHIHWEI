@@ -1097,18 +1097,24 @@ function _parseStooq(raw) {
     regularMarketPreviousClose: null
   };
 }
+var _quoteApplied = false;
 function fetchQuote() {
+  // GitHub Pages 沒有 server-side proxy，公開 CORS proxy 也已失效
+  // 直接依賴 WebSocket（見下方 chart/price WebSocket），15秒後若仍無資料才顯示錯誤
+  var isNetlify = location.hostname.indexOf('netlify.app') !== -1;
+  if (!isNetlify) {
+    setTimeout(function() { if (!_quoteApplied) showNoData(); }, 15000);
+    return;
+  }
   var yUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
   var sources = [
     { url: '/api/quote/' + TICKER,                                            parse: _parseYahoo },
-    { url: 'https://corsproxy.io/?' + encodeURIComponent(yUrl),              parse: _parseYahoo },
     { url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrl), parse: _parseAllOrigins },
-    { url: 'https://api.codetabs.com/v1/proxy?quest=' + yUrl,                parse: _parseYahoo },
     { url: 'https://stooq.com/q/l/?s=pgy.us&f=sd2t2ohlcv&h&e=json',         parse: _parseStooq }
   ];
   function trySource(i) {
-    if (i >= sources.length) { showNoData(); return; }
-    fetchTimeout(sources[i].url, 8000)
+    if (i >= sources.length) { if (!_quoteApplied) showNoData(); return; }
+    fetchTimeout(sources[i].url, 5000)
       .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(raw) {
         var q = sources[i].parse(raw);
@@ -1121,6 +1127,7 @@ function fetchQuote() {
 }
 
 function showNoData() {
+  if (_quoteApplied) return;
   setText('mkt-status', '⚠️ 即時資料暫時無法取得，請稍後重試');
   var b = document.getElementById('why-badge');
   if (b) { b.textContent = '資料讀取失敗'; b.style = 'background:rgba(139,148,158,.2);color:var(--m)'; }
@@ -1134,6 +1141,7 @@ function showNoData() {
 }
 
 function applyQuote(q) {
+  _quoteApplied = true;
   var price = q.regularMarketPrice;
   var chg   = q.regularMarketChange;
   var pct   = q.regularMarketChangePercent;
