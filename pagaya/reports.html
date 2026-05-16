@@ -83,6 +83,10 @@ body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSyste
 /* Footer */
 .footer{text-align:center;padding:36px 20px 28px;color:var(--m);font-size:12px;border-top:1px solid var(--bd);margin-top:8px}
 .footer a{color:var(--bl);text-decoration:none}
+
+/* Skeleton loader */
+.skeleton{background:linear-gradient(90deg,var(--s) 25%,var(--s2) 50%,var(--s) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -103,261 +107,25 @@ body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSyste
     <div class="ph-title">每日動態報告</div>
     <div class="ph-sub">每日更新的 PGY 股價走勢、重要公告、AI 分析觀點完整歸檔</div>
     <div class="ph-stats">
-      <div class="ph-stat"><span class="ph-stat-val">20</span><span class="ph-stat-label">報告總數</span></div>
-      <div class="ph-stat"><span class="ph-stat-val">2026-04-24</span><span class="ph-stat-label">最早報告</span></div>
-      <div class="ph-stat"><span class="ph-stat-val">2026-05-16</span><span class="ph-stat-label">最新報告</span></div>
+      <div class="ph-stat"><span class="ph-stat-val" id="stat-count">—</span><span class="ph-stat-label">報告總數</span></div>
+      <div class="ph-stat"><span class="ph-stat-val" id="stat-earliest">—</span><span class="ph-stat-label">最早報告</span></div>
+      <div class="ph-stat"><span class="ph-stat-val" id="stat-latest">—</span><span class="ph-stat-label">最新報告</span></div>
     </div>
   </div>
 
   <!-- LATEST REPORT HIGHLIGHT -->
-  <div class="latest-banner">
+  <div id="latest-banner" class="latest-banner">
     <div class="lb-tag">📌 最新報告</div>
-    <div class="lb-title">2026-05-16（六）— 週末快報・B. Riley 大會前夕</div>
-    <div style="font-size:13px;color:var(--m);line-height:1.6">
-      本週股價從 $13.53 低點回升，週五收盤 $13.60。日內波動區間 $13.02–$13.80。
-      <strong style="color:var(--t)">2026-05-18~20 Oppenheimer / Barclays / B. Riley 三連大會</strong>是下週最重要催化劑。
-    </div>
-    <div class="lb-stats">
-      <div class="lb-stat"><span class="lb-stat-label">週五收盤</span><span class="lb-stat-val" style="color:var(--g)">$13.60</span></div>
-      <div class="lb-stat"><span class="lb-stat-label">Q1 Adj. EPS</span><span class="lb-stat-val" style="color:var(--g)">$0.73（超預期 265%）</span></div>
-      <div class="lb-stat"><span class="lb-stat-label">下週大事</span><span class="lb-stat-val" style="color:var(--y)">B. Riley 投資人大會</span></div>
-      <div class="lb-stat"><span class="lb-stat-label">分析師評級</span><span class="lb-stat-val" style="color:var(--g)">強力買入 10/0</span></div>
-    </div>
-    <div class="lb-links">
-      <a href="../Pagaya_Daily/pdf/2026-05-16_report.pdf" class="rc-link pdf" target="_blank">📄 下載 PDF</a>
-      <a href="../Pagaya_Daily/reports/2026-05-16_report.md" class="rc-link md" target="_blank">📝 查看 Markdown</a>
-    </div>
+    <div class="lb-title skeleton" style="height:26px;width:60%;margin-bottom:10px">&nbsp;</div>
+    <div class="skeleton" style="height:14px;width:90%;margin-bottom:6px">&nbsp;</div>
+    <div class="skeleton" style="height:14px;width:75%">&nbsp;</div>
   </div>
 
   <!-- ALL REPORTS -->
   <div class="sec">
     <div class="sec-title">📅 所有報告</div>
-    <div class="report-grid">
-
-      <!-- May reports -->
-      <div class="rcard latest">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-16</div><div class="rc-weekday">星期六</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-highlight">本週回顧：股價從 $13.53 低點回升，週五收 $13.60。下週 B. Riley 大會（05-20）是最重要催化劑。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-16_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="../Pagaya_Daily/reports/2026-05-16_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-15</div><div class="rc-weekday">星期五</div></div>
-          <span class="badge bg">低位回升</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">$13.60</span><span class="rc-price-chg pos">回穩</span></div>
-        <div class="rc-highlight">日內區間 $13.02–$13.80，收盤 $13.60 守住支撐。B. Riley 大會倒數 5 天，下週三連大會受關注。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-15_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="../Pagaya_Daily/reports/2026-05-15_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-14</div><div class="rc-weekday">星期四</div></div>
-          <span class="badge bb">溫和反彈</span>
-        </div>
-        <div class="rc-highlight">自 $12.93 低位溫和反彈，技術回撤趨於收斂。Experian 合作利多持續發酵，分析師陣線仍 10 買入 0 賣出。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-14_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="../Pagaya_Daily/reports/2026-05-14_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-13</div><div class="rc-weekday">星期二</div></div>
-          <span class="badge br">技術回撤</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">$12.93</span><span class="rc-price-chg neg">−4.4%</span></div>
-        <div class="rc-highlight">技術面持續下行，自財報後高點 $17.14 累跌 -24.6%。日內區間 $12.91–$13.59，仍無基本面負面消息。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-14_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="../Pagaya_Daily/reports/2026-05-14_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-11</div><div class="rc-weekday">星期一</div></div>
-          <span class="badge bb">後財報整理</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">$15.47</span><span class="rc-price-chg pos">+</span></div>
-        <div class="rc-highlight">早盤下探 $14.23 低點，尾盤強力反彈收 $15.47，確立短期技術支撐。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-11_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-11_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-10</div><div class="rc-weekday">星期日</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-highlight">週末彙整：財報週後整體回顧、下週催化劑預覽。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-10_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-10_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-09</div><div class="rc-weekday">星期六</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-highlight">週末回顧：財報後第一週完整覆盤，技術面分析。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-09_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-09_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-08</div><div class="rc-weekday">星期四</div></div>
-          <span class="badge br">獲利了結</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">~$14.75</span><span class="rc-price-chg neg">回落</span></div>
-        <div class="rc-highlight">財報後獲利了結，區間 $14.46–$15.87，財報情緒消化中。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-08_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-08_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard" style="border-color:rgba(63,185,80,.4)">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-07</div><div class="rc-weekday">星期三</div></div>
-          <span class="badge bg">財報日 ⭐</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">$16.49</span><span class="rc-price-chg pos">+11.2%</span></div>
-        <div class="rc-highlight">Q1 2026 財報發布！Adj. EPS $0.73 超預期 265%，全年指引上調，股價暴漲 +11.2%。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-07_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-07_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-06</div><div class="rc-weekday">星期二</div></div>
-          <span class="badge bg">ABS 完成</span>
-        </div>
-        <div class="rc-highlight">PAID 2026-3 $8億 AAA ABS 完成（增額）；財報明日發布，市場靜待。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-06_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-06_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-05</div><div class="rc-weekday">星期一</div></div>
-          <span class="badge by">財報前夕</span>
-        </div>
-        <div class="rc-highlight">財報發布倒數 2 天，市場預期分析，技術支撐位確認。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-05_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-05_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-04</div><div class="rc-weekday">星期日</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">$14.44</span></div>
-        <div class="rc-highlight">週末回顧：$14.44 收盤守穩 $14 關卡，財報前技術面分析。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-04_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-04_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-03</div><div class="rc-weekday">星期六</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-highlight">財報前一週週末快報：技術指標、分析師預期匯整。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-03_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-03_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-02</div><div class="rc-weekday">星期五</div></div>
-          <span class="badge bb">每日報告</span>
-        </div>
-        <div class="rc-highlight">財報倒數 5 天，股價走勢追蹤，市場情緒分析。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-02_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-02_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-05-01</div><div class="rc-weekday">星期四</div></div>
-          <span class="badge bb">每日報告</span>
-        </div>
-        <div class="rc-price"><span class="rc-price-val">~$12.97</span><span class="rc-price-chg neg">弱勢</span></div>
-        <div class="rc-highlight">RPM-2026-2 $5億汽車 ABS 完成（史上最大）；股價仍在 $12-13 整理。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-05-01_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-05-01_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-04-30</div><div class="rc-weekday">星期三</div></div>
-          <span class="badge bb">每日報告</span>
-        </div>
-        <div class="rc-highlight">月末回顧：4月重要事件彙整，PAID-2026-R2 Fitch AAA 首獲再證券化。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-04-30_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-30_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-04-25</div><div class="rc-weekday">星期六</div></div>
-          <span class="badge by">週末快報</span>
-        </div>
-        <div class="rc-highlight">本週回顧：RPM-2026-2 $5億汽車 ABS 重要里程碑，技術支撐分析。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-04-25_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-25_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <div class="rc-top">
-          <div><div class="rc-date">2026-04-24</div><div class="rc-weekday">星期五</div></div>
-          <span class="badge bp">首份報告</span>
-        </div>
-        <div class="rc-highlight">RPM-2026-2 $5億汽車 ABS 完成（史上最大單筆）；系列報告正式啟動。</div>
-        <div class="rc-links">
-          <a href="../Pagaya_Daily/pdf/2026-04-24_report.pdf" class="rc-link pdf" target="_blank">📄 PDF</a>
-          <a href="https://github.com/oppo123414013-afk/SHIHWEI/blob/main/Pagaya_Daily/reports/2026-04-24_report.md" class="rc-link md" target="_blank">📝 MD</a>
-        </div>
-      </div>
-
+    <div id="report-grid" class="report-grid">
+      <div style="color:var(--m);padding:20px;grid-column:1/-1">載入報告中…</div>
     </div>
   </div>
 
@@ -365,9 +133,199 @@ body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSyste
 
 <div class="footer">
   <p style="font-size:14px;font-weight:600;color:var(--t);margin-bottom:6px">PGY 分析中心 · 每日動態報告</p>
-  <p>報告資料涵蓋 2026-04-24 至 2026-05-16 &nbsp;·&nbsp; <a href="pgy_live_dashboard.html">即時監控</a></p>
+  <p>報告資料涵蓋 <span id="footer-range">—</span> &nbsp;·&nbsp; <a href="pgy_live_dashboard.html">即時監控</a></p>
   <p style="margin-top:8px">本站內容由 Claude AI 自動生成，<strong>僅供資訊參考，不構成任何投資建議。</strong></p>
 </div>
+
+<script>
+(function(){
+  var OWNER='oppo123414013-afk', REPO='pgy-monitor';
+  var API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/Pagaya_Daily/reports';
+  var RAW='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/main/Pagaya_Daily/reports/';
+  var BLOB='https://github.com/'+OWNER+'/'+REPO+'/blob/main/Pagaya_Daily/reports/';
+  var WD=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+  function wd(d){return WD[new Date(d+'T12:00:00').getDay()];}
+  function isWknd(d){var n=new Date(d+'T12:00:00').getDay();return n===0||n===6;}
+
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function parseCard(md,dateStr){
+    var price=null,chg=null,highlight='';
+    var badge=isWknd(dateStr)?{cls:'by',text:'週末快報'}:{cls:'bb',text:'每日報告'};
+
+    // Price: try multiple patterns
+    var pm=md.match(/收盤[價]?[^$\n\r]*?\$\s*([\d]+\.[\d]+)/)
+      ||md.match(/\|\s*收盤[^|]*\|\s*\$?\s*([\d,]+\.[\d]+)/)
+      ||md.match(/close\s*[：:$]\s*\$?\s*([\d]+\.[\d]+)/i)
+      ||md.match(/\$\s*(1[0-9]\.[0-9]{2})\b/);
+    if(pm)price='$'+pm[1];
+
+    // Change: +X.X% or -X.X%
+    var cm=md.match(/([+＋]\s*[\d]+\.?[\d]*\s*%)/)||md.match(/([-−]\s*[\d]+\.?[\d]*\s*%)/);
+    if(cm)chg=cm[1].replace(/\s+/g,'').replace('＋','+').replace('−','-');
+
+    // Highlight: first non-trivial, non-header line
+    var lines=md.split(/\r?\n/);
+    for(var i=0;i<lines.length;i++){
+      var l=lines[i].trim();
+      if(!l||l.startsWith('#')||l.startsWith('|')||l.startsWith('>')||l.startsWith('---'))continue;
+      l=l.replace(/\*\*/g,'').replace(/\*/g,'').replace(/`/g,'');
+      if(l.length>=20){
+        highlight=l.length>150?l.slice(0,147)+'…':l;
+        break;
+      }
+    }
+
+    // Badge keyword detection (override if not weekend)
+    if(!isWknd(dateStr)){
+      if(md.match(/Q[1-4]\s*(20\d\d)?\s*財報|EPS.*超預期|財報.*亮眼/)){
+        badge={cls:'bg',text:'財報日 ⭐'};
+      } else if(md.match(/ABS.*完成|ABS.*定價|完成.*ABS/)){
+        badge={cls:'bg',text:'ABS 完成'};
+      } else if(/Experian/.test(md)){
+        badge={cls:'bb',text:'Experian 合作'};
+      } else if(/財報前夕|財報.*明[日天]/.test(md)){
+        badge={cls:'by',text:'財報前夕'};
+      } else if(chg){
+        var neg=chg.startsWith('-')||chg.startsWith('−');
+        var num=parseFloat(chg.replace(/[^0-9.]/g,''));
+        if(neg&&num>=4)badge={cls:'br',text:'技術回撤'};
+        else if(neg)badge={cls:'br',text:'小幅回落'};
+        else if(num>=8)badge={cls:'bg',text:'強力上漲'};
+        else if(num>=3)badge={cls:'bg',text:'溫和反彈'};
+        else badge={cls:'bg',text:'低位回升'};
+      }
+    }
+
+    return {price:price,chg:chg,highlight:highlight,badge:badge};
+  }
+
+  function buildCard(dateStr,data,isLatest){
+    var weekday=wd(dateStr);
+    var pdfUrl='../Pagaya_Daily/pdf/'+dateStr+'_report.pdf';
+    var mdUrl=BLOB+dateStr+'_report.md';
+    var cls='rcard'+(isLatest?' latest':'');
+    var extraStyle=isLatest?'':((dateStr==='2026-05-07')?'style="border-color:rgba(63,185,80,.4)"':'');
+
+    var badge=data?data.badge:{cls:'bb',text:'每日報告'};
+    if(isWknd(dateStr))badge={cls:'by',text:'週末快報'};
+
+    var priceHtml='';
+    if(data&&data.price){
+      var isPos=data.chg&&data.chg.startsWith('+');
+      var isNeg=data.chg&&data.chg.startsWith('-');
+      var chgHtml=data.chg?'<span class="rc-price-chg '+(isPos?'pos':isNeg?'neg':'')+'">'+esc(data.chg)+'</span>':'';
+      priceHtml='<div class="rc-price"><span class="rc-price-val">'+esc(data.price)+'</span>'+chgHtml+'</div>';
+    }
+
+    var hlHtml=data&&data.highlight?'<div class="rc-highlight">'+esc(data.highlight)+'</div>':'';
+
+    return '<div class="'+cls+'" '+extraStyle+'>'
+      +'<div class="rc-top">'
+        +'<div><div class="rc-date">'+dateStr+'</div><div class="rc-weekday">'+weekday+'</div></div>'
+        +'<span class="badge '+badge.cls+'">'+badge.text+'</span>'
+      +'</div>'
+      +priceHtml+hlHtml
+      +'<div class="rc-links">'
+        +'<a href="'+pdfUrl+'" class="rc-link pdf" target="_blank">📄 PDF</a>'
+        +'<a href="'+mdUrl+'" class="rc-link md" target="_blank">📝 MD</a>'
+      +'</div>'
+    +'</div>';
+  }
+
+  function renderBanner(dateStr,data){
+    var el=document.getElementById('latest-banner');
+    if(!el)return;
+    var weekday=wd(dateStr);
+    var pdfUrl='../Pagaya_Daily/pdf/'+dateStr+'_report.pdf';
+    var mdUrl=BLOB+dateStr+'_report.md';
+    var desc=(data&&data.highlight)?esc(data.highlight):'最新報告';
+    var priceStats='';
+    if(data&&data.price){
+      var isPos=data.chg&&data.chg.startsWith('+');
+      var col=isPos?'var(--g)':'var(--r)';
+      priceStats='<div class="lb-stats">'
+        +'<div class="lb-stat"><span class="lb-stat-label">收盤價</span><span class="lb-stat-val" style="color:'+col+'">'+esc(data.price)+'</span></div>'
+        +(data.chg?'<div class="lb-stat"><span class="lb-stat-label">漲跌幅</span><span class="lb-stat-val" style="color:'+col+'">'+esc(data.chg)+'</span></div>':'')
+      +'</div>';
+    }
+    el.innerHTML='<div class="lb-tag">📌 最新報告</div>'
+      +'<div class="lb-title">'+dateStr+'（'+weekday.slice(2)+'）</div>'
+      +'<div style="font-size:13px;color:var(--m);line-height:1.6">'+desc+'</div>'
+      +priceStats
+      +'<div class="lb-links">'
+        +'<a href="'+pdfUrl+'" class="rc-link pdf" target="_blank">📄 下載 PDF</a>'
+        +'<a href="'+mdUrl+'" class="rc-link md" target="_blank">📝 查看 Markdown</a>'
+      +'</div>';
+  }
+
+  function render(payload){
+    var dates=payload.dates, data=payload.data;
+    if(!dates||!dates.length){showError();return;}
+
+    var cnt=document.getElementById('stat-count');
+    var ear=document.getElementById('stat-earliest');
+    var lat=document.getElementById('stat-latest');
+    var ftr=document.getElementById('footer-range');
+    if(cnt)cnt.textContent=dates.length;
+    if(ear)ear.textContent=dates[dates.length-1];
+    if(lat)lat.textContent=dates[0];
+    if(ftr)ftr.textContent=dates[dates.length-1]+' 至 '+dates[0];
+
+    renderBanner(dates[0],data[dates[0]]);
+
+    var grid=document.getElementById('report-grid');
+    if(grid)grid.innerHTML=dates.map(function(d,i){return buildCard(d,data[d],i===0);}).join('');
+  }
+
+  function showError(){
+    var grid=document.getElementById('report-grid');
+    if(grid)grid.innerHTML='<div style="color:var(--m);padding:20px;grid-column:1/-1">載入失敗，請稍後重試。</div>';
+    var el=document.getElementById('latest-banner');
+    if(el)el.innerHTML='<div class="lb-tag">📌 最新報告</div><div style="color:var(--m)">無法取得資料</div>';
+  }
+
+  function init(){
+    var cached=sessionStorage.getItem('pgy_reports_v3');
+    if(cached){try{var p=JSON.parse(cached);if(p&&p.dates&&p.dates.length){render(p);return;}}catch(e){}}
+
+    fetch(API)
+      .then(function(r){
+        if(!r.ok)throw new Error('API '+r.status);
+        return r.json();
+      })
+      .then(function(files){
+        if(!Array.isArray(files))throw new Error('unexpected response');
+        var dates=files
+          .filter(function(f){return /^\d{4}-\d{2}-\d{2}_report\.md$/.test(f.name);})
+          .map(function(f){return f.name.slice(0,10);})
+          .sort().reverse();
+        if(!dates.length){showError();return;}
+
+        // Fetch all MD files in parallel (raw CDN, no rate limit)
+        Promise.all(dates.map(function(d){
+          return fetch(RAW+d+'_report.md')
+            .then(function(r){return r.ok?r.text():null;})
+            .catch(function(){return null;});
+        })).then(function(texts){
+          var data={};
+          dates.forEach(function(d,i){data[d]=texts[i]?parseCard(texts[i],d):null;});
+          var payload={dates:dates,data:data};
+          try{sessionStorage.setItem('pgy_reports_v3',JSON.stringify(payload));}catch(e){}
+          render(payload);
+        });
+      })
+      .catch(function(){showError();});
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init);
+  }else{
+    init();
+  }
+})();
+</script>
 
 </body>
 </html>

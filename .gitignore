@@ -1,0 +1,8 @@
+
+# Claude Code 工作目錄
+.claude/
+
+# 敏感資料
+threads_bot/.env
+*.env
+*.bak
