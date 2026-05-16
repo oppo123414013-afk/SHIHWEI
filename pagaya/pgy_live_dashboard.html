@@ -207,11 +207,14 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <a href="#live">📡 即時行情</a>
   <a href="#why">📊 漲跌分析</a>
   <a href="#news">📰 即時新聞</a>
+  <a href="#events">📅 事件軸</a>
   <a href="#fin">財務</a>
+  <a href="#abs">ABS</a>
   <a href="#model">商業模式</a>
   <a href="#partners">合作夥伴</a>
   <a href="#tech">技術面</a>
   <a href="#analyst">分析師</a>
+  <a href="#analyst-detail">分析師名單</a>
   <a href="#cat">催化劑</a>
   <a href="#risk">風險</a>
   <a href="#outlook">展望</a>
@@ -358,6 +361,55 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 </div>
 
+<!-- ══ 重要事件時間軸 ══════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 重要事件時間軸 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">即時追蹤最新催化劑與里程碑</span></div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">05-20<br>即將</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--y)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">B. Riley 投資人大會 <span class="badge by" style="background:rgba(210,153,34,.15);color:var(--y);border:1px solid rgba(210,153,34,.3)">催化劑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">洛杉磯 · 管理層出席 · 近期最重要事件</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">06-15<br>待定</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--o)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">CFO 正式交接</div><div style="font-size:12px;color:var(--m);margin-top:2px">Perros 離任 → Jon Dobres 接任 CFO</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">05-07<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Q1 2026 財報 <span class="badge bg">EPS +265%</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">Adj. EPS $0.73 · 全年指引上調 · 股價 +11.2%</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">05-06<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">PAID 2026-3 $8億 ABS 完成</div><div style="font-size:12px;color:var(--m);margin-top:2px">AAA 評級 · 增額完成 · 33 家機構投資人</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">05 近期<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--p)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">$4.5 億汽車再 ABS <span class="badge bp">業界首例</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">AI 驅動汽車再證券化 · 提升資本效率</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">Q1<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--bl)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">新增 4 家策略夥伴</div><div style="font-size:12px;color:var(--m);margin-top:2px">GLS · Upstart · Sezzle · Flex Pay 加入</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">Q2 末<br>目標</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--m)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">新增 7–8 家夥伴目標</div><div style="font-size:12px;color:var(--m);margin-top:2px">H2 增長核心驅動力 · Q2 財報首次量化</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026-08<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--m)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Q2 2026 財報</div><div style="font-size:12px;color:var(--m);margin-top:2px">H2 新夥伴貢獻首次量化 · 估值重估關鍵</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 核心財務指標 ══════════════════════════════════════════════ -->
 <div class="sec">
   <div class="sec-ttl">核心財務指標（Q1 2026 實績）</div>
@@ -409,6 +461,77 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 </div>
 
+<!-- ══ Q1 詳細財務表 + 全年指引 ══════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-ttl">Q1 2026 vs Q1 2025 完整財務明細</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Q1 2026 財務表現</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">指標</th>
+          <th style="padding:8px 12px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Q1 2026</th>
+          <th style="padding:8px 12px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Q1 2025</th>
+          <th style="padding:8px 12px;border-bottom:1px solid var(--bd);color:var(--m);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">YoY</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">總營收</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$318M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">$289M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+10%</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">網絡成交量</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$26B</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">$23.8B</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+9%</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">Adj. EBITDA</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$94M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">$79M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+19%</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">Adj. EBITDA 率</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">29.6%</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">27.6%</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+200bps</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">GAAP 淨利潤</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g);font-weight:700">$25M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">$8M</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">+213%</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">Adj. EPS</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--g);font-weight:700">$0.73</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">—</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">超預期 265%</span></td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">汽車業務年化</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--t);font-weight:600">$2.3B</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)">~$1.15B</td><td style="padding:9px 12px;border-bottom:1px solid rgba(48,54,61,.5)"><span class="badge bg">翻倍</span></td></tr>
+          <tr><td style="padding:9px 12px">連續 GAAP 盈利</td><td style="padding:9px 12px;color:var(--p);font-weight:700">第 5 季</td><td style="padding:9px 12px">第 1 季</td><td style="padding:9px 12px"><span class="badge bp">歷史紀錄</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle">2026 全年業績指引（最新）</div>
+      <div style="display:flex;flex-direction:column;gap:0;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">GAAP 淨利潤</div><div style="font-size:11px;color:var(--m);margin-top:2px">前次：$1.00億–$1.50億</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--g)">$1.10億–$1.60億</div><div style="margin-top:3px"><span class="badge bg">上調 $1,000萬</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">調整後 EBITDA</div><div style="font-size:11px;color:var(--m);margin-top:2px">前次：$4.00億–$4.40億</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--g)">$4.20億–$4.60億</div><div style="margin-top:3px"><span class="badge bg">上調 $2,000萬</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)">
+          <div><div style="font-size:13px;color:var(--m)">總營收及其他收入</div><div style="font-size:11px;color:var(--m);margin-top:2px">維持不變</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700">$14.0億–$15.75億</div><div style="margin-top:3px"><span class="badge bb">維持</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0">
+          <div><div style="font-size:13px;color:var(--m)">網絡成交量</div><div style="font-size:11px;color:var(--m);margin-top:2px">前次：$112.5億–$130億</div></div>
+          <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:var(--g)">$114.5億–$130億</div><div style="margin-top:3px"><span class="badge bg">下限上調</span></div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">Adj. EBITDA 指引中值</div>
+        <div style="font-size:22px;font-weight:700;color:var(--g)">$4.40億</div>
+        <div style="font-size:11px;color:var(--m)">EV/EBITDA &lt; 3× · AI Fintech 同業極低估值</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1 YoY 比較圖表 -->
+  <div class="g2" style="margin-top:16px">
+    <div class="card">
+      <div class="ctitle">核心損益指標 Q1 對比（百萬美元）</div>
+      <canvas id="q1CompareChartDash" style="margin-top:12px;max-height:220px"></canvas>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:12px">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:2px;background:rgba(139,148,158,.5);display:inline-block"></span>Q1 2025</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:2px;background:#58a6ff;display:inline-block"></span>Q1 2026</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">年增率 YoY（%）</div>
+      <canvas id="q1YoyChartDash" style="margin-top:12px;max-height:220px"></canvas>
+      <div style="font-size:11px;color:var(--m);margin-top:8px;text-align:center">* Adj. EPS 超預期 +265%，GAAP 淨利 +213% 為季度亮點</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 季度違約率追蹤 ═══════════════════════════════════════════ -->
 <div id="default-rate" class="sec">
   <div class="sec-ttl">📉 季度違約率追蹤 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">PGY 核心信用指標 · AI 模型準確性的直接反映</span></div>
@@ -439,6 +562,36 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div style="font-size:12px;font-weight:700;color:var(--g);margin-bottom:5px">📌 為何違約率是 PGY 最核心的指標？</div>
         <div style="font-size:12px;color:var(--m);line-height:1.7">PGY 本身不放貸，AI 模型準確性直接反映在 ABS 池信用表現上。<strong style="color:var(--t)">違約率持續下降</strong>代表 ① AI 模型越來越精準 ② ABS 投資人願意以更低利差認購 ③ FRLPC 費率可望提升 ④ 夥伴銀行更願意增加合作量。5 季連降趨勢是基本面最強有力的護城河佐證。</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABS 發行紀錄 ════════════════════════════════════════════ -->
+<div id="abs" class="sec">
+  <div class="sec-ttl">📋 2026 年 ABS 發行紀錄 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">YTD 合計 ~$38.5 億 · 歷史累計 $345 億以上 · 85 筆交易</span></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>日期</th><th>交易名稱</th><th>規模</th><th>評級</th><th>備註</th></tr></thead>
+      <tbody>
+        <tr><td>2026-05-06</td><td>PAID 2026-3 個人貸款 ABS</td><td style="color:var(--g);font-weight:700">$8 億</td><td><span class="tag tn">AAA</span></td><td>增額完成；33 家機構投資人</td></tr>
+        <tr><td>2026-05 近期</td><td>汽車再證券化</td><td style="color:var(--p);font-weight:700">$4.5 億</td><td>—</td><td><span class="tag ta">業界首例</span> AI 驅動汽車再 ABS</td></tr>
+        <tr><td>2026-04-24</td><td>RPM 2026-2 汽車 ABS</td><td style="color:var(--bl);font-weight:700">$5 億</td><td>—</td><td>史上最大汽車 ABS</td></tr>
+        <tr><td>2026-04-15</td><td>PAID 2026-R2 個貸再 ABS</td><td style="color:var(--bl);font-weight:700">$3.68 億</td><td><span class="tag tn">Fitch AAA</span></td><td>首獲 Fitch AAA</td></tr>
+        <tr><td>2026-04-06</td><td>PAID 2026-2 個人貸款 ABS</td><td style="color:var(--g);font-weight:700">$6 億</td><td><span class="tag tn">AAA</span></td><td>4 家新機構投資人</td></tr>
+        <tr><td>2026-02-04</td><td>PAID 2026-1 個人貸款 ABS</td><td style="color:var(--g);font-weight:700">$8 億</td><td><span class="tag tn">AAA</span></td><td>增額 33%；32 家機構</td></tr>
+        <tr><td>2026-01 約</td><td>RPM 2026-1 汽車 ABS</td><td style="color:var(--bl);font-weight:700">$4 億</td><td>—</td><td>2026 首筆傳統汽車 ABS</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- 即時 PGY 消息（Yahoo Finance RSS，60秒自動刷新） -->
+  <div style="margin-top:12px;background:var(--s2);border:1px solid rgba(88,166,255,.25);border-radius:10px;padding:14px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--bl)">📡 即時 PGY 消息</span>
+      <span id="abs-news-status-dash" style="font-size:11px;color:var(--m)">載入中…</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--m)">每 60 秒自動更新 · Yahoo Finance</span>
+    </div>
+    <div id="abs-news-list-dash" style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--m)">
+      <div style="color:var(--m);font-style:italic">抓取中…</div>
     </div>
   </div>
 </div>
@@ -560,6 +713,96 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div>⬇️ 最低目標：<span class="hr">$20.00</span></div>
       <div>📊 分析師覆蓋：8–10 人</div>
     </div>
+  </div>
+</div>
+
+<!-- ══ 個別分析師名單 ══════════════════════════════════════════ -->
+<div id="analyst-detail" class="sec">
+  <div class="sec-ttl">🏦 分析師完整名單 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">截至 2026-05-12 · 10 位全部買入</span></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>機構</th><th>分析師</th><th>評級</th><th>目標價</th><th>更新</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Needham</strong></td>
+          <td style="color:var(--m)">Kyle Peterson</td>
+          <td><span class="tag tn">Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$33</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>B. Riley Securities</strong></td>
+          <td style="color:var(--m)">Hal Goetsch</td>
+          <td><span class="tag tn">Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$30</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>JMP Securities</strong></td>
+          <td style="color:var(--m)">David Scharf</td>
+          <td><span class="tag tk" style="background:rgba(57,211,83,.2);color:var(--tl)">Strong Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$28</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>Raymond James</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tk" style="background:rgba(57,211,83,.2);color:var(--tl)">Strong Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$35</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>Piper Sandler</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tn">Overweight</span></td>
+          <td style="color:var(--g);font-weight:700">$27</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>Keefe Bruyette &amp; Woods</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tn">Outperform</span></td>
+          <td style="color:var(--g);font-weight:700">$28</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>Wedbush</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tn">Outperform</span></td>
+          <td style="color:var(--g);font-weight:700">$30</td>
+          <td style="color:var(--m);font-size:12px">2026-04</td>
+        </tr>
+        <tr>
+          <td><strong>Oppenheimer</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tk" style="background:rgba(57,211,83,.2);color:var(--tl)">Outperform</span></td>
+          <td style="color:var(--g);font-weight:700">$35</td>
+          <td style="color:var(--m);font-size:12px">2026-05</td>
+        </tr>
+        <tr>
+          <td><strong>Maxim Group</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tn">Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$25</td>
+          <td style="color:var(--m);font-size:12px">2026-04</td>
+        </tr>
+        <tr>
+          <td><strong>Compass Point</strong></td>
+          <td style="color:var(--m)">—</td>
+          <td><span class="tag tn">Buy</span></td>
+          <td style="color:var(--g);font-weight:700">$20</td>
+          <td style="color:var(--m);font-size:12px">2026-04</td>
+        </tr>
+        <tr style="color:var(--m);font-size:12px">
+          <td colspan="5" style="padding:10px 12px;border-top:1px dashed var(--bd)">
+            ✅ 買入/強力買入：<strong style="color:var(--g)">10 位</strong> &nbsp;·&nbsp; Hold：<strong>0</strong> &nbsp;·&nbsp; 賣出：<strong>0</strong> &nbsp;·&nbsp; 平均目標價：<strong style="color:var(--g)" id="analyst-avg-tp">$29.1</strong> &nbsp;·&nbsp; 潛在漲幅：<strong style="color:var(--g)" id="analyst-upside-pct">—</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:12px;padding:14px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:8px;font-size:12px;color:var(--m)">
+    <strong style="color:var(--bl)">AI 觀點：</strong>10:0 買入/賣出比＋ABS 側持續超額認購＋機構固定收益需求擴張，三個維度同時綠燈，是 Pagaya 估值再發現的重要前提。
   </div>
 </div>
 
@@ -857,6 +1100,7 @@ function _parseStooq(raw) {
 function fetchQuote() {
   var yUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + TICKER;
   var sources = [
+    { url: '/api/quote/' + TICKER,                                            parse: _parseYahoo },
     { url: 'https://corsproxy.io/?' + encodeURIComponent(yUrl),              parse: _parseYahoo },
     { url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yUrl), parse: _parseAllOrigins },
     { url: 'https://api.codetabs.com/v1/proxy?quest=' + yUrl,                parse: _parseYahoo },
@@ -938,6 +1182,10 @@ function applyQuote(q) {
   setText('u-pct', '+' + up.toFixed(0) + '%');
   setText('u-lbl', '現價 $' + fmt(price) + ' → 均值目標 $' + AVG_TARGET);
   setText('thesis-up', '+' + up.toFixed(0) + '%');
+  // 分析師名單漲幅（即時，用 $29.1 均值）
+  var avgTp = 29.1;
+  var upDetail = ((avgTp / price) - 1) * 100;
+  setText('analyst-upside-pct', '+' + upDetail.toFixed(0) + '% （現價 $' + fmt(price) + ' vs 均值 $' + avgTp + '）');
 
   // WHY footer
   setText('w-prev', '$' + fmt(prev));
@@ -1131,12 +1379,109 @@ function initCharts() {
   }
 }
 
+// ── Q1 YoY 比較圖表（首頁移入）────────────────────────────────
+(function(){
+  var q1Ctx = document.getElementById('q1CompareChartDash');
+  if(q1Ctx){
+    new Chart(q1Ctx.getContext('2d'),{
+      type:'bar',
+      data:{
+        labels:['總營收','Adj. EBITDA','GAAP 淨利'],
+        datasets:[
+          {label:'Q1 2025',data:[289,79,8],backgroundColor:'rgba(139,148,158,.45)',borderColor:'#8b949e',borderWidth:1,borderRadius:5},
+          {label:'Q1 2026',data:[318,94,25],
+            backgroundColor:['rgba(88,166,255,.75)','rgba(63,185,80,.75)','rgba(188,140,255,.75)'],
+            borderColor:['#58a6ff','#3fb950','#bc8cff'],borderWidth:1,borderRadius:5}
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+': $'+c.raw+'M';}}}},
+        scales:{
+          x:{ticks:{color:'#8b949e',font:{size:11}},grid:{color:'rgba(48,54,61,.4)'}},
+          y:{ticks:{color:'#8b949e',font:{size:11},callback:function(v){return '$'+v+'M';}},grid:{color:'rgba(48,54,61,.4)'},suggestedMin:0}
+        }
+      }
+    });
+  }
+  var yoyCtx = document.getElementById('q1YoyChartDash');
+  if(yoyCtx){
+    new Chart(yoyCtx.getContext('2d'),{
+      type:'bar',
+      data:{
+        labels:['總營收 +10%','網絡量 +9%','EBITDA +19%','GAAP淨利 +213%','Adj.EPS +265%'],
+        datasets:[{
+          label:'YoY %',
+          data:[10,9,19,213,265],
+          backgroundColor:['rgba(88,166,255,.7)','rgba(88,166,255,.7)','rgba(63,185,80,.7)','rgba(188,140,255,.7)','rgba(188,140,255,.85)'],
+          borderColor:['#58a6ff','#58a6ff','#3fb950','#bc8cff','#bc8cff'],
+          borderWidth:1,borderRadius:5
+        }]
+      },
+      options:{
+        indexAxis:'y',responsive:true,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '+'+c.raw+'% YoY';}}}},
+        scales:{
+          x:{ticks:{color:'#8b949e',font:{size:11},callback:function(v){return '+'+v+'%';}},grid:{color:'rgba(48,54,61,.4)'}},
+          y:{ticks:{color:'#8b949e',font:{size:11}},grid:{display:false}}
+        }
+      }
+    });
+  }
+})();
+
+// ── ABS 即時消息（Yahoo Finance RSS，60秒刷新）───────────────────
+(function(){
+  var proxy = 'https://corsproxy.io/?';
+  var rss = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=PGY&region=US&lang=en-US';
+  function timeAgo(date){
+    var sec=Math.floor((Date.now()-date)/1000);
+    if(sec<60)return sec+' 秒前';
+    if(sec<3600)return Math.floor(sec/60)+' 分鐘前';
+    if(sec<86400)return Math.floor(sec/3600)+' 小時前';
+    return Math.floor(sec/86400)+' 天前';
+  }
+  function fetchAbsNews(){
+    var url = proxy + encodeURIComponent(rss);
+    fetchTimeout(url, 8000)
+      .then(function(r){return r.text();})
+      .then(function(xml){
+        var doc=new DOMParser().parseFromString(xml,'text/xml');
+        var items=doc.querySelectorAll('item');
+        var list=document.getElementById('abs-news-list-dash');
+        var status=document.getElementById('abs-news-status-dash');
+        if(!items.length||!list)return;
+        var html='';
+        var count=Math.min(items.length,6);
+        for(var i=0;i<count;i++){
+          var title=(items[i].querySelector('title')||{}).textContent||'';
+          var link=(items[i].querySelector('link')||{}).textContent||'#';
+          var pubDate=(items[i].querySelector('pubDate')||{}).textContent||'';
+          var ago=pubDate?timeAgo(new Date(pubDate)):'';
+          html+='<a href="'+link+'" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(48,54,61,.5);text-decoration:none;color:inherit;transition:color .2s" onmouseover="this.style.color=\'#58a6ff\'" onmouseout="this.style.color=\'\'">'
+            +'<span style="flex:1;line-height:1.5">'+title+'</span>'
+            +(ago?'<span style="color:var(--m);font-size:11px;white-space:nowrap;margin-top:2px">'+ago+'</span>':'')
+            +'</a>';
+        }
+        if(list)list.innerHTML=html||'<div style="color:var(--m)">暫無最新消息</div>';
+        if(status)status.textContent='更新 '+new Date().toLocaleTimeString('zh-TW');
+      })
+      .catch(function(){
+        var s=document.getElementById('abs-news-status-dash');
+        if(s)s.textContent='⚠ 暫時無法取得';
+      });
+  }
+  fetchAbsNews();
+  setInterval(fetchAbsNews,60000);
+})();
+
 // ── 走勢圖（Yahoo Finance 1m 資料 → Chart.js）──────────────────
 var _intradayChartInstance = null;
 
 function fetchIntradayChart() {
   var url = 'https://query2.finance.yahoo.com/v8/finance/chart/PGY?interval=1m&range=1d';
   var proxies = [
+    '/api/chart/PGY',
     'https://corsproxy.io/?' + encodeURIComponent(url),
     'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
   ];

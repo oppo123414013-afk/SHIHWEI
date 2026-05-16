@@ -1,0 +1,7 @@
+# Netlify 反向代理 — 解決瀏覽器 CORS 限制
+# Yahoo Finance Quote API
+/api/quote/*  https://query1.finance.yahoo.com/v7/finance/quote?symbols=:splat  200
+# Yahoo Finance Chart API
+/api/chart/*  https://query2.finance.yahoo.com/v8/finance/chart/:splat?range=1d&interval=1m  200
+# Stooq 備援
+/api/stooq/*  https://stooq.com/q/l/?s=:splat&f=sd2t2ohlcv&h&e=json  200
