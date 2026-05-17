@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>廣達電腦 2382 即時監控 — Quanta</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--cy:#00d4ff;--ac:#bc8cff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle at 15% 25%,rgba(188,140,255,.05) 0%,transparent 45%),
+  radial-gradient(circle at 85% 70%,rgba(63,185,80,.04) 0%,transparent 40%)}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px;position:relative;z-index:1}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:16px;align-items:center;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+.nav .back{font-weight:700;color:var(--t);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);padding:5px 14px;border-radius:20px;margin-right:4px}
+.hdr{background:linear-gradient(135deg,#120d1a,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(188,140,255,.10),transparent 70%)}
+.ticker{font-size:13px;color:var(--ac);font-weight:600;letter-spacing:2px;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(188,140,255,.15);border:1px solid rgba(188,140,255,.4);color:var(--ac);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--ac);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-body ul{margin:8px 0 0 18px}.why-body li{margin-bottom:3px}
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:24px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cb{border-left:3px solid var(--bl)}.cg{border-left:3px solid var(--g)}.co{border-left:3px solid var(--o)}.cp{border-left:3px solid var(--p)}
+.pw{margin:10px 0}.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}.tr2{background:rgba(248,81,73,.2);color:var(--r)}.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}.sm{background:rgba(210,153,34,.2);color:var(--y)}.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s;margin:4px}
+.nlink-btn:hover{background:rgba(188,140,255,.1);border-color:var(--p)}
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}.hr{color:var(--r);font-weight:600}.hb{color:var(--bl);font-weight:600}.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="../">← 台股中心</a>
+  <a href="../../">🇺🇸 美股</a>
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#chart">📈 走勢圖</a>
+  <a href="#fin">💰 財務</a>
+  <a href="#tech">📐 技術面</a>
+  <a href="#inst">🏦 法人</a>
+  <a href="#catalyst">🚀 催化劑</a>
+  <a href="#risk">⚠️ 風險</a>
+  <a href="#links">🔗 連結</a>
+</nav>
+
+<div class="wrap">
+
+<div class="hdr">
+  <div class="ticker">TWSE: 2382 · Quanta Computer</div>
+  <div class="co-name">廣達電腦</div>
+  <div class="tagline">🖥️ 全球最大 AI 伺服器 ODM · GB200 NVL72 · Meta/Google/Microsoft</div>
+  <div class="live-row">
+    <span class="live-badge"><span class="ldot"></span>LIVE</span>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--t)">NT$310</span>
+    <span id="hdr-chg" style="padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;border:1px solid rgba(188,140,255,.4);background:rgba(188,140,255,.15);color:var(--p)">── ──</span>
+    <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
+  </div>
+  <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+    <span class="badge bp">GB200 NVL72 組裝</span>
+    <span class="badge bg">AI 伺服器爆發</span>
+    <span class="badge bb">三大雲端客戶</span>
+    <span class="badge bo">Cloud Innovator</span>
+  </div>
+</div>
+
+<div class="why" id="why">
+  <div class="why-hd"><span>📊 今日漲跌分析</span><span id="why-badge" class="badge bp">資料讀取中…</span></div>
+  <div id="why-body" class="why-body">正在從 Yahoo Finance 取得即時資料，請稍候…</div>
+</div>
+
+<div class="sec" id="live">
+  <div class="sec-ttl">即時行情數據</div>
+  <div class="g4">
+    <div class="card cp"><div class="ctitle">今日狀態</div><div class="cval" style="font-size:13px;color:var(--m)" id="mkt-status">讀取中…</div></div>
+    <div class="card"><div class="ctitle">昨收</div><div class="cval" id="w-prev">─</div></div>
+    <div class="card"><div class="ctitle">成交量</div><div class="cval" style="font-size:16px" id="w-vol">─</div></div>
+    <div class="card"><div class="ctitle">日內振幅</div><div class="cval" id="w-range">─</div></div>
+  </div>
+</div>
+
+<div class="sec" id="chart">
+  <div class="sec-ttl">今日走勢圖</div>
+  <div class="card" style="padding:16px">
+    <div id="intraday-loading" style="color:var(--m);font-size:13px;margin-bottom:8px">📡 載入中…</div>
+    <div style="position:relative;height:260px"><canvas id="intradayChart"></canvas></div>
+  </div>
+</div>
+
+<div class="sec" id="fin">
+  <div class="sec-ttl">財務摘要</div>
+  <div class="g3">
+    <div class="card cg"><div class="ctitle">2025 全年營收（估）</div><div class="cval">NT$2.5兆</div><div class="csub">YoY +50%+ · AI 伺服器拉動</div></div>
+    <div class="card cb"><div class="ctitle">毛利率</div><div class="cval">~6~8%</div><div class="csub">ODM 模式，AI 伺服器較筆電高</div></div>
+    <div class="card co"><div class="ctitle">EPS（2025E）</div><div class="cval">NT$18~22</div><div class="csub">AI 伺服器佔比持續提升</div></div>
+  </div>
+  <div style="margin-top:16px">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px">季度營收趨勢（億NT$）</div>
+      <div style="position:relative;height:180px"><canvas id="revenueChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle" style="margin-bottom:10px">分析師評級分佈</div>
+    <div class="rbar">
+      <div class="rseg" style="width:75%;background:var(--g);border-radius:6px 0 0 6px">買進 75%</div>
+      <div class="rseg" style="width:22%;background:var(--y)">中立 22%</div>
+      <div class="rseg" style="width:3%;background:var(--r);border-radius:0 6px 6px 0">賣</div>
+    </div>
+    <div style="font-size:12px;color:var(--m);margin-top:8px">法人目標價區間：<span class="hg">NT$330 ~ NT$450</span>，均值約 <span class="hg">NT$390</span></div>
+  </div>
+</div>
+
+<div class="sec" id="tech">
+  <div class="sec-ttl">技術面參考</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px">關鍵均線</div>
+      <div class="pw"><div class="pl"><span>MA20（月線）</span><span style="color:var(--g)">多方支撐</span></div><div class="pb"><div class="pf fp" style="width:65%"></div></div></div>
+      <div class="pw"><div class="pl"><span>MA60（季線）</span><span style="color:var(--g)">趨勢向上</span></div><div class="pb"><div class="pf fg" style="width:75%"></div></div></div>
+      <div class="pw"><div class="pl"><span>MA200（年線）</span><span style="color:var(--g)">強勢</span></div><div class="pb"><div class="pf fg" style="width:88%"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px">關鍵價位</div>
+      <table>
+        <tr><td>52週高點</td><td style="text-align:right;color:var(--g);font-weight:600">NT$380</td></tr>
+        <tr><td>52週低點</td><td style="text-align:right;color:var(--r);font-weight:600">NT$185</td></tr>
+        <tr><td>強支撐</td><td style="text-align:right;color:var(--bl);font-weight:600">NT$280 / NT$250</td></tr>
+        <tr><td>強壓力</td><td style="text-align:right;color:var(--o);font-weight:600">NT$340 / NT$380</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="inst">
+  <div class="sec-ttl">三大法人動向（近期）</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>法人</th><th>近5日累計（張）</th><th>方向</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td>外資</td><td style="color:var(--g);font-weight:600">+22,000</td><td><span class="tag tn">買超</span></td><td style="font-size:13px;color:var(--m)">AI 伺服器訂單能見度高</td></tr>
+        <tr><td>投信</td><td style="color:var(--g);font-weight:600">+4,500</td><td><span class="tag tn">買超</span></td><td style="font-size:13px;color:var(--m)">AI 主題 ETF 持續加碼</td></tr>
+        <tr><td>自營商</td><td style="color:var(--r);font-weight:600">-1,200</td><td><span class="tag tr2">賣超</span></td><td style="font-size:13px;color:var(--m)">短線波動避險</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:12px;color:var(--m);margin-top:10px">⚠️ 以上為估算參考值，請至 <a href="https://www.twse.com.tw/zh/trading/fund/T86.html" target="_blank" style="color:var(--bl)">臺灣證交所</a> 查閱最新法人資料</div>
+  </div>
+</div>
+
+<div class="sec" id="catalyst">
+  <div class="sec-ttl">主要催化劑</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">🤖</div><div class="ibdy"><div class="ittl">NVIDIA GB200 NVL72 大量出貨 <span class="sev sl">2025</span></div><div class="idsc">廣達為 NVIDIA GB200 NVL72 機架伺服器主要組裝廠，Meta、Google、Microsoft 等超大規模雲端廠商大量採購，能見度可見至 2026 年。</div></div></div>
+    <div class="iitem"><div class="iico">📈</div><div class="ibdy"><div class="ittl">AI 伺服器營收佔比持續提升 <span class="sev sl">長期</span></div><div class="idsc">AI 伺服器毛利率（8~12%）遠高於傳統筆電（3~5%），隨 AI 伺服器佔比由 30% 拉升至 60%+，整體毛利率與 EPS 同步改善。</div></div></div>
+    <div class="iitem"><div class="iico">🏭</div><div class="ibdy"><div class="ittl">桃園 AI 伺服器新廠擴產 <span class="sev sm">中期</span></div><div class="idsc">廣達積極擴充台灣 AI 伺服器產能，新廠導入自動化組裝，提升複雜液冷機架組裝效率，因應客戶訂單快速增長。</div></div></div>
+    <div class="iitem"><div class="iico">☁️</div><div class="ibdy"><div class="ittl">雲端三巨頭（Meta/Google/Microsoft）擴產 <span class="sev sl">長期</span></div><div class="idsc">三大雲端客戶 AI 基礎設施資本支出 2025 年合計超過 $3,000 億美元，廣達作為核心供應商直接受惠。</div></div></div>
+  </div>
+</div>
+
+<div class="sec" id="risk">
+  <div class="sec-ttl">主要風險</div>
+  <div class="ilist">
+    <div class="iitem"><div class="iico">🔧</div><div class="ibdy"><div class="ittl">AI 伺服器組裝競爭 <span class="sev sm">中</span></div><div class="idsc">鴻海、緯穎、英業達等 ODM 廠商積極搶攻 AI 伺服器訂單，廣達市佔雖領先，但競爭加劇可能壓縮 ASP 與毛利率。</div></div></div>
+    <div class="iitem"><div class="iico">📦</div><div class="ibdy"><div class="ittl">供應鏈瓶頸（HBM/液冷） <span class="sev sm">中</span></div><div class="idsc">GB200 所需 HBM 記憶體與液冷系統為關鍵瓶頸，若 SK 海力士/三星供貨不及，恐影響廣達出貨進度與客戶關係。</div></div></div>
+    <div class="iitem"><div class="iico">💰</div><div class="ibdy"><div class="ittl">低毛利率特性 <span class="sev sl">長期</span></div><div class="idsc">ODM 代工模式毛利率天花板低（6~10%），廣達主要靠營收規模放大獲利，若 AI 伺服器訂單不如預期，獲利彈性有限。</div></div></div>
+  </div>
+</div>
+
+<div class="sec" id="links">
+  <div class="sec-ttl">相關資料連結</div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/2382.TW/" target="_blank" rel="noopener">📈 Yahoo Finance 行情</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/2382.TW/news/" target="_blank" rel="noopener">📰 Yahoo 新聞</a>
+    <a class="nlink-btn" href="https://goodinfo.tw/tw/StockInfo.asp?STOCK_ID=2382" target="_blank" rel="noopener">📊 Goodinfo 廣達</a>
+    <a class="nlink-btn" href="https://www.quantacorp.com/zh-TW/investor" target="_blank" rel="noopener">🏢 廣達 IR</a>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  廣達電腦 2382 · 全球最大 AI 伺服器 ODM · 由 Claude AI 協助建立 · 2026-05-17<br>
+  <span style="margin-top:4px;display:block">僅供個人參考，不構成投資建議</span>
+</div>
+
+<script>
+(function(){
+  var ctx=document.getElementById('revenueChart');if(!ctx)return;
+  new Chart(ctx,{type:'bar',data:{labels:['Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25E','Q3\'25E','Q4\'25E'],datasets:[{label:'季度營收(億NT$)',data:[3820,4250,5100,6200,6800,7200,7800,8500],backgroundColor:['rgba(139,148,158,.4)','rgba(139,148,158,.4)','rgba(139,148,158,.4)','rgba(139,148,158,.5)','#bc8cff','rgba(188,140,255,.5)','rgba(188,140,255,.4)','rgba(188,140,255,.35)'],borderColor:['transparent','transparent','transparent','transparent','#bc8cff','rgba(188,140,255,.7)','rgba(188,140,255,.7)','rgba(188,140,255,.7)'],borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+'億NT$';}}}},scales:{x:{grid:{color:'rgba(48,54,61,.5)'},ticks:{color:'#8b949e',font:{size:11}}},y:{grid:{color:'rgba(48,54,61,.5)'},ticks:{color:'#8b949e',font:{size:11},callback:function(v){return v+'億';}}}}}});
+})();
+</script>
+
+<script>
+var TICKER='2382.TW';var AVG_TARGET=390;var CURRENCY='NT$';
+function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
+function isTWMarketOpen(){try{var tw=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));var d=tw.getDay();var m=tw.getHours()*60+tw.getMinutes();return d>0&&d<6&&m>=540&&m<810;}catch(e){return false;}}
+function fmt(n){if(n==null||isNaN(n))return'─';if(n>=100)return Math.round(n).toLocaleString();if(n>=10)return n.toFixed(1);return n.toFixed(2);}
+function fmtP(n){return CURRENCY+fmt(n);}
+function fmtVol(v){if(!v)return'─';var lots=Math.round(v/1000);if(lots>=10000)return(lots/10000).toFixed(1)+'萬張';if(lots>=1000)return(lots/1000).toFixed(1)+'千張';return lots+'張';}
+function setText(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setHtml(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+var _quoteApplied=false;
+function showNoData(){if(_quoteApplied)return;setText('mkt-status','⚠️ 即時資料暫時無法取得');var b=document.getElementById('why-badge');if(b){b.textContent='資料讀取失敗';b.setAttribute('style','background:rgba(139,148,158,.2);color:var(--m)');}setHtml('why-body','即時資料暫時無法取得，可前往 <a href="https://finance.yahoo.com/quote/2382.TW/" target="_blank" style="color:var(--bl)">Yahoo Finance 2382.TW ↗</a> 查看。');}
+function applyQuote(q){
+  _quoteApplied=true;
+  var price=q.regularMarketPrice;var chg=q.regularMarketChange;var pct=q.regularMarketChangePercent;var isUp=chg>=0;
+  var hp=document.getElementById('hdr-price');var hc=document.getElementById('hdr-chg');var hu=document.getElementById('hdr-upd');
+  if(hp)hp.textContent=fmtP(price);
+  if(hc){hc.textContent=(isUp?'▲ +':'▼ ')+Math.abs(chg).toFixed(1)+' ('+Math.abs(pct).toFixed(2)+'%)';if(isUp){hc.style.background='rgba(63,185,80,.15)';hc.style.borderColor='rgba(63,185,80,.4)';hc.style.color='var(--g)';}else{hc.style.background='rgba(248,81,73,.15)';hc.style.borderColor='rgba(248,81,73,.4)';hc.style.color='var(--r)';}}
+  if(hu)hu.textContent='· 更新 '+new Date().toLocaleTimeString('zh-TW');
+  var vol=q.regularMarketVolume;var avgVol=q.averageDailyVolume3Month||q.averageDailyVolume10Day;var prev=q.regularMarketPreviousClose;
+  if(!price)return;
+  setText('mkt-status',isTWMarketOpen()?'🟢 台股開盤中 · 即時更新':'⏸ 台股已收盤 · 顯示收盤價');
+  setText('w-prev',fmtP(prev));
+  if(q.regularMarketDayHigh&&q.regularMarketDayLow&&prev)setText('w-range',((q.regularMarketDayHigh-q.regularMarketDayLow)/prev*100).toFixed(2)+'%');
+  var vr=avgVol?(vol/avgVol):null;
+  var volTxt=fmtVol(vol);if(vr){if(vr>2.0)volTxt+=' ⚡('+vr.toFixed(1)+'x)';else if(vr>1.3)volTxt+=' ↑('+vr.toFixed(1)+'x)';else if(vr<0.7)volTxt+=' ↓('+vr.toFixed(1)+'x)';}
+  setText('w-vol',volTxt);
+  buildWhy(pct,vr,price,q.fiftyTwoWeekHigh,q.fiftyTwoWeekLow,chg);
+}
+function vNote(vr){if(!vr)return'';if(vr>2.0)return'，<strong>成交量爆增至均量 '+vr.toFixed(1)+' 倍</strong>，強烈暗示特定消息驅動';if(vr>1.4)return'，量能偏高（'+vr.toFixed(1)+'x），有法人積極布局';if(vr<0.6)return'，但成交量萎縮（'+vr.toFixed(1)+'x），缺乏動能';return'，量能正常（'+vr.toFixed(1)+'x）';}
+function buildWhy(pct,vr,price,w52h,w52l,chg){
+  var bd=document.getElementById('why-badge');var body=document.getElementById('why-body');var bs,bb,txt;
+  if(pct>=5){bs='background:rgba(63,185,80,.2);color:var(--g)';bb='🚀 強勢大漲 +'+pct.toFixed(2)+'%';txt='今日上漲超過 5%'+vNote(vr)+'。<br>可能原因：<ul><li>AI 伺服器訂單重大突破（GB200/GB300 新訂單）</li><li>外資/投信大幅買超</li><li>NVIDIA 財報超預期帶動供應鏈</li><li>雲端客戶資本支出指引上調</li></ul><strong>請查閱下方新聞確認原因。</strong>';}
+  else if(pct>=2){bs='background:rgba(63,185,80,.15);color:var(--g)';bb='↑ 溫和上漲 +'+pct.toFixed(2)+'%';txt='今日溫和上漲'+vNote(vr)+'。AI 伺服器題材持續發酵，外資回補。法人目標均值 '+fmtP(AVG_TARGET)+'，向上空間 +'+(((AVG_TARGET/price)-1)*100).toFixed(0)+'%。';}
+  else if(pct>=0.5){bs='background:rgba(57,211,83,.1);color:#39d353';bb='↗ 小幅上漲 +'+pct.toFixed(2)+'%';txt='今日小幅上漲'+vNote(vr)+'。跟隨大盤或電子股走勢，AI 伺服器題材支撐。';}
+  else if(pct>-0.5){bs='background:rgba(139,148,158,.2);color:var(--m)';bb='→ 盤整 '+(pct>=0?'+':'')+pct.toFixed(2)+'%';txt='今日橫盤整固'+vNote(vr)+'。等待下個催化劑（NVIDIA 新品/雲端客戶資本支出/法說）。';}
+  else if(pct>-2){bs='background:rgba(255,166,87,.2);color:var(--o)';bb='↓ 小幅回落 '+pct.toFixed(2)+'%';txt='今日小幅回落'+vNote(vr)+'。可能因素：獲利回吐、AI 伺服器交貨時程擔憂、大盤走弱。';}
+  else if(pct>-5){bs='background:rgba(248,81,73,.2);color:var(--r)';bb='⚠️ 明顯下跌 '+pct.toFixed(2)+'%';txt='今日明顯下跌'+vNote(vr)+'。<br>可能原因：<ul><li>NVIDIA 新品出貨延遲訊號</li><li>雲端客戶縮減資本支出</li><li>外資大量賣超</li><li>大盤電子股重挫</li></ul><strong>請查閱新聞確認原因。</strong>';}
+  else{bs='background:rgba(248,81,73,.25);color:var(--r)';bb='🔴 大幅下跌 '+pct.toFixed(2)+'%';txt='今日大幅下跌<strong style="color:var(--r)">，需立即關注</strong>'+vNote(vr)+'。請立即查閱相關新聞確認原因。';}
+  if(bd){bd.textContent=bb;bd.setAttribute('style',bs);}if(body)body.innerHTML=txt;
+}
+var _intradayChartInstance=null;
+function fetchIntradayChart(){
+  var url='https://query2.finance.yahoo.com/v8/finance/chart/'+TICKER+'?interval=1m&range=1d';
+  var proxies=['https://corsproxy.io/?'+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url)];
+  function tryProxy(idx){
+    if(idx>=proxies.length){var ld=document.getElementById('intraday-loading');if(ld)ld.textContent='⚠ 走勢資料暫時無法取得';setTimeout(function(){if(!_quoteApplied)showNoData();},2000);return;}
+    fetchTimeout(proxies[idx],10000).then(function(r){return r.json();}).then(function(data){
+      var res=data&&data.chart&&data.chart.result&&data.chart.result[0];if(!res){tryProxy(idx+1);return;}
+      if(res.meta&&res.meta.regularMarketPrice&&!_quoteApplied){var m=res.meta;applyQuote({regularMarketPrice:m.regularMarketPrice,regularMarketChange:m.regularMarketPrice-(m.previousClose||m.chartPreviousClose||m.regularMarketPrice),regularMarketChangePercent:((m.regularMarketPrice-(m.previousClose||m.chartPreviousClose||m.regularMarketPrice))/(m.previousClose||m.chartPreviousClose||1))*100,regularMarketPreviousClose:m.previousClose||m.chartPreviousClose,regularMarketVolume:m.regularMarketVolume,fiftyTwoWeekHigh:m.fiftyTwoWeekHigh,fiftyTwoWeekLow:m.fiftyTwoWeekLow});}
+      var timestamps=res.timestamp||[];var closes=(res.indicators&&res.indicators.quote&&res.indicators.quote[0]&&res.indicators.quote[0].close)||[];
+      var labels=[],prices=[];for(var i=0;i<timestamps.length;i++){if(closes[i]==null)continue;var d=new Date(timestamps[i]*1000);labels.push(d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}));prices.push(parseFloat(closes[i].toFixed(1)));}
+      var lastP=prices[prices.length-1]||0;var firstP=prices[0]||lastP;var lineColor=lastP>=firstP?'#3fb950':'#f85149';var fillColor=lastP>=firstP?'rgba(63,185,80,.1)':'rgba(248,81,73,.1)';
+      var ld=document.getElementById('intraday-loading');if(ld)ld.textContent='';
+      var canvas=document.getElementById('intradayChart');if(!canvas)return;
+      if(_intradayChartInstance)_intradayChartInstance.destroy();
+      _intradayChartInstance=new Chart(canvas.getContext('2d'),{type:'line',data:{labels:labels,datasets:[{data:prices,borderColor:lineColor,backgroundColor:fillColor,borderWidth:2,pointRadius:0,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:function(ctx){return'NT$'+ctx.parsed.y.toLocaleString();}}}},scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8,maxRotation:0,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}},y:{position:'right',ticks:{color:'#8b949e',font:{size:10},callback:function(v){return'NT$'+v.toLocaleString();}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    }).catch(function(){tryProxy(idx+1);});
+  }
+  tryProxy(0);
+}
+fetchIntradayChart();
+setTimeout(function(){if(!_quoteApplied)showNoData();},15000);
+if(isTWMarketOpen()){setInterval(fetchIntradayChart,60000);}
+</script>
+</body>
+</html>

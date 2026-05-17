@@ -16,8 +16,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 .nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);padding:10px 24px;display:flex;gap:16px;align-items:center;z-index:100}
 .nav a{color:var(--m);text-decoration:none;font-size:13px;transition:color .2s}
 .nav a:hover{color:var(--t)}
-.nav .logo{font-weight:700;color:var(--bl);margin-right:8px;font-size:14px}
-.nav .active{color:var(--t);font-weight:600}
+.nav .logo{font-weight:700;color:var(--t);margin-right:8px;font-size:14px}
+.nav .tab{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid transparent;transition:all .2s}
+.nav .tab.active{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.4);color:var(--bl)}
+.nav .tab:hover:not(.active){background:rgba(255,255,255,.06);border-color:var(--bd)}
 .wrap{max-width:1060px;margin:0 auto;padding:48px 20px;position:relative;z-index:1}
 header{text-align:center;margin-bottom:48px}
 header .icon{font-size:36px;margin-bottom:12px}
@@ -107,7 +109,9 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
 <body>
 
 <nav class="nav">
-  <a href="." class="logo active">📊 客製化股票監控中心</a>
+  <span class="logo">📊 股票監控中心</span>
+  <a class="tab active" href="./">🇺🇸 美股</a>
+  <a class="tab" href="taiwan/">🇹🇼 台股</a>
 </nav>
 
 <div class="wrap">
