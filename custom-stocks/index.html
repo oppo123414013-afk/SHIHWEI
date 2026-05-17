@@ -66,6 +66,42 @@ header p{font-size:14px;color:var(--m)}
 .stat-card .num{font-size:28px;font-weight:800;margin:4px 0}
 .stat-card .lbl{font-size:11px;color:var(--m)}
 footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+/* AI 每日評語 */
+.ai-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:40px}
+@media(max-width:700px){.ai-grid{grid-template-columns:1fr}}
+.ai-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;padding:20px;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ai-card.ai-gpt::before{background:linear-gradient(90deg,#10a37f,#1a7a5e)}
+.ai-card.ai-grok::before{background:linear-gradient(90deg,#1da1f2,#0d7bb5)}
+.ai-card.ai-gemini::before{background:linear-gradient(90deg,#4285f4,#ea4335,#fbbc05,#34a853)}
+.ai-card.ai-claude::before{background:linear-gradient(90deg,#d4a054,#b8860b)}
+.ai-name{font-size:13px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.ai-model{font-size:10px;color:var(--m);margin-bottom:8px}
+.ai-rating{display:inline-block;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:10px}
+.ai-summary{font-size:12px;color:var(--m);line-height:1.75;margin-bottom:10px}
+.ai-highlight{font-size:11px;padding:8px 10px;border-radius:8px;background:var(--s2);border-left:3px solid var(--bl);color:var(--t);line-height:1.5}
+/* Top 5 排行 */
+.top5-list{display:flex;flex-direction:column;gap:12px;margin-bottom:40px}
+.top5-item{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px 20px;display:flex;align-items:flex-start;gap:16px}
+.top5-rank{font-size:26px;font-weight:900;min-width:38px;text-align:center;line-height:1.1}
+.top5-body{flex:1;min-width:0}
+.top5-ticker{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.top5-name{font-size:15px;font-weight:700;margin-bottom:6px}
+.top5-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.top5-reason{font-size:12px;color:var(--m);line-height:1.65}
+.ai-score-box{text-align:center;min-width:50px}
+.ai-score-num{font-size:22px;font-weight:900;color:var(--g)}
+.ai-score-lbl{font-size:9px;color:var(--m);letter-spacing:.5px}
+/* AI 辯論 */
+.debate-topic{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:13px;font-weight:600;line-height:1.5}
+.debate-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:700px){.debate-grid{grid-template-columns:1fr}}
+.debate-card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.debate-ai-name{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.debate-stance{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;background:rgba(255,255,255,.06)}
+.debate-arg{font-size:12px;color:var(--m);line-height:1.65}
+.debate-conclusion{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px;border-left:3px solid var(--y);font-size:13px;line-height:1.65;color:var(--m)}
+.ai-section-wrap{margin-bottom:40px}
 </style>
 </head>
 <body>
@@ -303,6 +339,29 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
 
   </div>
 
+  <!-- AI 每日評語 loading -->
+  <div id="ai-loading" style="text-align:center;padding:32px;color:var(--m);font-size:13px">⏳ 載入 AI 每日評語中...</div>
+
+  <!-- AI 四方評語 -->
+  <div id="ai-opinions" style="display:none" class="ai-section-wrap">
+    <div class="sec-ttl">🤖 AI 每日綜合評語 · <span id="ai-date" style="font-weight:400;letter-spacing:0;text-transform:none;color:var(--bl)"></span></div>
+    <div class="ai-grid" id="ai-opinions-grid"></div>
+  </div>
+
+  <!-- AI 前5排行 -->
+  <div id="ai-top5" style="display:none" class="ai-section-wrap">
+    <div class="sec-ttl">🏆 AI 買入前5排行 · 盤後綜合評分</div>
+    <div class="top5-list" id="ai-top5-list"></div>
+  </div>
+
+  <!-- AI 辯論 -->
+  <div id="ai-debate" style="display:none" class="ai-section-wrap">
+    <div class="sec-ttl">⚔️ AI 辯論 · 今日爭議標的</div>
+    <div class="debate-topic" id="debate-topic"></div>
+    <div class="debate-grid" id="debate-grid"></div>
+    <div class="debate-conclusion" id="debate-conclusion"></div>
+  </div>
+
   <!-- 說明 -->
   <div style="background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-top:8px">
     <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">📋 使用說明</div>
@@ -320,5 +379,76 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
   <span style="margin-top:4px;display:block">僅供個人參考，不構成投資建議</span>
 </footer>
 
+<script>
+const RATING_COLORS = {g:'var(--g)',bl:'var(--bl)',o:'var(--o)',p:'var(--p)',y:'var(--y)',r:'var(--r)',cy:'var(--cy)'};
+const RATING_BG = {g:'rgba(63,185,80,.15)',bl:'rgba(88,166,255,.15)',o:'rgba(255,166,87,.15)',p:'rgba(188,140,255,.15)',y:'rgba(210,153,34,.15)',r:'rgba(248,81,73,.15)'};
+function stars(n){return '⭐'.repeat(n)+'☆'.repeat(5-n);}
+
+async function loadAI(){
+  try{
+    const r=await fetch('./ai-daily.json?t='+Date.now());
+    const d=await r.json();
+    renderAI(d);
+  }catch(e){
+    document.getElementById('ai-loading').innerHTML='<span style="color:var(--r)">⚠️ AI 評語暫時無法載入</span>';
+  }
+}
+
+function renderAI(d){
+  document.getElementById('ai-loading').style.display='none';
+  document.getElementById('ai-date').textContent=d.date+' '+d.updateTime;
+
+  // 四方評語
+  const og=document.getElementById('ai-opinions-grid');
+  og.innerHTML=Object.entries(d.aiOpinions).map(([k,ai])=>`
+    <div class="ai-card ai-${k}">
+      <div class="ai-name">${ai.icon} ${ai.name}</div>
+      <div class="ai-model">${ai.model}</div>
+      <div class="ai-rating" style="background:${RATING_BG[ai.ratingColor]||RATING_BG.g};color:${RATING_COLORS[ai.ratingColor]||'var(--g)'}">${ai.rating}</div>
+      <div class="ai-summary">${ai.summary}</div>
+      <div class="ai-highlight">💡 ${ai.highlight}</div>
+    </div>`).join('');
+  document.getElementById('ai-opinions').style.display='block';
+
+  // 前5排行
+  const rankColors=['var(--y)','var(--m)','var(--o)','var(--m)','var(--m)'];
+  const t5=document.getElementById('ai-top5-list');
+  t5.innerHTML=d.top5.map((s,i)=>`
+    <div class="top5-item" style="border-left:4px solid ${s.color}">
+      <div class="top5-rank" style="color:${rankColors[i]}">${s.rank}</div>
+      <div class="top5-body">
+        <div class="top5-ticker" style="color:${s.color}">${s.ticker}</div>
+        <div class="top5-name">${s.name}</div>
+        <div class="top5-meta">
+          <span style="color:var(--g);font-size:14px;font-weight:800">${s.upside}</span>
+          <span style="color:var(--m);font-size:12px">$${s.price} → $${s.target}</span>
+          <span class="badge bg" style="font-size:10px">${s.consensus}</span>
+          <span style="font-size:12px">${stars(s.stars)}</span>
+        </div>
+        <div class="top5-reason">${s.reason}</div>
+      </div>
+      <div class="ai-score-box">
+        <div class="ai-score-num">${s.aiScore}</div>
+        <div class="ai-score-lbl">AI 分</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('ai-top5').style.display='block';
+
+  // AI 辯論
+  const db=d.debate;
+  document.getElementById('debate-topic').innerHTML='<span style="color:var(--o)">⚔️ 今日辯題：</span>'+db.topic;
+  const dg=document.getElementById('debate-grid');
+  dg.innerHTML=Object.entries(db.positions).map(([k,p])=>`
+    <div class="debate-card">
+      <div class="debate-ai-name">${p.icon} ${k.toUpperCase()}</div>
+      <div class="debate-stance" style="color:${p.stanceColor}">${p.stance}</div>
+      <div class="debate-arg">${p.argument}</div>
+    </div>`).join('');
+  document.getElementById('debate-conclusion').innerHTML='<strong style="color:var(--y)">📊 AI 共識：</strong>'+db.conclusion;
+  document.getElementById('ai-debate').style.display='block';
+}
+
+loadAI();
+</script>
 </body>
 </html>

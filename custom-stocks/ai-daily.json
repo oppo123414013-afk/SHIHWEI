@@ -1,0 +1,143 @@
+{
+  "date": "2026-05-17",
+  "updateTime": "盤後 22:00 ET",
+  "aiOpinions": {
+    "gpt": {
+      "name": "ChatGPT",
+      "model": "GPT-4o",
+      "icon": "🤖",
+      "color": "#10a37f",
+      "rating": "偏多",
+      "ratingColor": "g",
+      "summary": "整體投資組合具備強勁基本面支撐，以 AI 基礎設施與國防自動化為核心主題。PGY 的 EV/EBITDA &lt;3× 是本組合最顯著的估值折價，搭配 100% 分析師 Buy 共識，風險報酬比最優。ONDS 政府合約積壓 $457M 提供未來2年能見度，AXTI 估值已明顯超前基本面需警惕。建議 60% 倉位集中於 PGY、ONDS、FIG 三標的。",
+      "highlight": "首選 PGY：EV/EBITDA &lt;3× 搭配 +143% 上行空間，為本組合最大機會"
+    },
+    "grok": {
+      "name": "Grok",
+      "model": "Grok 3",
+      "icon": "⚡",
+      "color": "#1da1f2",
+      "rating": "強烈看多",
+      "ratingColor": "g",
+      "summary": "動能與基本面雙重驗證。IREN 的 AI GPU 資料中心轉型加上比特幣礦業現金流，是目前市場最稀缺的「雙引擎」資產，150K GPU 目標若實現將帶動股價重估。INMB 的 XPro™ Phase 2 Nature 期刊發表是 2026 上半年最重要生技催化劑之一。ONDS 財報後 +21% 只是開始，$457M 積壓訂單將持續消化至 2027。不要低估動能的力量。",
+      "highlight": "最看好 IREN：AI+BTC 雙引擎市場稀缺，150K GPU 部署加速是重估關鍵"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "model": "Gemini 1.5 Pro",
+      "icon": "💎",
+      "color": "#4285f4",
+      "rating": "中性偏多",
+      "ratingColor": "bl",
+      "summary": "品質優先策略下，FIG 和 UI 最符合高品質成長標準。FIG 的 NDR 139% 顯示深度用戶黏性，+46% YoY 在 SaaS 領域屬頂級成長率；UI 創辦人持股 90%+ 保證資本配置紀律，EPS 超預期 +26%。整體組合偏向高風險/高報酬，建議對 KITT（52週高 $87 vs 現價 $2.25）和 INMB 的倉位嚴格控制，不超過總資金 5%。",
+      "highlight": "品質首選 FIG：NDR 139% 是 SaaS 稀缺資產，IPO 後仍有 +124% 上行空間"
+    },
+    "claude": {
+      "name": "Claude",
+      "model": "Sonnet 4.6",
+      "icon": "🧬",
+      "color": "#d4a054",
+      "rating": "審慎看多",
+      "ratingColor": "y",
+      "summary": "風險調整後報酬分析：PGY 以最低估值提供最大上行空間（+143%），是本組合風險/報酬比最佳標的。需特別注意：AXTI 現價已超分析師目標均值 +41%，持有者應考慮部分獲利了結；KITT 從 52週高 $87 跌至 $2.25（-97%）流動性風險仍高；INMB 盈利前 burn rate 在 FDA 結果明朗前需謹慎。整體建議以 PGY + ONDS + FIG 為核心倉位。",
+      "highlight": "風險提醒：AXTI 估值嚴重超前基本面，建議部分獲利了結並設定嚴格止損"
+    }
+  },
+  "top5": [
+    {
+      "rank": 1,
+      "ticker": "PGY",
+      "name": "Pagaya Technologies",
+      "price": 14.19,
+      "target": 34.50,
+      "upside": "+143%",
+      "consensus": "100% Buy",
+      "stars": 5,
+      "aiScore": 95,
+      "color": "#58a6ff",
+      "reason": "EV/EBITDA &lt;3× 是金融科技板塊罕見低估值，連續5季GAAP獲利排除盈利疑慮，100% 分析師 Buy 共識代表強烈機構認同，ABS累積 $345B+ 代表平台規模護城河。四大AI評語中三項將其列為首選，風險報酬比為本組合最佳。"
+    },
+    {
+      "rank": 2,
+      "ticker": "ONDS",
+      "name": "Ondas Inc.",
+      "price": 10.72,
+      "target": 19.83,
+      "upside": "+85%",
+      "consensus": "6/6 Strong Buy",
+      "stars": 5,
+      "aiScore": 88,
+      "color": "#ffa657",
+      "reason": "6/6 分析師 Strong Buy 是本組合最強共識，$457M 積壓訂單提供未來2年營收能見度，財報後 +21.1% 確認基本面轉折，政府主承包商地位在地緣政治緊張背景下具備防禦性。+1,065% YoY 營收不是曇花一現而是結構性需求轉變。"
+    },
+    {
+      "rank": 3,
+      "ticker": "FIG",
+      "name": "Figma Inc.",
+      "price": 22.57,
+      "target": 50.50,
+      "upside": "+124%",
+      "consensus": "Hold 共識",
+      "stars": 4,
+      "aiScore": 82,
+      "color": "#bc8cff",
+      "reason": "IPO 後估值相對合理，NDR 139% 創2年新高證明深度用戶黏性，Q1 2026 +46% YoY 成長動能強勁，指引上調 $55M 顯示管理層信心。設計工具市場競爭格局清晰，Figma 的協作護城河明確且難以複製。"
+    },
+    {
+      "rank": 4,
+      "ticker": "UPST",
+      "name": "Upstart Holdings",
+      "price": 28.06,
+      "target": 45.84,
+      "upside": "+63%",
+      "consensus": "Buy 共識",
+      "stars": 4,
+      "aiScore": 74,
+      "color": "#58a6ff",
+      "reason": "Q1 貸款量 +61% YoY 是信貸週期復甦的明確訊號，$4B 新承諾資本解決最大融資風險。AI 信貸評估模型持續優化，隨利率下行週期啟動，Upstart 有望成為最大受益者之一。22位分析師覆蓋提供充足流動性。"
+    },
+    {
+      "rank": 5,
+      "ticker": "INMB",
+      "name": "INmune Bio",
+      "price": 1.55,
+      "target": 5.40,
+      "upside": "+248%",
+      "consensus": "5/5 Buy",
+      "stars": 3,
+      "aiScore": 68,
+      "color": "#f85149",
+      "reason": "最高上行空間 +248%，Phase 2 MINDFuL 結果發表於 Nature 系列期刊是重要里程碑，5/5 分析師 Buy 共識支撐。屬高風險二元事件標的，建議倉位不超過總資金5%。FDA Fast Track 加速審查是關鍵護身符。"
+    }
+  ],
+  "debate": {
+    "topic": "AXTI 漲幅達 +600%，現價超分析師目標 +41%，現在該持有還是獲利了結？",
+    "positions": {
+      "gpt": {
+        "stance": "部分獲利了結",
+        "icon": "🤖",
+        "stanceColor": "#d29922",
+        "argument": "技術面超買訊號明顯，現價已超分析師目標均值 $87.75 達 +41%，即使基本面持續改善也需相當長時間消化溢價。建議保留 30~50% 倉位繼續參與上行，其餘獲利了結轉進 PGY 等仍有安全邊際的標的，在不確定的環境下主動管理風險才是正確做法。"
+      },
+      "grok": {
+        "stance": "繼續持有",
+        "icon": "⚡",
+        "stanceColor": "#3fb950",
+        "argument": "AI 資料中心 800G 光互連需求是結構性趨勢，非短期炒作。InP 基板供應瓶頸無法在1-2年內解決，AXTI 先行者護城河深厚。+600% 聽起來嚇人，但從基本面看 Q2 轉盈指引正式確認商業化轉折。分析師目標落後股價是因為他們反應慢，不代表股票高估。設高位止損繼續持有。"
+      },
+      "gemini": {
+        "stance": "減倉至合理比重",
+        "icon": "💎",
+        "stanceColor": "#ffa657",
+        "argument": "從投資組合管理角度，單一標的獲利 +600% 後佔總倉位比例嚴重失衡。即使看好長期故事，風險管理要求應將 AXTI 倉位調回合理比例（5~10%）。並非看空，而是在不確定環境下集中持股的尾部風險不可忽視，獲利了結是為了保護已有收益再平衡。"
+      },
+      "claude": {
+        "stance": "設止損後持有",
+        "icon": "🧬",
+        "stanceColor": "#58a6ff",
+        "argument": "市場給予更高成長溢價在動能行情中並不罕見，但在無明確新催化劑的情況下，進一步顯著上漲空間有限。建議：保留倉位但在 $100（約 -19%）設定嚴格止損，一旦觸發立即執行不要猶豫。同時評估是否將部分資金再配置至仍有安全邊際的標的，效率更高。"
+      }
+    },
+    "conclusion": "三對一傾向「減少或保護倉位」。Grok 是唯一明確看多者；GPT 與 Gemini 建議減倉；Claude 建議嚴格止損保護收益。AI 共識：不建議此時大量加倉，也不必急於全部出清——風險管理優先，動態調整倉位結構。"
+  }
+}
