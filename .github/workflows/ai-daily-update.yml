@@ -1,0 +1,45 @@
+name: AI 每日評語自動更新
+
+on:
+  schedule:
+    # 每天 03:00 UTC = 台灣時間 11:00（美股盤後隔日早上）
+    # 週二到週六執行（涵蓋週一到週五交易日）
+    - cron: '0 3 * * 2-6'
+  workflow_dispatch:  # 允許手動觸發
+
+permissions:
+  contents: write
+
+jobs:
+  update-ai-daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout 專案
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐍 設定 Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 安裝依賴套件
+        run: |
+          pip install --upgrade pip
+          pip install google-generativeai yfinance
+
+      - name: 🤖 執行 AI 評語生成腳本
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/generate_ai_daily.py
+
+      - name: 📤 Commit & Push ai-daily.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add custom-stocks/ai-daily.json
+          git diff --staged --quiet || git commit -m "🤖 AI 每日評語自動更新 $(date -u +'%Y-%m-%d')"
+          git push
