@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KITT 監控中心 — Nauticus Robotics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#0d1a30,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(88,166,255,.10),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(63,185,80,.07),transparent 70%)}
+.ticker{font-size:13px;color:var(--bl);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);color:var(--bl);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--bl);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--bl);background:rgba(88,166,255,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--bl);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(88,166,255,.1);border-color:var(--bl)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--bl);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--bl),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.ubox{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(63,185,80,.05));border:1px solid rgba(88,166,255,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--bl)}
+.ulbl{font-size:13px;color:var(--m)}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(88,166,255,.05) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(88,166,255,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(63,185,80,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--bl);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:700;color:var(--t);background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);padding:3px 10px;border-radius:20px;font-size:12px;margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#fin">財務</a>
+  <a href="#model">商業模式</a>
+  <a href="#tech">技術面</a>
+  <a href="#analyst">分析師</a>
+  <a href="#cat">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#outlook">展望</a>
+  <a href="#thesis">投資論點</a>
+  <a href="#ai-debate">AI辯論</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: KITT</div>
+  <div class="co-name">Nauticus Robotics, Inc.</div>
+  <div class="tagline">電動自主海底機器人平台 · ToolKITT 自主系統 · 海洋能源 · 美國德州</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>LIVE · Yahoo Finance</div>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$2.25</span>
+    <span id="hdr-chg" style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(88,166,255,.15);border:1px solid rgba(88,166,255,.4);color:var(--bl)">52週 $2.12–$87.12</span>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span id="mkt-status" style="font-size:12px;color:var(--m)">讀取中...</span>
+    <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bb">🤖 ToolKITT 自主平台</span>
+    <span class="badge bb">🌊 海底 AUV 商業部署</span>
+    <span class="badge bo">🌍 EMEA 擴張中</span>
+    <span class="badge br">⚠️ 早期商業化階段</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cb">
+    <div class="ctitle">2025 全年營收</div>
+    <div class="cval" style="color:var(--bl)">$5.3M</div>
+    <div class="csub">+190% YoY · 公司史上最高</div>
+  </div>
+  <div class="card cr">
+    <div class="ctitle">Q1 2026 營收</div>
+    <div class="cval" style="color:var(--r)">$0.2M</div>
+    <div class="csub">季節性/案件性波動 · 高度不穩定</div>
+  </div>
+  <div class="card co">
+    <div class="ctitle">Q1 2026 淨虧損</div>
+    <div class="cval" style="color:var(--o)">$9.3M</div>
+    <div class="csub">每股 -$2.46 · 早期商業化燒錢</div>
+  </div>
+  <div class="card cp">
+    <div class="ctitle">分析師目標均值</div>
+    <div class="cval" style="color:var(--p)">$2.55</div>
+    <div class="csub">現價接近目標 · 上行空間有限</div>
+  </div>
+</div>
+
+<!-- ══ 即時走勢 ════════════════════════════════════════════════════ -->
+<div id="live" class="sec">
+  <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
+  <div class="card" style="padding:20px">
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">KITT 今日走勢圖 · Yahoo Finance 1 分鐘線</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px;position:relative">
+      <canvas id="intradayChart" style="width:100%;height:100%"></canvas>
+      <div id="intraday-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px">⏳ 載入走勢中…</div>
+    </div>
+    <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
+      <span>Yahoo Finance 1m · 自動更新</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 今日漲跌分析（即時）════════════════════════════════════════ -->
+<div id="why" class="why">
+  <div class="why-hd">
+    📊 今日漲跌分析
+    <span id="why-badge" class="why-badge" style="background:rgba(139,148,158,.2);color:var(--m)">連線中...</span>
+  </div>
+  <div id="why-body" class="why-body">正在連接 Yahoo Finance 取得即時資料...</div>
+  <div class="why-foot">
+    <div>前收：<span id="w-prev">─</span></div>
+    <div>今日振幅：<span id="w-range">─</span></div>
+    <div>量能：<span id="w-vol">─</span></div>
+    <div>即時更新：<span id="w-time">─</span></div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 ════════════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(88,166,255,.2);color:var(--bl)">2025 全年 $5.3M +190% YoY · Q1 2026 商業部署進行中</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>Nauticus Robotics 是德州休士頓的海底自主機器人公司，旗艦產品 ToolKITT 是平台無關的自主機器人作業系統，可在不同海底載具（AUV/ROV）上運行。透過收購 SeaTrepid（ROV 服務商）提供短期收入橋接，同時推進 ToolKITT 商業授權。2025 全年營收 $5.3M（+190% YoY），但 Q1 2026 僅 $0.2M，顯示收入高度不穩定。2026-05 任命新 CRO Brian Allen，負責 EMEA 和全球技術授權推展。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>~$2.25</span></div>
+    <div>2025 全年營收：<span class="hg">$5.3M (+190%)</span></div>
+    <div>Q1 2026：<span class="hr">$0.2M</span></div>
+    <div>分析師目標：<span style="color:var(--bl)">$2.55</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">2025 全年營收 $5.3M (+190% YoY) 是公司史上最高，但 Q1 2026 僅 $0.2M 顯示業務高度不穩定，海底工程合約呈季節性/案件性特質——不是穩定訂閱收入，是單次案件交付。<strong style="color:var(--t)">目前市值極小，處於微型股（micro-cap）階段，流動性差，單一大訂單可能大幅改變收入面貌。</strong>技術面：52週高 $87.12 → 現 ~$2.25，跌幅 -97%，處於歷史低位區。分析師目標均值 $2.55，現價接近目標，上漲空間有限，需要重大商業合約突破才能驅動估值重建。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">KITT 的核心敘事：海底自動化是「最後一個尚未被機器人化的產業」。ToolKITT 平台策略類似 AWS——提供底層自主系統基礎設施，讓不同載具製造商在上面部署應用，而非只賣機器人硬體。<strong style="color:var(--t)">海洋能源（油氣、離岸風電）+ 國防（海底偵察）雙市場，TAM 理論上巨大。SeaTrepid 整合提供短期收入橋接，等待 ToolKITT 授權規模化。</strong>風險：燒錢速度快（每季 ~$9M 虧損），商業化進度緩慢。如果 ToolKITT 被一家大型能源公司採用，敘事可能快速改變。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">52週從 $87 跌至 $2.25 是嚴重的市場不信任信號，不是正常回調，是系統性重定價。<strong style="color:var(--t)">高 short interest 可能，日均成交量偏低，大型機構幾乎不可能在此流動性下建倉。</strong>Q1 2026 收入僅 $0.2M 遠低於市場預期，說明商業化進度嚴重落後於原定計劃。這是高風險投機標的，非長期價值投資。觀察指標：季度合約公告、現金消耗速度（每季 ~$9M，需確認現金跑道）、是否需要再融資（稀釋風險極高）。</div>
+    </div>
+
+    <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>ToolKITT「AWS 化」的敘事很吸引人，但 AWS 的護城河來自數百萬客戶的數據和鎖定效應——KITT 的 ToolKITT 目前部署案例極少，無法驗證平台黏性，敘事與現實仍有巨大落差。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>同意敘事與現實有落差，但早期平台公司的核心問題是「有沒有人願意第一個用」。新 CRO Brian Allen 的 EMEA 職責若能帶進第一個大型能源客戶合約，整個估值邏輯將被重新定義——股價不會線性反應，而是跳躍性重定價。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都在討論最樂觀情境，但忽略最現實的問題——<strong style="color:var(--t)">以每季 $9M 的虧損速度，KITT 的現金跑道還剩多久？如果不到 4 個季度，稀釋性融資幾乎不可避免，現股東將承受嚴重稀釋。</strong>在看到首批大型商業合約公告之前，這是投機而非投資。<br>
+        <strong style="color:#4285f4">Gemini→Grok：</strong>Grok 的現金跑道問題是核心，但 KITT 若能宣布 UAE/GCC 大型能源合約，可能同步啟動策略融資（合作夥伴直接投資），改變融資結構，不一定是純粹的稀釋性配售。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/KITT/news/" target="_blank" rel="noopener">📰 Yahoo Finance KITT 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/kitt/" target="_blank" rel="noopener">📊 StockAnalysis KITT ↗</a>
+    <a class="nlink-btn" href="https://ir.nauticusrobotics.com" target="_blank" rel="noopener">📢 Nauticus IR ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/KITT/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://ir.nauticusrobotics.com" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🤖 Q1 2026 財報：營收 $0.2M，淨虧損 $9.3M，ToolKITT 商業部署持續進行</div>
+      <div class="nmeta">2026-Q1 · ir.nauticusrobotics.com · 每股 -$2.46 · 2025 全年 $5.3M +190% YoY</div>
+    </a>
+    <a class="nitem" href="https://ir.nauticusrobotics.com" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">🌍 任命新 CRO Brian Allen：負責 EMEA 與全球技術授權</div>
+      <div class="nmeta">2026-05 · 擴展 EMEA/GCC 市場 · 技術授權商業化加速</div>
+    </a>
+    <a class="nitem" href="https://ir.nauticusrobotics.com" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🌊 ToolKITT 自主系統：平台無關海底自主作業系統，UAE/GCC 擴張進行中</div>
+      <div class="nmeta">2026 · nauticusrobotics.com · AUV + 電動機器手臂 + 軟體平台三合一</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/kitt/" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">📊 KITT 技術面：52週 $2.12–$87.12，現價 $2.25（距高點 -97%），分析師目標 $2.55</div>
+      <div class="nmeta">2026-05 · 微型市值 · 歷史低位 · 少數分析師覆蓋</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 財務數據 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">財務數據</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">季度營收趨勢</div>
+      <table>
+        <thead><tr><th>時期</th><th>營收</th><th>YoY</th><th>狀況</th></tr></thead>
+        <tbody>
+          <tr><td>Q1 2026</td><td style="color:var(--r)">$0.2M</td><td style="color:var(--r)">大幅下滑</td><td><span class="tag tr2">季節性低點</span></td></tr>
+          <tr><td>Q4 2025</td><td style="color:var(--g)">$1.1M</td><td>—</td><td><span class="tag tn">季度高點</span></td></tr>
+          <tr><td>2025 全年</td><td style="color:var(--bl)">$5.3M</td><td style="color:var(--g)">+190%</td><td><span class="tag ta">史上最高</span></td></tr>
+          <tr><td>2024 全年</td><td>$1.8M</td><td>—</td><td><span class="tag tb">基期</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">關鍵財務指標</div>
+      <table>
+        <thead><tr><th>指標</th><th>數值</th><th>評估</th></tr></thead>
+        <tbody>
+          <tr><td>Q1 淨虧損</td><td style="color:var(--r)">$9.3M</td><td><span class="tag tr2">燒錢快</span></td></tr>
+          <tr><td>每股虧損</td><td style="color:var(--r)">-$2.46</td><td><span class="tag tr2">高</span></td></tr>
+          <tr><td>52週高</td><td style="color:var(--r)">$87.12</td><td><span class="tag tr2">-97%</span></td></tr>
+          <tr><td>52週低</td><td style="color:var(--g)">$2.12</td><td><span class="tag tn">接近低點</span></td></tr>
+          <tr><td>分析師目標</td><td style="color:var(--m)">$2.55</td><td><span class="tag tb">少數覆蓋</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 年度營收視覺圖 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">年度營收成長（史上最高 2025 年 $5.3M）</div>
+    <div class="bchart">
+      <div class="bcol">
+        <div class="bval" style="color:var(--m)">$1.8M</div>
+        <div class="bar" style="height:34%;background:linear-gradient(180deg,rgba(139,148,158,.6),rgba(139,148,158,.3))"></div>
+        <div class="blbl">2024</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--bl)">$5.3M</div>
+        <div class="bar" style="height:100%;background:linear-gradient(180deg,#58a6ff,rgba(88,166,255,.5))"></div>
+        <div class="blbl">2025 ★</div>
+      </div>
+      <div class="bcol">
+        <div class="bval" style="color:var(--r)">$0.2M</div>
+        <div class="bar" style="height:4%;background:linear-gradient(180deg,rgba(248,81,73,.6),rgba(248,81,73,.3))"></div>
+        <div class="blbl">Q1'26</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--m);text-align:center">年度/季度營收（$M）— 收入波動大，Q1 季節性低點</div>
+  </div>
+</div>
+
+<!-- ══ 商業模式 ════════════════════════════════════════════════════ -->
+<div id="model" class="sec">
+  <div class="sec-ttl">🤖 商業模式</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--bl);margin-bottom:14px">三合一平台：AUV 硬體 + ToolKITT 軟體 + ROV 服務</div>
+    <div class="flow">
+      <div class="fstep">
+        <div>
+          <div class="ft">🤖 ToolKITT 自主作業系統 <span class="tag ta">核心平台</span></div>
+          <div class="fd">平台無關的自主機器人 OS，可運行於不同海底載具（AUV/ROV）。目標是成為海底自動化的 AWS——提供基礎設施讓合作夥伴在上面部署應用，技術授權為主要商業化路徑。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🌊 電動 AUV + 機器手臂 <span class="tag tn">硬體產品</span></div>
+          <div class="fd">自主水下載具（AUV）搭載電動機器手臂，可執行海底管線檢查、設備維護、樣本採集等作業。目標市場：海洋能源（油氣、離岸風電）、國防（海底偵察）、海底基礎設施。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🔧 SeaTrepid ROV 服務 <span class="tag tb">收入橋接</span></div>
+          <div class="fd">透過收購 SeaTrepid（傳統 ROV 有人操控服務商），提供短期穩定服務收入，同時作為 ToolKITT 自主化升級的試驗場，逐步從有人操控轉向 ToolKITT 自主化。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🌍 EMEA/GCC 擴張 <span class="tag tk">成長引擎</span></div>
+          <div class="fd">新 CRO Brian Allen 負責 EMEA 與全球技術授權，UAE/GCC 地區海洋能源市場是主要目標。離岸油氣與離岸風電基礎設施維護是短期最可能落地的大型合約場景。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 技術面 ══════════════════════════════════════════════════════ -->
+<div id="tech" class="sec">
+  <div class="sec-ttl">📈 技術面分析</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">52 週價格區間</div>
+      <div class="trange">
+        <div style="font-size:12px;color:var(--m);margin-bottom:8px">KITT 52週範圍：從高點 $87.12 跌至歷史低位</div>
+        <div class="rtrack">
+          <div class="rfill" id="r-fill" style="left:0%;width:2%"></div>
+          <div class="rmark" id="r-curr-m" style="left:2%;color:var(--bl)" id="r-curr">$2.25</div>
+          <div class="rlbl" id="r-curr-l" style="left:2%">現價</div>
+          <div class="rmark" style="left:0%;color:var(--r)" id="r-low">$2.12</div>
+          <div class="rlbl" style="left:0%">低</div>
+          <div class="rmark" style="left:100%;color:var(--g)" id="r-high">$87.12</div>
+          <div class="rlbl" style="left:100%">高</div>
+        </div>
+        <div style="margin-top:30px;font-size:11px;color:var(--m);text-align:center">現價 $2.25 位於52週範圍底部（約 2%），距離高點 $87.12 下跌 -97%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">技術指標</div>
+      <table>
+        <thead><tr><th>指標</th><th>數值</th><th>信號</th></tr></thead>
+        <tbody>
+          <tr><td>現價</td><td style="color:var(--bl)">~$2.25</td><td><span class="tag tr2">歷史低位</span></td></tr>
+          <tr><td>52週高</td><td style="color:var(--r)">$87.12</td><td><span class="tag tr2">距高 -97%</span></td></tr>
+          <tr><td>52週低</td><td style="color:var(--g)">$2.12</td><td><span class="tag tn">支撐區間</span></td></tr>
+          <tr><td>分析師目標</td><td style="color:var(--m)">$2.55</td><td><span class="tag tb">+13% 空間</span></td></tr>
+          <tr><td>市值規模</td><td style="color:var(--r)">微型股</td><td><span class="tag tr2">流動性差</span></td></tr>
+          <tr><td>趨勢</td><td style="color:var(--r)">長期下行</td><td><span class="tag tr2">熊市</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ══════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">評級狀況（少數分析師覆蓋）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:60%;background:var(--y)">中性/持有</div>
+        <div class="rseg" style="width:40%;background:#30363d;color:var(--m)">其他</div>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--m);line-height:1.8">
+        KITT 目前分析師覆蓋極少，屬微型股早期商業化階段。<br>
+        目標均值 <strong style="color:var(--bl)">$2.55</strong>，現價接近目標，上行空間約 <strong style="color:var(--g)">+13%</strong>。<br>
+        機構覆蓋稀少顯示市場關注度低，大幅反彈需要重大商業合約公告。
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">目標價分析</div>
+      <div class="ubox" style="margin-bottom:12px">
+        <div>
+          <div class="unum">+13%</div>
+          <div class="ulbl">現價 → 目標均值潛在漲幅</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:var(--bl)">$2.55</div>
+          <div style="font-size:12px;color:var(--m)">分析師均值目標</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">
+        ⚠️ 分析師覆蓋極少（少數機構），目標價可靠性有限。<br>
+        現價接近目標，若無重大合約公告，上行空間受限。<br>
+        歷史高點 $87.12 對應的市場情緒與現在完全不同（早期題材熱度）。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ══════════════════════════════════════════════════════ -->
+<div id="cat" class="sec">
+  <div class="sec-ttl">🚀 成長催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🛢️</div>
+      <div class="ibdy">
+        <div class="ittl">重大商業合約公告（油氣公司/國防）<span class="sev sh">高影響</span></div>
+        <div class="idsc">一筆大型油氣或國防合約可能是 KITT 最重要的價格觸發點。UAE/GCC 地區海洋能源基礎設施維護是最具可能性的場景，尤其是離岸油氣平台的自主 ROV 部署需求。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🌍</div>
+      <div class="ibdy">
+        <div class="ittl">UAE/GCC 首批收入確認 <span class="sev sm">中期</span></div>
+        <div class="idsc">新 CRO Brian Allen 負責 EMEA 開拓，UAE/GCC 若能在 2026 年確認首批收入，將直接驗證 ToolKITT 的國際商業化可行性，改變市場對 KITT 的看法。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📋</div>
+      <div class="ibdy">
+        <div class="ittl">ToolKITT 技術授權協議 <span class="sev sm">中期</span></div>
+        <div class="idsc">若 ToolKITT 能與大型 ROV 製造商或海洋工程公司簽署技術授權協議，將從「設備銷售」轉向「軟體授權」的高毛利模式，重新定義商業模式可擴展性。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏛️</div>
+      <div class="ibdy">
+        <div class="ittl">國防合約（美國海軍/盟軍）<span class="sev sl">長期</span></div>
+        <div class="idsc">海底自主偵察、水雷偵測等國防應用是海底機器人的重要市場，美國海軍對自主海底系統的需求持續增長，長期是潛在的大型機構客戶。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ═════════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">💸</div>
+      <div class="ibdy">
+        <div class="ittl">燒錢速度快，再融資稀釋風險 <span class="sev sh">高</span></div>
+        <div class="idsc">每季虧損約 $9.3M，若無大型合約收入，現金跑道有限。再融資幾乎不可避免，對現有股東構成嚴重稀釋風險。需密切追蹤公司現金部位和融資動向。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📉</div>
+      <div class="ibdy">
+        <div class="ittl">商業化進度持續不及預期 <span class="sev sh">高</span></div>
+        <div class="idsc">Q1 2026 收入僅 $0.2M，遠低於 Q4 2025 的 $1.1M，顯示商業化進度高度不穩定。若持續無法獲得大型客戶合約，市場信心難以重建。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏭</div>
+      <div class="ibdy">
+        <div class="ittl">海底機器人市場競爭 <span class="sev sm">中</span></div>
+        <div class="idsc">競爭對手包括 Oceaneering International（大型 ROV 服務商）、Saab Seaeye（電動 ROV 製造商）等，均有更大規模、更完整的技術積累和客戶基礎。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📊</div>
+      <div class="ibdy">
+        <div class="ittl">收入高度不穩定（案件性/季節性）<span class="sev sm">中</span></div>
+        <div class="idsc">海底工程合約不是穩定訂閱收入，是單次案件交付，導致季度間收入差異極大（Q4 $1.1M vs Q1 $0.2M）。投資者需接受極高的收入波動性。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 展望 ═════════════════════════════════════════════════════════ -->
+<div id="outlook" class="sec">
+  <div class="sec-ttl">🔭 展望</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--bl);margin-bottom:14px">短期：EMEA 擴張落地；中期：ToolKITT 規模化；長期：海底自動化基礎設施</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">短期（0–6個月）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">新 CRO EMEA 動態<br>UAE/GCC 首批接洽<br>Q2 2026 收入是否反彈<br>現金消耗速度</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">中期（6–18個月）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">首個大型油氣/國防合約<br>ToolKITT 技術授權協議<br>收入從 $5M 突破 $10M<br>融資結構改善</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">長期（18個月+）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">ToolKITT 成為業界標準<br>離岸風電市場滲透<br>國防長期合約<br>財務轉虧為盈</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--m);line-height:1.8;padding:12px;background:rgba(248,81,73,.05);border-radius:8px;border:1px solid rgba(248,81,73,.2)">
+      ⚠️ <strong style="color:var(--r)">核心風險提示：</strong>每季 $9.3M 虧損意味著如果不能快速獲得大型合約，KITT 可能在 2026-2027 年面臨嚴峻的現金危機。敘事雖然吸引人，但需要用合約和收入來驗證。
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ═════════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 投資論點</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--bl);margin-bottom:14px">海底自動化的早期佈局：高風險高回報的技術題材股</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.9;margin-bottom:16px">
+      Nauticus Robotics 試圖解決海底作業「最後一個尚未自動化」的問題，ToolKITT 平台策略如果成功，長期 TAM（離岸油氣+國防+離岸風電）是巨大的市場。<br><br>
+      <strong style="color:var(--t)">多頭論點：</strong>2025 年 $5.3M 營收 +190% YoY 證明商業化已開始；新 CRO 負責 EMEA 擴張；ToolKITT 若被大型能源/國防採用，估值重建空間巨大；現股價接近 52 週低，下行空間相對有限（技術支撐）。<br><br>
+      <strong style="color:var(--t)">空頭論點：</strong>每季 $9.3M 虧損難以持續；Q1 2026 收入僅 $0.2M 顯示商業化進度嚴重不穩；52週從 $87 跌到 $2 是嚴重的市場重定價；分析師覆蓋極少，機構關注度低；再融資稀釋幾乎不可避免。<br><br>
+      <strong style="color:var(--r)">適合對象：</strong>能承受「公司可能歸零」風險、以小部位投機為主、有意等待大型合約觸發跳躍性重定價的高風險承受投資者。不適合長期持有或重倉押注。
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">風險等級</div>
+        <div style="font-weight:700;color:var(--r)">極高（投機）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">核心觸發點</div>
+        <div style="font-weight:700;color:var(--bl)">大型合約公告</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">現金危機風險</div>
+        <div style="font-weight:700;color:var(--r)">高（需監控）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">操作建議</div>
+        <div style="font-weight:700;color:var(--o)">小倉位投機</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI 三方綜合辯論 ══════════════════════════════════════════════ -->
+<div id="ai-debate" class="why">
+  <div class="why-hd">
+    🤖 AI 三方綜合辯論
+    <span class="why-badge" style="background:rgba(88,166,255,.2);color:var(--bl)">KITT 完整投資辯論</span>
+  </div>
+
+  <div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三方完整開場陳述</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        從數量角度：KITT 的 2025 全年 $5.3M (+190% YoY) 表面亮眼，但需要拆解——其中大部分來自 SeaTrepid ROV 服務收入，非 ToolKITT 自主系統授權。Q1 2026 的 $0.2M 更接近 ToolKITT 尚未規模化的真實水位。<br><br>
+        微型市值 + 流動性差 + 每季 $9M 虧損 = 數學上的高危組合。若按當前燒錢速度，且假設現金儲備有限，稀釋性融資是大概率事件，這對股價是持續的下行壓力。<br><br>
+        <strong style="color:var(--t)">數量結論：</strong>只有當季度合約收入穩定超過 $3M+ 且連續 2 季，才開始改變對「商業化可行」的評估。現在尚未達到這個門檻。
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        KITT 的核心價值命題很清晰：在 AI + 機器人技術成熟的當下，海底是最後一個大規模自動化的「前沿」，市場空白巨大。ToolKITT 的平台化策略是正確方向——不是賣硬體，而是賣「海底自主化作業能力」。<br><br>
+        類比：KITT 的位置類似 2010 年的 AWS——雲計算基礎設施在企業大規模採用前，市場也不相信會有人付錢「租伺服器」。第一批企業客戶的採用是整個敘事的轉折點。<br><br>
+        <strong style="color:var(--t)">敘事結論：</strong>KITT 的問題不是「技術是否成立」，而是「商業化速度是否足夠快」。新 CRO + EMEA 擴張是正確方向，但需要在現金耗盡之前完成首批標誌性合約。
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        市場結構層面：從 $87 到 $2.25，這不是普通的題材退潮，而是市場對「商業化時間表」的系統性重定價。2021-2022 年 SPAC/深科技泡沫退潮，所有早期機器人公司都經歷了類似的 -90%+ 重定價。<br><br>
+        籌碼面：日均成交量低 + 微型市值 = 大型機構無法建倉。現在持有 KITT 的大多是散戶投機者和 SPAC 時期的「套牢盤」。這種籌碼結構在沒有重大催化劑下很難自我修復。<br><br>
+        <strong style="color:var(--t)">市場結論：</strong>沒有大型合約公告，KITT 的股價很難有效反彈——因為驅動它的「題材溢價」已被市場反覆懲罰。等待合約公告是唯一合理的進場邏輯。
+      </div>
+    </div>
+
+    <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:10px">💬 三方交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#10a37f">GPT→Gemini：</strong>你說需要季度收入 $3M+ 才算商業化成立，但這個門檻對剛起步的海底機器人公司來說過於線性。一個 $10M 年度服務合約的宣布可能是一次性的，但足以重建市場信心，完全不需要先達到穩定月收入門檻。<br>
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意合約公告可以是催化劑，但「重建市場信心」和「重建估值」是兩件事。若合約只是一次性交付而非多年期授權，股價的反彈可能只是短暫的，無法支撐持續的估值擴張。<br>
+        <strong style="color:#e11d48">Grok→GPT&Gemini：</strong>你們都在假設公司能活到合約公告的那天。現在最重要的問題是：<strong style="color:var(--t)">KITT 的現金還剩多少個季度？</strong>每季 $9M 的虧損，如果現金不足 4 個季度，所有的敘事討論都是在沙上建塔。<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>Grok 的現金危機論點是核心風險，完全同意。但你也需要考慮：UAE/GCC 的能源客戶若認可 ToolKITT，可能直接以「戰略投資 + 合約」的形式注資，這種情境下現金問題和合約問題可以同時解決。
+      </div>
+    </div>
+
+    <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:10px">✅ 三方共識 / 分歧 / 操作建議</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        <strong style="color:var(--t)">共識：</strong>
+        <ul style="margin:6px 0 10px 16px;display:flex;flex-direction:column;gap:4px">
+          <li>ToolKITT 的平台化策略方向正確，但商業化速度是核心問題</li>
+          <li>每季 $9M 虧損是持續的財務壓力，再融資風險極高</li>
+          <li>大型合約公告是唯一有效的股價催化劑</li>
+          <li>這是高風險投機標的，非長期價值投資</li>
+        </ul>
+        <strong style="color:var(--t)">分歧：</strong>
+        <ul style="margin:6px 0 10px 16px;display:flex;flex-direction:column;gap:4px">
+          <li>Gemini 更悲觀：認為需要穩定收入才算改變；GPT 更樂觀：認為單一大合約可以跳躍式重定價</li>
+          <li>Grok 聚焦現金跑道；GPT 認為戰略融資可能同步解決合約和現金問題</li>
+        </ul>
+        <strong style="color:var(--t)">操作建議：</strong>
+        <ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px">
+          <li>🔴 全倉/重倉：極度不建議，現金危機風險過高</li>
+          <li>🟡 小倉位投機：等待大型合約公告後的反應確認</li>
+          <li>🟢 觀察指標：季度合約公告、現金跑道更新、EMEA 進展</li>
+          <li>⚠️ 停損設定：若跌破 $2.00（52週低支撐），建議出場</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+<div class="footer">
+  <div style="margin-bottom:6px">KITT · Nauticus Robotics, Inc. · NASDAQ · 電動自主海底機器人 · ToolKITT 自主平台</div>
+  <div>資料截止 2026-05-17 · 本頁僅供研究參考，不構成投資建議</div>
+  <div style="margin-top:4px">分析師評級來源：公開研究報告彙整 · <a href="https://ir.nauticusrobotics.com" target="_blank" rel="noopener" style="color:var(--bl)">ir.nauticusrobotics.com</a></div>
+</div>
+
+</div><!-- .wrap -->
+
+<script>
+// ── 即時股價 + 漲跌分析（Yahoo Finance）──────────────────────────
+var TICKER     = 'KITT';
+var AVG_TARGET = 2.55;
+
+function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
+function isMarketOpen(){try{var ny=new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}));var d=ny.getDay();var m=ny.getHours()*60+ny.getMinutes();return d>0&&d<6&&m>=570&&m<960;}catch(e){return false;}}
+function fmt(n,d){d=d||2;return(n!=null&&!isNaN(n))?Number(n).toFixed(d):'─';}
+function fmtVol(v){if(!v)return'─';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);}
+function setText(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setHtml(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+
+var _quoteApplied=false;
+function showNoData(){
+  if(_quoteApplied)return;
+  setText('mkt-status','⚠️ 即時資料暫時無法取得');
+  var b=document.getElementById('why-badge');
+  if(b){b.textContent='資料讀取失敗';b.setAttribute('style','background:rgba(139,148,158,.2);color:var(--m)');}
+  setHtml('why-body','即時資料暫時無法取得，可前往 <a href="https://finance.yahoo.com/quote/'+TICKER+'" target="_blank" rel="noopener" style="color:var(--bl)">Yahoo Finance '+TICKER+' ↗</a> 查看即時報價。');
+}
+
+function applyQuote(q){
+  _quoteApplied=true;
+  var price=q.regularMarketPrice;
+  var chg=q.regularMarketChange;
+  var pct=q.regularMarketChangePercent;
+  var isUp=chg>=0;
+  var hp=document.getElementById('hdr-price');
+  var hc=document.getElementById('hdr-chg');
+  var hu=document.getElementById('hdr-upd');
+  if(hp)hp.textContent='$'+fmt(price);
+  if(hc){
+    hc.textContent=(isUp?'▲ +':'▼ ')+Math.abs(chg).toFixed(2)+' ('+Math.abs(pct).toFixed(2)+'%)';
+    if(isUp){hc.style.background='rgba(63,185,80,.15)';hc.style.borderColor='rgba(63,185,80,.4)';hc.style.color='var(--g)';}
+    else{hc.style.background='rgba(248,81,73,.15)';hc.style.borderColor='rgba(248,81,73,.4)';hc.style.color='var(--r)';}
+  }
+  if(hu)hu.textContent='· 更新 '+new Date().toLocaleTimeString('zh-TW');
+  var w52h=q.fiftyTwoWeekHigh;
+  var w52l=q.fiftyTwoWeekLow;
+  var prev=q.regularMarketPreviousClose;
+  var vol=q.regularMarketVolume;
+  var avgVol=q.averageDailyVolume3Month||q.averageDailyVolume10Day;
+  if(!price)return;
+  setText('mkt-status',isMarketOpen()?'🟢 美股開盤中 · 每15秒更新':'⏸ 美股已收盤 · 顯示收盤價');
+  setText('w-prev','$'+fmt(prev));
+  if(q.regularMarketDayHigh&&q.regularMarketDayLow&&prev){setText('w-range',fmt(((q.regularMarketDayHigh-q.regularMarketDayLow)/prev*100),2)+'%');}
+  var vr=avgVol?(vol/avgVol):null;
+  var volTxt='─';
+  if(vr){if(vr>2.0)volTxt='⚡ 爆量 ('+vr.toFixed(1)+'x 均量)';else if(vr>1.3)volTxt='↑ 偏高 ('+vr.toFixed(1)+'x)';else if(vr<0.7)volTxt='↓ 縮量 ('+vr.toFixed(1)+'x)';else volTxt='= 正常 ('+vr.toFixed(1)+'x)';}
+  setText('w-vol',volTxt);
+  setText('w-time',new Date().toLocaleTimeString('zh-TW'));
+  buildWhy(pct,vr,price,w52h,w52l,chg);
+}
+
+function vNote(vr){if(!vr)return'';if(vr>2.0)return'，<strong>成交量爆增至均量 '+vr.toFixed(1)+' 倍</strong>，強烈暗示特定消息驅動';if(vr>1.4)return'，量能偏高（'+vr.toFixed(1)+'x），有機構資金參與跡象';if(vr<0.6)return'，但成交量萎縮（'+vr.toFixed(1)+'x），缺乏資金支撐';return'，量能正常（'+vr.toFixed(1)+'x）';}
+
+function buildWhy(pct,vr,price,w52h,w52l,chg){
+  var bd=document.getElementById('why-badge');
+  var body=document.getElementById('why-body');
+  var bs,bb,txt;
+  var isUp=chg>=0;
+  if(pct>=5){bs='background:rgba(63,185,80,.2);color:var(--g)';bb='🚀 強勢大漲 +'+pct.toFixed(1)+'%';txt='今日上漲超過 5%，屬於<strong style="color:var(--g)">強勢上攻</strong>'+vNote(vr)+'。<br><strong>可能觸發原因：</strong><ul><li>重大合約公告（油氣/國防）</li><li>ToolKITT 技術授權協議宣布</li><li>機構大量買進或分析師上調目標價</li><li>EMEA/GCC 首批訂單確認</li></ul>'+(w52h?'📌 距 52 週高點 $'+fmt(w52h)+' 仍有 '+Math.abs(((price/w52h)-1)*100).toFixed(1)+'% 空間。':'')+'<strong>請對照下方新聞連結確認驅動原因。</strong>';}
+  else if(pct>=2){bs='background:rgba(63,185,80,.15);color:var(--g)';bb='↑ 溫和上漲 +'+pct.toFixed(1)+'%';txt='今日溫和上漲'+vNote(vr)+'。<br>可能原因：市場情緒改善、板塊輪動、小幅利好（合作公告、分析師評論）或大盤拉動。'+(AVG_TARGET?'目前向上空間（+'+(((AVG_TARGET/price)-1)*100).toFixed(0)+'%）有限。':'')+'密切關注量能是否放大。';}
+  else if(pct>=0.5){bs='background:rgba(57,211,83,.1);color:var(--tl)';bb='↗ 小幅上漲 +'+pct.toFixed(1)+'%';txt='今日小幅上漲，在正常波動範圍內'+vNote(vr)+'。無明顯特定催化劑，可能跟隨大盤或板塊走勢。';}
+  else if(pct>-0.5){bs='background:rgba(139,148,158,.2);color:var(--m)';bb='→ 盤整 '+(pct>=0?'+':'')+pct.toFixed(1)+'%';txt='今日橫盤整固'+vNote(vr)+'。市場多空均衡，等待新催化劑。<br>請查看下方新聞掌握最新動態。';}
+  else if(pct>-2){bs='background:rgba(255,166,87,.2);color:var(--o)';bb='↓ 小幅回落 '+pct.toFixed(1)+'%';txt='今日小幅回落，在正常回調範圍內'+vNote(vr)+'。可能因素：獲利回吐、大盤走弱或無特定利多支撐。'+(w52l&&price<w52l*1.1?'⚠️ 接近 52W 低點 $'+fmt(w52l)+'，需關注賣壓。':'');}
+  else if(pct>-5){bs='background:rgba(248,81,73,.2);color:var(--r)';bb='⚠️ 明顯下跌 '+pct.toFixed(1)+'%';txt='今日明顯下跌，需要關注'+vNote(vr)+'。<br>可能原因：<ul><li>板塊整體走弱</li><li>個股特定負面消息（查閱下方新聞）</li><li>技術面跌破支撐位</li></ul>📌 <strong>請點擊上方新聞按鈕查看最新動態。</strong>';}
+  else{bs='background:rgba(248,81,73,.25);color:var(--r)';bb='🔴 大幅下跌 '+pct.toFixed(1)+'%';txt='今日大幅下跌，<strong style="color:var(--r)">需立即關注</strong>'+vNote(vr)+'。<br>高優先排查：<ul><li>🔴 負面合約消息/融資公告</li><li>🔴 財報不及預期</li><li>🟡 現金危機信號</li></ul><strong>⚠️ 請立即點擊上方新聞按鈕。</strong>';}
+  if(bd){bd.textContent=bb;bd.setAttribute('style',bs);}
+  if(body)body.innerHTML=txt;
+}
+
+// ── 走勢圖（Yahoo Finance 1m → Chart.js）──────────────────────────
+var _intradayChartInstance=null;
+function fetchIntradayChart(){
+  var url='https://query2.finance.yahoo.com/v8/finance/chart/'+TICKER+'?interval=1m&range=1d';
+  var proxies=['https://corsproxy.io/?'+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url)];
+  function tryProxy(idx){
+    if(idx>=proxies.length){var ld=document.getElementById('intraday-loading');if(ld)ld.textContent='⚠ 走勢資料暫時無法取得';setTimeout(function(){if(!_quoteApplied)showNoData();},2000);return;}
+    fetchTimeout(proxies[idx],10000)
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(raw){
+        var inner=typeof raw.contents==='string'?JSON.parse(raw.contents):raw;
+        var res=inner&&inner.chart&&inner.chart.result&&inner.chart.result[0];
+        if(!res)throw new Error('no result');
+        var meta=res.meta||{};
+        var timestamps=(res.timestamp||[]);
+        var closes=(res.indicators&&res.indicators.quote&&res.indicators.quote[0]&&res.indicators.quote[0].close)||[];
+        var prev=meta.chartPreviousClose||meta.previousClose||null;
+        var labels=[],prices=[];
+        for(var i=0;i<timestamps.length;i++){if(closes[i]==null)continue;var d=new Date(timestamps[i]*1000);labels.push(d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}));prices.push(parseFloat(closes[i].toFixed(2)));}
+        var lastP=prices[prices.length-1]||0;
+        var isUp=prev?lastP>=prev:true;
+        var lineColor=isUp?'#3fb950':'#f85149';
+        var fillColor=isUp?'rgba(63,185,80,0.12)':'rgba(248,81,73,0.12)';
+        var canvas=document.getElementById('intradayChart');
+        var ld=document.getElementById('intraday-loading');
+        if(!canvas)return;
+        if(ld)ld.style.display='none';
+        if(_intradayChartInstance){_intradayChartInstance.destroy();}
+        _intradayChartInstance=new Chart(canvas.getContext('2d'),{type:'line',data:{labels:labels,datasets:[{data:prices,borderColor:lineColor,backgroundColor:fillColor,borderWidth:2,pointRadius:0,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:function(ctx){return'$'+ctx.parsed.y.toFixed(2);}}}},scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8,maxRotation:0,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}},y:{position:'right',ticks:{color:'#8b949e',font:{size:10},callback:function(v){return'$'+v.toFixed(2);}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+        var chartPrice=meta.regularMarketPrice||lastP;
+        var chartPrev=prev||meta.chartPreviousClose||chartPrice;
+        if(chartPrice){applyQuote({regularMarketPrice:chartPrice,regularMarketChange:chartPrice-chartPrev,regularMarketChangePercent:((chartPrice-chartPrev)/chartPrev)*100,regularMarketDayHigh:meta.regularMarketDayHigh||chartPrice,regularMarketDayLow:meta.regularMarketDayLow||chartPrice,regularMarketVolume:meta.regularMarketVolume||0,regularMarketPreviousClose:chartPrev,fiftyTwoWeekHigh:meta.fiftyTwoWeekHigh||null,fiftyTwoWeekLow:meta.fiftyTwoWeekLow||null});}
+        var info=document.getElementById('intraday-info');
+        if(info){info.innerHTML=[prev?'<span>前收 <b>$'+prev.toFixed(2)+'</b></span>':'',meta.regularMarketDayHigh?'<span>今高 <b style="color:var(--g)">$'+meta.regularMarketDayHigh.toFixed(2)+'</b></span>':'',meta.regularMarketDayLow?'<span>今低 <b style="color:var(--r)">$'+meta.regularMarketDayLow.toFixed(2)+'</b></span>':'','<span>更新 '+new Date().toLocaleTimeString('zh-TW')+'</span>','<span style="color:var(--m)">Yahoo Finance · 1m</span>'].filter(Boolean).join('');}
+      })
+      .catch(function(){tryProxy(idx+1);});
+  }
+  tryProxy(0);
+}
+
+// ── 啟動 ──────────────────────────────────────────────────────────
+fetchIntradayChart();
+setTimeout(function(){if(!_quoteApplied)showNoData();},15000);
+if(isMarketOpen()){setInterval(fetchIntradayChart,60000);}
+</script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INMB 監控中心 — INmune Bio</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#2a0d0d,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(248,81,73,.10),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(188,140,255,.07),transparent 70%)}
+.ticker{font-size:13px;color:var(--r);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:var(--r);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--r);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--r);background:rgba(248,81,73,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--r);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(248,81,73,.1);border-color:var(--r)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tk{background:rgba(57,211,83,.2);color:var(--tl)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--r);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--o))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.ubox{background:linear-gradient(135deg,rgba(248,81,73,.1),rgba(63,185,80,.05));border:1px solid rgba(248,81,73,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--r)}
+.ulbl{font-size:13px;color:var(--m)}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(248,81,73,.05) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(248,81,73,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(188,140,255,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../../index.html" style="font-weight:700;color:var(--r);margin-right:4px">← 分析中心</a>
+  <a href="../" style="font-weight:700;color:var(--t);background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);padding:3px 10px;border-radius:20px;font-size:12px;margin-right:8px">客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#fin">管線進度</a>
+  <a href="#model">商業模式</a>
+  <a href="#tech">技術面</a>
+  <a href="#analyst">分析師</a>
+  <a href="#cat">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#outlook">展望</a>
+  <a href="#thesis">投資論點</a>
+  <a href="#ai-debate">AI辯論</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: INMB</div>
+  <div class="co-name">INmune Bio, Inc.</div>
+  <div class="tagline">神經炎症免疫療法 · XPro™ 抗 TNF 平台 · 阿茲海默症 · 美國加州</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>LIVE · Yahoo Finance</div>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$1.55</span>
+    <span id="hdr-chg" style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.4);color:var(--r)">52週 $1.09–$11.64</span>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span id="mkt-status" style="font-size:12px;color:var(--m)">讀取中...</span>
+    <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge br">🧬 XPro™ FDA Fast Track</span>
+    <span class="badge bp">🧠 阿茲海默症 Phase 2 發表</span>
+    <span class="badge bg">🔬 CORDStrom Phase 3</span>
+    <span class="badge bo">⚠️ 臨床階段（無商業收入）</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cr">
+    <div class="ctitle">現股價（2026-05-16）</div>
+    <div class="cval" style="color:var(--r)">$1.55</div>
+    <div class="csub">FDA Fast Track 後 +15%</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">分析師目標均值</div>
+    <div class="cval" style="color:var(--g)">$5.40</div>
+    <div class="csub">隱含 +248% 潛在空間</div>
+  </div>
+  <div class="card cp">
+    <div class="ctitle">最高目標價</div>
+    <div class="cval" style="color:var(--p)">$9.00</div>
+    <div class="csub">Lucid Capital · Buy 評級</div>
+  </div>
+  <div class="card cb">
+    <div class="ctitle">分析師共識</div>
+    <div class="cval" style="color:var(--bl)">Buy</div>
+    <div class="csub">4-5 位分析師 · XPro™ Phase 3 關鍵</div>
+  </div>
+</div>
+
+<!-- ══ 即時走勢 ════════════════════════════════════════════════════ -->
+<div id="live" class="sec">
+  <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
+  <div class="card" style="padding:20px">
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">INMB 今日走勢圖 · Yahoo Finance 1 分鐘線</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px;position:relative">
+      <canvas id="intradayChart" style="width:100%;height:100%"></canvas>
+      <div id="intraday-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px">⏳ 載入走勢中…</div>
+    </div>
+    <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
+      <span>Yahoo Finance 1m · 自動更新</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 今日漲跌分析（即時）════════════════════════════════════════ -->
+<div id="why" class="why">
+  <div class="why-hd">
+    📊 今日漲跌分析
+    <span id="why-badge" class="why-badge" style="background:rgba(139,148,158,.2);color:var(--m)">連線中...</span>
+  </div>
+  <div id="why-body" class="why-body">正在連接 Yahoo Finance 取得即時資料...</div>
+  <div class="why-foot">
+    <div>前收：<span id="w-prev">─</span></div>
+    <div>今日振幅：<span id="w-range">─</span></div>
+    <div>量能：<span id="w-vol">─</span></div>
+    <div>即時更新：<span id="w-time">─</span></div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 ════════════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(248,81,73,.2);color:var(--r)">XPro™ FDA Fast Track · Phase 2 NPJ Dementia 發表 · 2026-05</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>INmune Bio 是加州臨床階段生技公司，旗艦藥 XPro™（XPro1595，pegipanermin）是抗 TNF 生物製劑，靶向神經炎症。2026-05-14 獲 FDA Fast Track 指定（早期阿茲海默症），2026-05-15 Phase 2 MINDFuL 試驗結果發表於 NPJ Dementia（Nature Portfolio）。在伴有炎症生物標誌物的 ADi 亞群中，認知、功能、行為及生物標誌物均有方向一致改善，且無 ARIA 事件。股價在 FDA Fast Track 後反彈約 +15% 至 $1.55。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>~$1.55</span></div>
+    <div>FDA Fast Track：<span class="hg">2026-05-14</span></div>
+    <div>Phase 2 發表：<span class="hg">NPJ Dementia</span></div>
+    <div>分析師目標均值：<span style="color:var(--g)">$5.40 (+248%)</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">FDA Fast Track 是重要里程碑，阿茲海默症市場 TAM 極大（全球 5,000 萬患者，美國約 680 萬）。XPro™ 的差異化：靶向神經炎症的可溶性 TNF 抑制，不同於 amyloid 路徑（lecanemab/donanemab），若 Phase 3 成功，可能切入那些對 amyloid 療法無效的患者群。<strong style="color:var(--t)">52週位置：$1.55 / $1.09–$11.64，現在接近歷史低位，分析師均值 $5.40 對應 +248% 潛在空間，但生技股目標估值可靠性有限。</strong>量化指標：Phase 2 結果有方向一致性趨勢，但未達全體試驗主要終點（ADi 子群效益）——這是 Phase 3 設計的關鍵問題。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">INMB 的核心敘事：「阿茲海默症的第三條路」——不是 amyloid（lecanemab），不是 tau（donanemab），而是神經炎症。XPro™ 針對可溶性 TNF（sTNF），不影響跨膜 TNF，理論上比傳統 TNF 抑制劑副作用更少（不會增加感染風險）。<strong style="color:var(--t)">FDA Fast Track 本身不保證批准，但加快與 FDA 溝通頻率、可能更快推進 Phase 3 設計。MINDFuL Phase 2 結果在「伴有炎症」的 ADi 子群中表現最好——這是精準醫療方向，AD 患者中 40-50% 有炎症標誌物，代表龐大的潛在目標人群。</strong>CORDStrom RDEB 是近期最近的商業化機會（罕見病，更快路徑）。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">現股價 $1.55 接近 52週低 $1.09，說明市場對 Phase 2 結果不完全買單。Phase 2 MINDFuL 未達全體試驗終點，僅在 ADi 子群顯示方向一致效益，這是市場謹慎的根源——只有 FDA 認可 ADi 子群作為 Phase 3 的入組標準，才算真正解決了這個問題。<strong style="color:var(--t)">生技股最常見的陷阱：Phase 2 成功 → Phase 3 失敗。AD 市場歷史上 Phase 3 失敗率極高（>95%），XPro™ 雖然機制不同，但風險依然巨大。</strong>短期催化劑：Phase 3 試驗方案公告（最重要）；籌碼：微型市值，流動性差，大波動風險高。</div>
+    </div>
+
+    <div style="background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--r);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>你說「第三條路」是差異化敘事，但市場已經見過無數個「非 amyloid」機制在 Phase 3 失敗——BACE 抑制劑、gamma-secretase 調節劑、多種抗炎路徑都失敗了。XPro™ 的 sTNF 選擇性是否足夠差異化，Phase 2 的子群效益能否在 Phase 3 重現？<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>Gemini 的歷史案例是對的，但有一個重要差異——XPro™ 的 Phase 2 是帶著<strong style="color:var(--t)">精準醫療邏輯</strong>（事前定義 ADi 子群）進行的，不是事後分析。FDA 對這種設計更友善，Fast Track 指定也印證了 FDA 認可這個方向。Phase 3 若以 ADi 為入組標準，成功率可能高於全體 AD 試驗。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都在討論試驗設計，但忽略最現實的問題——<strong style="color:var(--t)">INMB 是臨床階段生技，無商業收入，完全依賴融資生存。Phase 3 需要多少錢？多久才能出結果？稀釋風險如何？</strong>若 Phase 3 需要 3-4 年、$80-100M 以上，INMB 的融資壓力將持續壓制股價。<br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>INMB 還有 CORDStrom RDEB Phase 3——罕見病路徑更快，若能在 XPro™ Phase 3 前率先獲批，可以提供一個商業收入來源，降低純融資依賴風險，也改善公司的財務可持續性。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/INMB/news/" target="_blank" rel="noopener">📰 Yahoo Finance INMB 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/inmb/" target="_blank" rel="noopener">📊 StockAnalysis INMB ↗</a>
+    <a class="nlink-btn" href="https://ir.inmunebio.com" target="_blank" rel="noopener">📢 INmune Bio IR ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/INMB/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://ir.inmunebio.com" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🏆 FDA Fast Track 指定：XPro™ 用於早期阿茲海默症（MCI + 輕度 AD）· 2026-05-14</div>
+      <div class="nmeta">2026-05-14 · FDA Fast Track · 阿茲海默症 · 加快溝通與審查 · 股價 +15% 反應</div>
+    </a>
+    <a class="nitem" href="https://www.nature.com/npjdementiares/" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">🧬 Phase 2 MINDFuL 結果發表：NPJ Dementia（Nature Portfolio）· ADi 子群顯示方向一致改善</div>
+      <div class="nmeta">2026-05-15 · NPJ Dementia · Nature 系列期刊 · 認知/功能/行為/生物標誌物改善 · 無 ARIA 事件</div>
+    </a>
+    <a class="nitem" href="https://ir.inmunebio.com" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🔬 CORDStrom Phase 3：RDEB（大皰性表皮鬆解症）· 顯著減少搔癢/疼痛 · 6 個月持續效益</div>
+      <div class="nmeta">2026 · 罕見病適應症 · 更快監管路徑 · 改善傷口癒合與搔癢控制</div>
+    </a>
+    <a class="nitem" href="https://stockanalysis.com/stocks/inmb/" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">📊 分析師：目標均值 $5.40（+248%），最高 $9.00（Lucid Capital），4-5 位 Buy 評級</div>
+      <div class="nmeta">2026-05 · 4-5 位分析師覆蓋 · Buy 共識 · 最高 $9 / 最低 $2</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ 管線進度 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">🔬 藥物管線進度</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">主要管線狀態</div>
+      <table>
+        <thead><tr><th>藥物</th><th>適應症</th><th>階段</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--r)">XPro™</td><td>早期 AD（MCI+輕度）</td><td><span class="tag tr2">Phase 3 準備</span></td><td><span class="tag tn">FDA Fast Track</span></td></tr>
+          <tr><td style="color:var(--r)">XPro™</td><td>阿茲海默症（ADi）</td><td><span class="tag tr2">Phase 2 完成</span></td><td><span class="tag tp">NPJ 發表</span></td></tr>
+          <tr><td style="color:var(--p)">CORDStrom</td><td>RDEB 罕見病</td><td><span class="tag tp">Phase 3</span></td><td><span class="tag tn">進行中</span></td></tr>
+          <tr><td style="color:var(--bl)">INKmune</td><td>前列腺癌</td><td><span class="tag ta">Phase 2</span></td><td><span class="tag tb">進行中</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">XPro™ 關鍵里程碑</div>
+      <table>
+        <thead><tr><th>時間</th><th>事件</th><th>意義</th></tr></thead>
+        <tbody>
+          <tr><td>2026-05-14</td><td style="color:var(--g)">FDA Fast Track</td><td><span class="tag tn">重要里程碑</span></td></tr>
+          <tr><td>2026-05-15</td><td style="color:var(--g)">NPJ Dementia 發表</td><td><span class="tag tp">Nature 系列</span></td></tr>
+          <tr><td>待公告</td><td style="color:var(--y)">Phase 3 設計公告</td><td><span class="tag tb">最重要催化劑</span></td></tr>
+          <tr><td>待公告</td><td style="color:var(--m)">CORDStrom 監管提交</td><td><span class="tag ta">近期機會</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- XPro 機制視覺說明 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">XPro™ 作用機制：神經炎症的第三條路</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div style="background:var(--s2);border-radius:8px;padding:14px;border-left:3px solid var(--r)">
+        <div style="font-size:11px;color:var(--r);font-weight:700;margin-bottom:6px">XPro™（INMB）</div>
+        <div style="font-size:12px;color:var(--t);font-weight:600;margin-bottom:4px">靶向：可溶性 TNF（sTNF）</div>
+        <div style="font-size:11px;color:var(--m);line-height:1.6">神經炎症路徑<br>不影響跨膜 TNF<br>副作用理論較少<br>Phase 2 ADi 子群有效</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:14px;border-left:3px solid var(--g)">
+        <div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:6px">Lecanemab（競品）</div>
+        <div style="font-size:12px;color:var(--t);font-weight:600;margin-bottom:4px">靶向：Amyloid-β 斑塊</div>
+        <div style="font-size:11px;color:var(--m);line-height:1.6">已上市（2023）<br>ARIA 腦水腫/出血副作用<br>效益溫和<br>$26,500/年定價</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:14px;border-left:3px solid var(--p)">
+        <div style="font-size:11px;color:var(--p);font-weight:700;margin-bottom:6px">Donanemab（競品）</div>
+        <div style="font-size:12px;color:var(--t);font-weight:600;margin-bottom:4px">靶向：Amyloid + Tau</div>
+        <div style="font-size:11px;color:var(--m);line-height:1.6">FDA 批准中（2024）<br>同樣有 ARIA 風險<br>早期 AD 療效更強<br>市場主導地位</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--m);text-align:center">XPro™ 靶向神經炎症（sTNF），無 ARIA 事件記錄，差異化明顯，但需 Phase 3 確認全體療效</div>
+  </div>
+</div>
+
+<!-- ══ 商業模式 ════════════════════════════════════════════════════ -->
+<div id="model" class="sec">
+  <div class="sec-ttl">🧬 商業模式</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--r);margin-bottom:14px">精準醫療生技：神經炎症 + 罕見病雙管線策略</div>
+    <div class="flow">
+      <div class="fstep">
+        <div>
+          <div class="ft">🧠 XPro™ 阿茲海默症（主管線）<span class="tag tr2">Phase 3 準備</span></div>
+          <div class="fd">靶向可溶性 TNF 的神經炎症抑制劑，FDA Fast Track 指定。Phase 2 MINDFuL 在 ADi（伴有炎症生物標誌物）亞群中顯示認知、功能、行為及生物標誌物方向一致改善，且無 ARIA。Phase 3 設計公告是最重要的股價催化劑。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🔬 CORDStrom RDEB（近期商業化機會）<span class="tag tp">Phase 3</span></div>
+          <div class="fd">臍帶來源細胞療法，用於罕見病「大皰性表皮鬆解症」（RDEB）。Phase 3 顯示顯著減少搔癢/疼痛，改善傷口癒合，6 個月持續效益。罕見病路徑更快，若能率先獲批，提供 INMB 首個商業收入來源。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">⚗️ INKmune NK 細胞免疫療法（前列腺癌）<span class="tag ta">Phase 2</span></div>
+          <div class="fd">NK 細胞激活免疫療法，用於前列腺癌的 Innate Killer Immune Cell Conditioning。Phase 2 進行中，數據待更新。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">💰 收入模式：純融資 → 未來授權/銷售<span class="tag tr2">臨床階段</span></div>
+          <div class="fd">目前無商業收入，完全依賴股權融資。未來商業化路徑：XPro™ Phase 3 成功後授權大型製藥公司或自行銷售；CORDStrom 若批准，可能先自行銷售或授權罕見病專科公司。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 技術面 ══════════════════════════════════════════════════════ -->
+<div id="tech" class="sec">
+  <div class="sec-ttl">📈 技術面分析</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">52 週價格區間</div>
+      <div class="trange">
+        <div style="font-size:12px;color:var(--m);margin-bottom:8px">INMB 52週範圍：$1.09–$11.64，現接近低位</div>
+        <div class="rtrack">
+          <div class="rfill" id="r-fill" style="left:0%;width:43%"></div>
+          <div class="rmark" id="r-curr-m" style="left:43%;color:var(--r)" id="r-curr">$1.55</div>
+          <div class="rlbl" id="r-curr-l" style="left:43%">現價</div>
+          <div class="rmark" style="left:0%;color:var(--r)" id="r-low">$1.09</div>
+          <div class="rlbl" style="left:0%">低</div>
+          <div class="rmark" style="left:100%;color:var(--g)" id="r-high">$11.64</div>
+          <div class="rlbl" style="left:100%">高</div>
+        </div>
+        <div style="margin-top:30px;font-size:11px;color:var(--m);text-align:center">現價 $1.55 位於52週底部區間，距高點 $11.64 下跌 -87%，FDA Fast Track 後反彈 +15%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">技術指標</div>
+      <table>
+        <thead><tr><th>指標</th><th>數值</th><th>信號</th></tr></thead>
+        <tbody>
+          <tr><td>現價</td><td style="color:var(--r)">~$1.55</td><td><span class="tag tr2">低位區</span></td></tr>
+          <tr><td>52週高</td><td style="color:var(--r)">$11.64</td><td><span class="tag tr2">距高 -87%</span></td></tr>
+          <tr><td>52週低</td><td style="color:var(--g)">$1.09</td><td><span class="tag tn">支撐</span></td></tr>
+          <tr><td>分析師均值</td><td style="color:var(--g)">$5.40</td><td><span class="tag tn">+248%</span></td></tr>
+          <tr><td>最高目標</td><td style="color:var(--g)">$9.00</td><td><span class="tag tn">+481%</span></td></tr>
+          <tr><td>流動性</td><td style="color:var(--r)">微型市值</td><td><span class="tag tr2">大波動風險</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ══════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">評級分佈（4-5 位分析師）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:80%;background:var(--g)">Buy 4-5</div>
+        <div class="rseg" style="width:20%;background:#30363d;color:var(--m)">其他</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;flex-wrap:wrap">
+        <span style="color:var(--g)">● Buy 4-5 位</span>
+        <span style="color:var(--m)">● Hold 0</span>
+        <span style="color:var(--r)">● Sell 0</span>
+      </div>
+      <div style="margin-top:14px">
+        <div class="pw">
+          <div class="pl"><span>Buy</span><span class="hg">~100%</span></div>
+          <div class="pb"><div class="pf fg" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--m)">
+        目標價：最高 <strong style="color:var(--g)">$9.00</strong>（Lucid Capital，Buy）· 最低 <strong style="color:var(--r)">$2.00</strong>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">目標價分析</div>
+      <div class="ubox" style="margin-bottom:12px">
+        <div>
+          <div class="unum">+248%</div>
+          <div class="ulbl">現價 → 均值目標潛在漲幅</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:var(--g)">$5.40</div>
+          <div style="font-size:12px;color:var(--m)">分析師均值目標</div>
+        </div>
+      </div>
+      <div class="trange">
+        <div style="font-size:12px;color:var(--m);margin-bottom:8px">目標價區間（Phase 3 結果高度不確定）</div>
+        <div class="rtrack">
+          <div class="rfill" style="left:0%;width:100%"></div>
+          <div class="rmark" style="left:0%;color:var(--r)">$2.00</div>
+          <div class="rlbl" style="left:0%">低</div>
+          <div class="rmark" style="left:47%;color:var(--g)">$5.40</div>
+          <div class="rlbl" style="left:47%">均值</div>
+          <div class="rmark" style="left:100%;color:var(--g)">$9.00</div>
+          <div class="rlbl" style="left:100%">高</div>
+        </div>
+        <div style="margin-top:30px;font-size:11px;color:var(--m);text-align:center">目標區間 $2–$9 反映 Phase 3 設計與成功率的高度不確定性</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ══════════════════════════════════════════════════════ -->
+<div id="cat" class="sec">
+  <div class="sec-ttl">🚀 成長催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">📋</div>
+      <div class="ibdy">
+        <div class="ittl">Phase 3 XPro™ 試驗設計 + 啟動公告 <span class="sev sh">最重要</span></div>
+        <div class="idsc">Phase 3 試驗方案公告是最重要的股價觸發點。FDA Fast Track 加快與 FDA 的 End-of-Phase-2 會議，Phase 3 設計若確認以 ADi（伴有炎症生物標誌物）為入組標準，將驗證精準醫療方向，大幅改善市場信心。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🔬</div>
+      <div class="ibdy">
+        <div class="ittl">CORDStrom RDEB 監管提交（FDA/EMA）<span class="sev sm">中期</span></div>
+        <div class="idsc">罕見病路徑更快，若 CORDStrom 能在 XPro™ Phase 3 完成前率先獲批，提供 INMB 首個商業收入，改善財務可持續性，降低純融資依賴。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">⚗️</div>
+      <div class="ibdy">
+        <div class="ittl">INKmune Phase 2 更新數據 <span class="sev sl">長期</span></div>
+        <div class="idsc">NK 細胞免疫療法 Phase 2 若有正面數據更新，將強化 INMB 的「神經炎症/免疫腫瘤」雙平台敘事，增加管線多樣性的吸引力。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🤝</div>
+      <div class="ibdy">
+        <div class="ittl">機構夥伴合作/授權協議 <span class="sev sl">長期</span></div>
+        <div class="idsc">若大型製藥公司（如 Biogen、Eli Lilly 等 AD 藥廠）對 XPro™ 表達授權興趣，將是巨大的估值重定價信號，也解決融資問題。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ═════════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🧪</div>
+      <div class="ibdy">
+        <div class="ittl">Phase 3 設計可能失敗 <span class="sev sh">高</span></div>
+        <div class="idsc">Phase 2 MINDFuL 未達全體試驗主要終點，僅在 ADi 子群有效益。Phase 2→3 生技歷史成功率約 50%，AD 領域更低。若 Phase 3 無法在全體 AD 患者或 ADi 子群重現 Phase 2 效益，股價可能歸零。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💸</div>
+      <div class="ibdy">
+        <div class="ittl">融資稀釋風險（臨床階段，無商業收入）<span class="sev sh">高</span></div>
+        <div class="idsc">INMB 無商業收入，Phase 3 試驗可能需要 $80-150M，持續融資將稀釋現有股東。每次增發都是股價下行壓力，尤其在股價低迷時融資成本極高。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📊</div>
+      <div class="ibdy">
+        <div class="ittl">Phase 2 僅在 ADi 子群有效益 <span class="sev sm">中</span></div>
+        <div class="idsc">全體試驗未達主要終點是市場謹慎的核心原因。FDA 是否接受 ADi 作為 Phase 3 的入組標準，以及 Phase 3 能否在更大樣本中重現效益，是最大的不確定性。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏭</div>
+      <div class="ibdy">
+        <div class="ittl">競爭激烈（amyloid 路徑已有藥物上市）<span class="sev sm">中</span></div>
+        <div class="idsc">Lecanemab（Leqembi）和 Donanemab（Kisunla）已獲 FDA 批准，建立了 amyloid 路徑的市場地位。XPro™ 需要在 AD 臨床社群建立「神經炎症路徑」的信任，這需要時間。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 展望 ═════════════════════════════════════════════════════════ -->
+<div id="outlook" class="sec">
+  <div class="sec-ttl">🔭 展望</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--r);margin-bottom:14px">短期：Phase 3 設計公告；中期：CORDStrom 獲批；長期：XPro™ Phase 3 結果</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">短期（0–6個月）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">Phase 3 試驗設計公告<br>FDA End-of-Phase-2 會議<br>CORDStrom 監管進度<br>融資動向</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">中期（6–24個月）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">Phase 3 XPro™ 試驗啟動<br>CORDStrom 可能獲批<br>INKmune Phase 2 數據更新<br>授權合作可能</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:6px;font-weight:700">長期（24個月+）</div>
+        <div style="font-size:12px;color:var(--t);line-height:1.7">XPro™ Phase 3 中期數據<br>AD 精準醫療市場建立<br>多管線商業化<br>財務轉虧為盈</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--m);line-height:1.8;padding:12px;background:rgba(63,185,80,.05);border-radius:8px;border:1px solid rgba(63,185,80,.2)">
+      🌟 <strong style="color:var(--g)">牛市情境：</strong>Phase 3 設計被 FDA 認可（ADi 入組標準），大型製藥公司表達授權興趣，CORDStrom 罕見病率先獲批，XPro™ 成為「神經炎症 AD」的第一個被批准藥物。分析師目標 $9（Lucid Capital）對應的情境。
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ═════════════════════════════════════════════════════ -->
+<div id="thesis" class="sec">
+  <div class="sec-ttl">💡 投資論點</div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:var(--r);margin-bottom:14px">神經炎症的第三條路：高風險高回報的生技精準醫療</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.9;margin-bottom:16px">
+      INMB 試圖在阿茲海默症市場切入一個差異化定位——既不是 amyloid，也不是 tau，而是神經炎症路徑。FDA Fast Track 和 NPJ Dementia 發表（Nature 系列）是重要的科學和監管信任背書。<br><br>
+      <strong style="color:var(--t)">多頭論點：</strong>XPro™ 獲 FDA Fast Track（科學認可）；Phase 2 ADi 子群顯示方向一致改善且無 ARIA；分析師全數 Buy，均值目標 $5.40（+248%）；CORDStrom 罕見病提供近期商業化機會；AD 市場 TAM 巨大（全球 5,000 萬患者）；現股價接近 52週低，下行空間相對有限（技術支撐）。<br><br>
+      <strong style="color:var(--t)">空頭論點：</strong>Phase 2 未達全體試驗主要終點；融資稀釋風險持續；Phase 3 需數年時間和大量資金；AD 歷史 Phase 3 成功率極低；無商業收入，現金全依賴融資；競爭對手已有批准藥物。<br><br>
+      <strong style="color:var(--r)">適合對象：</strong>理解生技投資週期、能承受「可能在 Phase 3 失敗歸零」風險、小倉位佈局等待 Phase 3 啟動公告的高風險承受投資者。Phase 3 設計公告前是重要的進出場觀察窗口。
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">風險等級</div>
+        <div style="font-weight:700;color:var(--r)">極高（生技）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">核心觸發點</div>
+        <div style="font-weight:700;color:var(--r)">Phase 3 設計公告</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">分析師共識</div>
+        <div style="font-weight:700;color:var(--g)">Buy（$5.40）</div>
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px">
+        <div style="font-size:11px;color:var(--m);margin-bottom:4px">操作建議</div>
+        <div style="font-weight:700;color:var(--o)">小倉位等待</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI 三方綜合辯論 ══════════════════════════════════════════════ -->
+<div id="ai-debate" class="why">
+  <div class="why-hd">
+    🤖 AI 三方綜合辯論
+    <span class="why-badge" style="background:rgba(248,81,73,.2);color:var(--r)">INMB 完整投資辯論</span>
+  </div>
+
+  <div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三方完整開場陳述</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        量化角度：FDA Fast Track 是重要的「過程里程碑」，但本身不改變 Phase 3 成功概率——它只加快溝通速度。AD 藥物 Phase 3 歷史失敗率 >95%，XPro™ 機制差異化不等於效益差異化。<br><br>
+        從數字看：Phase 2 MINDFuL 的 ADi 子群包含約 40-50% 的 AD 患者（若以炎症生物標誌物陽性為標準），這仍然是一個大型市場。關鍵問題：ADi 子群的效益在多大樣本下能達到統計顯著性？Phase 3 需要多少病人？多久？<br><br>
+        <strong style="color:var(--t)">數量結論：</strong>若 Phase 3 以 ADi 子群為主要終點、樣本量合理（200-400 人）、時間線 2-3 年，勝算比「全體 AD 試驗」高。這是最值得等待的數字。
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        敘事層面：INMB 站在 AD 治療的一個重要轉折點上。Lecanemab 和 Donanemab 的上市確立了「早期干預 + 生物標誌物選擇」的新典範，這對 XPro™ 是利好——FDA 現在更接受精準醫療設計，ADi 作為入組標準在這個新典範下是合理的。<br><br>
+        XPro™ 的最強論點不是「比 lecanemab 更好」，而是「對 lecanemab 不適合的患者（有 ARIA 風險、炎症為主的 ADi 患者）提供替代選擇」。這是一個共存而非取代的市場邏輯。<br><br>
+        <strong style="color:var(--t)">敘事結論：</strong>FDA Fast Track + NPJ Dementia 發表是科學社群和監管機構同時給出的正向信號，Phase 3 設計公告若符合精準醫療邏輯，INMB 的敘事將從「高風險實驗」升級為「有監管路徑的精準療法」。
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）— 開場</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        市場結構層面：$1.55 接近 52週低 $1.09，說明 FDA Fast Track 消息僅引發 +15% 的溫和反彈，市場並不完全買單。原因很明顯——Phase 2 沒達到全體試驗終點，這個「缺陷」是市場持續壓制估值的核心原因。<br><br>
+        籌碼面：微型市值 + 生技不確定性 = 高波動的投機性持倉結構。Phase 3 設計公告可能引發 +50-100% 的短期反彈（好消息），也可能引發 -30-50% 的拋售（設計不符預期）。<br><br>
+        <strong style="color:var(--t)">市場結論：</strong>Phase 3 設計公告是最重要的二元事件。在公告前，股價缺乏方向性，維持低位震盪。公告後的方向取決於設計是否被市場認可為「Phase 3 成功率合理提升」的方案。
+      </div>
+    </div>
+
+    <div style="background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--r);margin-bottom:10px">💬 三方交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>你說「共存而非取代」，但 lecanemab 和 donanemab 的市場佔有率還很低，醫生採用速度緩慢，AD 藥物市場並未爆發。XPro™ 進入這個市場，還要同時教育醫生關於「神經炎症亞群」的診斷，商業化門檻非常高。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>Gemini 說的商業化門檻是真實挑戰，但你忽略了一點——INmune Bio 不需要自己完成商業化，只需要 Phase 3 數據足夠好，就能吸引大型製藥公司授權收購，讓有商業化能力的公司去做。Biogen、Eli Lilly 都在找 AD 管線，XPro™ 若 Phase 3 成功，授權溢價是最現實的退出路徑。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>GPT 提到授權退出，這確實是最合理的牛市情境。但問題是：INMB 能否在現金耗盡之前完成 Phase 3？若 Phase 3 需要 3 年，每年融資 $30-50M，股東稀釋會非常嚴重，即使最終授權成功，現有股東的回報也可能大幅縮水。<br>
+        <strong style="color:#4285f4">Gemini→Grok：</strong>Grok 的稀釋計算是對的，但 CORDStrom RDEB 罕見病路徑可能在 Phase 3 完成前就帶來商業收入，改善現金流，減少純股權融資依賴。RDEB 是孤兒藥市場，FDA 批准優先審查更快，這個時間線可能比 XPro™ Phase 3 短很多。
+      </div>
+    </div>
+
+    <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:10px">✅ 三方共識 / 分歧 / 操作建議</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.85">
+        <strong style="color:var(--t)">共識：</strong>
+        <ul style="margin:6px 0 10px 16px;display:flex;flex-direction:column;gap:4px">
+          <li>Phase 3 設計公告是最重要的股價催化劑（二元事件）</li>
+          <li>FDA Fast Track 是正向信號，但不保證 Phase 3 成功</li>
+          <li>融資稀釋是持續壓制股價的結構性因素</li>
+          <li>CORDStrom 罕見病是值得追蹤的近期商業化機會</li>
+        </ul>
+        <strong style="color:var(--t)">分歧：</strong>
+        <ul style="margin:6px 0 10px 16px;display:flex;flex-direction:column;gap:4px">
+          <li>Gemini 更關注 Phase 3 樣本量和統計設計可行性</li>
+          <li>GPT 更看重授權退出路徑的可能性（大廠收購）</li>
+          <li>Grok 更聚焦稀釋風險和股東實際回報問題</li>
+        </ul>
+        <strong style="color:var(--t)">操作建議：</strong>
+        <ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px">
+          <li>🟡 Phase 3 設計公告前：小倉位觀察，不宜重押</li>
+          <li>🟢 Phase 3 設計公告後（若符合 ADi 精準醫療邏輯）：可考慮增加倉位</li>
+          <li>🔴 Phase 3 設計不理想（全體 AD 試驗，缺乏精準選擇）：謹慎評估退出</li>
+          <li>⚠️ 停損設定：若跌破 $1.09（52週低），考慮出場</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+<div class="footer">
+  <div style="margin-bottom:6px">INMB · INmune Bio, Inc. · NASDAQ · 神經炎症免疫療法 · XPro™ 阿茲海默症</div>
+  <div>資料截止 2026-05-17 · 本頁僅供研究參考，不構成投資建議</div>
+  <div style="margin-top:4px">分析師評級來源：公開研究報告彙整 · <a href="https://ir.inmunebio.com" target="_blank" rel="noopener" style="color:var(--r)">ir.inmunebio.com</a></div>
+</div>
+
+</div><!-- .wrap -->
+
+<script>
+// ── 即時股價 + 漲跌分析（Yahoo Finance）──────────────────────────
+var TICKER     = 'INMB';
+var AVG_TARGET = 5.40;
+
+function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
+function isMarketOpen(){try{var ny=new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'}));var d=ny.getDay();var m=ny.getHours()*60+ny.getMinutes();return d>0&&d<6&&m>=570&&m<960;}catch(e){return false;}}
+function fmt(n,d){d=d||2;return(n!=null&&!isNaN(n))?Number(n).toFixed(d):'─';}
+function fmtVol(v){if(!v)return'─';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);}
+function setText(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setHtml(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+
+var _quoteApplied=false;
+function showNoData(){
+  if(_quoteApplied)return;
+  setText('mkt-status','⚠️ 即時資料暫時無法取得');
+  var b=document.getElementById('why-badge');
+  if(b){b.textContent='資料讀取失敗';b.setAttribute('style','background:rgba(139,148,158,.2);color:var(--m)');}
+  setHtml('why-body','即時資料暫時無法取得，可前往 <a href="https://finance.yahoo.com/quote/'+TICKER+'" target="_blank" rel="noopener" style="color:var(--r)">Yahoo Finance '+TICKER+' ↗</a> 查看即時報價。');
+}
+
+function applyQuote(q){
+  _quoteApplied=true;
+  var price=q.regularMarketPrice;
+  var chg=q.regularMarketChange;
+  var pct=q.regularMarketChangePercent;
+  var isUp=chg>=0;
+  var hp=document.getElementById('hdr-price');
+  var hc=document.getElementById('hdr-chg');
+  var hu=document.getElementById('hdr-upd');
+  if(hp)hp.textContent='$'+fmt(price);
+  if(hc){
+    hc.textContent=(isUp?'▲ +':'▼ ')+Math.abs(chg).toFixed(2)+' ('+Math.abs(pct).toFixed(2)+'%)';
+    if(isUp){hc.style.background='rgba(63,185,80,.15)';hc.style.borderColor='rgba(63,185,80,.4)';hc.style.color='var(--g)';}
+    else{hc.style.background='rgba(248,81,73,.15)';hc.style.borderColor='rgba(248,81,73,.4)';hc.style.color='var(--r)';}
+  }
+  if(hu)hu.textContent='· 更新 '+new Date().toLocaleTimeString('zh-TW');
+  var w52h=q.fiftyTwoWeekHigh;
+  var w52l=q.fiftyTwoWeekLow;
+  var prev=q.regularMarketPreviousClose;
+  var vol=q.regularMarketVolume;
+  var avgVol=q.averageDailyVolume3Month||q.averageDailyVolume10Day;
+  if(!price)return;
+  setText('mkt-status',isMarketOpen()?'🟢 美股開盤中 · 每15秒更新':'⏸ 美股已收盤 · 顯示收盤價');
+  setText('w-prev','$'+fmt(prev));
+  if(q.regularMarketDayHigh&&q.regularMarketDayLow&&prev){setText('w-range',fmt(((q.regularMarketDayHigh-q.regularMarketDayLow)/prev*100),2)+'%');}
+  var vr=avgVol?(vol/avgVol):null;
+  var volTxt='─';
+  if(vr){if(vr>2.0)volTxt='⚡ 爆量 ('+vr.toFixed(1)+'x 均量)';else if(vr>1.3)volTxt='↑ 偏高 ('+vr.toFixed(1)+'x)';else if(vr<0.7)volTxt='↓ 縮量 ('+vr.toFixed(1)+'x)';else volTxt='= 正常 ('+vr.toFixed(1)+'x)';}
+  setText('w-vol',volTxt);
+  setText('w-time',new Date().toLocaleTimeString('zh-TW'));
+  buildWhy(pct,vr,price,w52h,w52l,chg);
+}
+
+function vNote(vr){if(!vr)return'';if(vr>2.0)return'，<strong>成交量爆增至均量 '+vr.toFixed(1)+' 倍</strong>，強烈暗示特定消息驅動';if(vr>1.4)return'，量能偏高（'+vr.toFixed(1)+'x），有機構資金參與跡象';if(vr<0.6)return'，但成交量萎縮（'+vr.toFixed(1)+'x），缺乏資金支撐';return'，量能正常（'+vr.toFixed(1)+'x）';}
+
+function buildWhy(pct,vr,price,w52h,w52l,chg){
+  var bd=document.getElementById('why-badge');
+  var body=document.getElementById('why-body');
+  var bs,bb,txt;
+  var isUp=chg>=0;
+  if(pct>=5){bs='background:rgba(63,185,80,.2);color:var(--g)';bb='🚀 強勢大漲 +'+pct.toFixed(1)+'%';txt='今日上漲超過 5%，屬於<strong style="color:var(--g)">強勢上攻</strong>'+vNote(vr)+'。<br><strong>可能觸發原因：</strong><ul><li>臨床試驗正面數據（Phase 3 設計/更新）</li><li>FDA 重要里程碑（Fast Track 後續進展）</li><li>機構授權/合作公告</li><li>CORDStrom RDEB 監管進展</li></ul>'+(w52h?'📌 距 52 週高點 $'+fmt(w52h)+' 仍有 '+Math.abs(((price/w52h)-1)*100).toFixed(1)+'% 空間。':'')+'<strong>請對照下方新聞連結確認驅動原因。</strong>';}
+  else if(pct>=2){bs='background:rgba(63,185,80,.15);color:var(--g)';bb='↑ 溫和上漲 +'+pct.toFixed(1)+'%';txt='今日溫和上漲'+vNote(vr)+'。<br>可能原因：生技板塊情緒改善、小幅利好消息或大盤拉動。'+(AVG_TARGET?'目前向上空間（+'+(((AVG_TARGET/price)-1)*100).toFixed(0)+'%）顯著。':'')+'密切關注量能是否放大以及是否有新聞催化。';}
+  else if(pct>=0.5){bs='background:rgba(57,211,83,.1);color:var(--tl)';bb='↗ 小幅上漲 +'+pct.toFixed(1)+'%';txt='今日小幅上漲，在正常波動範圍內'+vNote(vr)+'。無明顯特定催化劑，可能跟隨大盤或生技板塊走勢。';}
+  else if(pct>-0.5){bs='background:rgba(139,148,158,.2);color:var(--m)';bb='→ 盤整 '+(pct>=0?'+':'')+pct.toFixed(1)+'%';txt='今日橫盤整固'+vNote(vr)+'。市場多空均衡，等待 Phase 3 設計公告等新催化劑。<br>請查看下方新聞掌握最新動態。';}
+  else if(pct>-2){bs='background:rgba(255,166,87,.2);color:var(--o)';bb='↓ 小幅回落 '+pct.toFixed(1)+'%';txt='今日小幅回落，在正常回調範圍內'+vNote(vr)+'。可能因素：FDA Fast Track 後獲利回吐、大盤走弱或生技板塊輪動。'+(w52l&&price<w52l*1.1?'⚠️ 接近 52W 低點 $'+fmt(w52l)+'，需關注賣壓。':'');}
+  else if(pct>-5){bs='background:rgba(248,81,73,.2);color:var(--r)';bb='⚠️ 明顯下跌 '+pct.toFixed(1)+'%';txt='今日明顯下跌，需要關注'+vNote(vr)+'。<br>可能原因：<ul><li>臨床試驗負面消息</li><li>生技板塊整體走弱</li><li>融資公告（稀釋擔憂）</li><li>技術面跌破支撐位</li></ul>📌 <strong>請點擊上方新聞按鈕查看最新動態。</strong>';}
+  else{bs='background:rgba(248,81,73,.25);color:var(--r)';bb='🔴 大幅下跌 '+pct.toFixed(1)+'%';txt='今日大幅下跌，<strong style="color:var(--r)">需立即關注</strong>'+vNote(vr)+'。<br>高優先排查：<ul><li>🔴 臨床試驗失敗/暫停</li><li>🔴 FDA 負面消息</li><li>🟡 大規模融資（稀釋）公告</li></ul><strong>⚠️ 請立即點擊上方新聞按鈕。</strong>';}
+  if(bd){bd.textContent=bb;bd.setAttribute('style',bs);}
+  if(body)body.innerHTML=txt;
+}
+
+// ── 走勢圖（Yahoo Finance 1m → Chart.js）──────────────────────────
+var _intradayChartInstance=null;
+function fetchIntradayChart(){
+  var url='https://query2.finance.yahoo.com/v8/finance/chart/'+TICKER+'?interval=1m&range=1d';
+  var proxies=['https://corsproxy.io/?'+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url)];
+  function tryProxy(idx){
+    if(idx>=proxies.length){var ld=document.getElementById('intraday-loading');if(ld)ld.textContent='⚠ 走勢資料暫時無法取得';setTimeout(function(){if(!_quoteApplied)showNoData();},2000);return;}
+    fetchTimeout(proxies[idx],10000)
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(raw){
+        var inner=typeof raw.contents==='string'?JSON.parse(raw.contents):raw;
+        var res=inner&&inner.chart&&inner.chart.result&&inner.chart.result[0];
+        if(!res)throw new Error('no result');
+        var meta=res.meta||{};
+        var timestamps=(res.timestamp||[]);
+        var closes=(res.indicators&&res.indicators.quote&&res.indicators.quote[0]&&res.indicators.quote[0].close)||[];
+        var prev=meta.chartPreviousClose||meta.previousClose||null;
+        var labels=[],prices=[];
+        for(var i=0;i<timestamps.length;i++){if(closes[i]==null)continue;var d=new Date(timestamps[i]*1000);labels.push(d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}));prices.push(parseFloat(closes[i].toFixed(2)));}
+        var lastP=prices[prices.length-1]||0;
+        var isUp=prev?lastP>=prev:true;
+        var lineColor=isUp?'#3fb950':'#f85149';
+        var fillColor=isUp?'rgba(63,185,80,0.12)':'rgba(248,81,73,0.12)';
+        var canvas=document.getElementById('intradayChart');
+        var ld=document.getElementById('intraday-loading');
+        if(!canvas)return;
+        if(ld)ld.style.display='none';
+        if(_intradayChartInstance){_intradayChartInstance.destroy();}
+        _intradayChartInstance=new Chart(canvas.getContext('2d'),{type:'line',data:{labels:labels,datasets:[{data:prices,borderColor:lineColor,backgroundColor:fillColor,borderWidth:2,pointRadius:0,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:function(ctx){return'$'+ctx.parsed.y.toFixed(2);}}}},scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8,maxRotation:0,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}},y:{position:'right',ticks:{color:'#8b949e',font:{size:10},callback:function(v){return'$'+v.toFixed(2);}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+        var chartPrice=meta.regularMarketPrice||lastP;
+        var chartPrev=prev||meta.chartPreviousClose||chartPrice;
+        if(chartPrice){applyQuote({regularMarketPrice:chartPrice,regularMarketChange:chartPrice-chartPrev,regularMarketChangePercent:((chartPrice-chartPrev)/chartPrev)*100,regularMarketDayHigh:meta.regularMarketDayHigh||chartPrice,regularMarketDayLow:meta.regularMarketDayLow||chartPrice,regularMarketVolume:meta.regularMarketVolume||0,regularMarketPreviousClose:chartPrev,fiftyTwoWeekHigh:meta.fiftyTwoWeekHigh||null,fiftyTwoWeekLow:meta.fiftyTwoWeekLow||null});}
+        var info=document.getElementById('intraday-info');
+        if(info){info.innerHTML=[prev?'<span>前收 <b>$'+prev.toFixed(2)+'</b></span>':'',meta.regularMarketDayHigh?'<span>今高 <b style="color:var(--g)">$'+meta.regularMarketDayHigh.toFixed(2)+'</b></span>':'',meta.regularMarketDayLow?'<span>今低 <b style="color:var(--r)">$'+meta.regularMarketDayLow.toFixed(2)+'</b></span>':'','<span>更新 '+new Date().toLocaleTimeString('zh-TW')+'</span>','<span style="color:var(--m)">Yahoo Finance · 1m</span>'].filter(Boolean).join('');}
+      })
+      .catch(function(){tryProxy(idx+1);});
+  }
+  tryProxy(0);
+}
+
+// ── 啟動 ──────────────────────────────────────────────────────────
+fetchIntradayChart();
+setTimeout(function(){if(!_quoteApplied)showNoData();},15000);
+if(isMarketOpen()){setInterval(fetchIntradayChart,60000);}
+</script>
+</body>
+</html>
