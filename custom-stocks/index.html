@@ -35,6 +35,7 @@ header p{font-size:14px;color:var(--m)}
 .stock-card.axti{border-left:4px solid var(--g)}.stock-card.axti:hover{box-shadow:0 8px 32px rgba(63,185,80,.18);border-color:var(--g)}
 .stock-card.cohr{border-left:4px solid var(--cy)}.stock-card.cohr:hover{box-shadow:0 8px 32px rgba(0,212,255,.18);border-color:var(--cy)}
 .stock-card.ui{border-left:4px solid var(--y)}.stock-card.ui:hover{box-shadow:0 8px 32px rgba(210,153,34,.18);border-color:var(--y)}
+.stock-card.pgy{border-left:4px solid var(--bl)}.stock-card.pgy:hover{box-shadow:0 8px 32px rgba(88,166,255,.18);border-color:var(--bl)}
 .stock-card.kitt{border-left:4px solid var(--bl)}.stock-card.kitt:hover{box-shadow:0 8px 32px rgba(88,166,255,.18);border-color:var(--bl)}
 .stock-card.inmb{border-left:4px solid var(--r)}.stock-card.inmb:hover{box-shadow:0 8px 32px rgba(248,81,73,.18);border-color:var(--r)}
 .ticker-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
@@ -70,9 +71,7 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
 <body>
 
 <nav class="nav">
-  <a href="../index.html" class="logo">← 分析中心</a>
-  <a href="../pagaya/pgy_live_dashboard.html">PGY</a>
-  <a href="." class="active">客製化股票</a>
+  <a href="." class="logo active">📊 客製化股票監控中心</a>
 </nav>
 
 <div class="wrap">
@@ -85,7 +84,7 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
 
   <!-- 總覽統計 -->
   <div class="stats-bar">
-    <div class="stat-card"><div class="lbl">追蹤股票數</div><div class="num" style="color:var(--bl)">9</div><div class="lbl">支股票</div></div>
+    <div class="stat-card"><div class="lbl">追蹤股票數</div><div class="num" style="color:var(--bl)">10</div><div class="lbl">支股票</div></div>
     <div class="stat-card"><div class="lbl">產業涵蓋</div><div class="num" style="color:var(--g)">7</div><div class="lbl">個產業</div></div>
     <div class="stat-card"><div class="lbl">全數 Strong Buy</div><div class="num" style="color:var(--o)">2</div><div class="lbl">支（ONDS/IREN）</div></div>
     <div class="stat-card"><div class="lbl">最後更新</div><div class="num" style="font-size:16px;color:var(--m)">05-17</div><div class="lbl">2026 年</div></div>
@@ -94,6 +93,26 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
   <!-- 股票列表 -->
   <div class="sec-ttl">已建立的股票 Dashboard</div>
   <div class="grid">
+
+    <!-- PGY -->
+    <a class="stock-card pgy" href="../pagaya/pgy_live_dashboard.html">
+      <div class="ticker-tag" style="color:var(--bl)">NASDAQ: PGY</div>
+      <div class="stock-name">Pagaya Technologies</div>
+      <div class="stock-sector">🤖 AI 信貸基礎設施 · B2B2C · 金融科技</div>
+      <div class="stock-desc">AI 驅動的信貸中間層平台，本身不放貸，透過 AI 重新評估借款人並以 ABS 籌資核貸，連續 5 季 GAAP 獲利，30+ 合作夥伴，EV/EBITDA &lt;3× 嚴重低估。</div>
+      <div class="badges">
+        <span class="badge bg">✅ 連續5季GAAP獲利</span>
+        <span class="badge bb">100% Buy</span>
+        <span class="badge bo">全年指引上調</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--bl)">$14.19</div></div>
+        <div class="stat"><div class="stat-label">目標均值</div><div class="stat-val" style="color:var(--g)">$34.50</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+143%</div></div>
+      </div>
+      <div class="open-link" style="color:var(--bl)">開啟 Dashboard →</div>
+      <div class="updated">2026-05-17 · 主要監控標的 · ABS 累計 $345B+</div>
+    </a>
 
     <!-- ONDS -->
     <a class="stock-card onds" href="onds/">
@@ -297,7 +316,7 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
 </div>
 
 <footer>
-  客製化股票監控中心 · 9 支股票 · 由 Claude AI 協助建立 · 2026-05-17<br>
+  客製化股票監控中心 · 10 支股票（含 PGY）· 由 Claude AI 協助建立 · 2026-05-17<br>
   <span style="margin-top:4px;display:block">僅供個人參考，不構成投資建議</span>
 </footer>
 
