@@ -61,6 +61,19 @@ header p{font-size:14px;color:var(--m)}
 .stat-card .num{font-size:28px;font-weight:800;margin:4px 0}
 .stat-card .lbl{font-size:11px;color:var(--m)}
 footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.ai-section-wrap{margin-bottom:36px}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}
+.ai-card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.ai-name{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.ai-name .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ai-text{font-size:12px;color:var(--m);line-height:1.7}
+.top5-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.top5-item{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px}
+.rank{font-size:20px;font-weight:800;width:28px;text-align:center;flex-shrink:0;color:var(--m)}
+.debate-topic{background:var(--s);border:1px solid rgba(0,212,255,.3);border-radius:10px;padding:14px;margin-bottom:14px}
+.debate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:14px}
+.debate-card{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.debate-conclusion{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:8px;padding:14px}
 </style>
 </head>
 <body>
@@ -103,9 +116,9 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
         <span class="badge bo">CoWoS 擴產</span>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--bl)">NT$1,080</div></div>
-        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$1,300</div></div>
-        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+20%</div></div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--bl)">NT$2,220</div></div>
+        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$2,800</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+26%</div></div>
       </div>
       <div class="open-link" style="color:var(--bl)">開啟 Dashboard →</div>
       <div class="updated">即時更新 · 全球市值前10大 · AI 晶片命脈</div>
@@ -123,9 +136,9 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
         <span class="badge by">成熟製程利基</span>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--g)">NT$47</div></div>
-        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$62</div></div>
-        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+32%</div></div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--g)">NT$110</div></div>
+        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$128</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+16%</div></div>
       </div>
       <div class="open-link" style="color:var(--g)">開啟 Dashboard →</div>
       <div class="updated">即時更新 · 高殖利率 · 成熟製程龍頭</div>
@@ -143,9 +156,9 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
         <span class="badge bb">車用/衛星</span>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--o)">NT$1,320</div></div>
-        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$1,600</div></div>
-        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+21%</div></div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--o)">NT$3,260</div></div>
+        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$3,800</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+16%</div></div>
       </div>
       <div class="open-link" style="color:var(--o)">開啟 Dashboard →</div>
       <div class="updated">即時更新 · 台灣最大 IC 設計 · AI Edge 佈局</div>
@@ -163,9 +176,9 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
         <span class="badge bb">三大雲端客戶</span>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--p)">NT$310</div></div>
-        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$390</div></div>
-        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+26%</div></div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--p)">NT$300</div></div>
+        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$380</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+27%</div></div>
       </div>
       <div class="open-link" style="color:var(--p)">開啟 Dashboard →</div>
       <div class="updated">即時更新 · AI 伺服器最大 ODM · 雲端三巨頭供應商</div>
@@ -183,14 +196,133 @@ footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-t
         <span class="badge bo">NAND 控制器龍頭</span>
       </div>
       <div class="stat-row">
-        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--cy)">NT$510</div></div>
-        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$650</div></div>
-        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+27%</div></div>
+        <div class="stat"><div class="stat-label">收盤</div><div class="stat-val" style="color:var(--cy)">NT$2,650</div></div>
+        <div class="stat"><div class="stat-label">法人目標</div><div class="stat-val" style="color:var(--g)">NT$3,200</div></div>
+        <div class="stat"><div class="stat-label">空間</div><div class="stat-val" style="color:var(--g)">+21%</div></div>
       </div>
       <div class="open-link" style="color:var(--cy)">開啟 Dashboard →</div>
       <div class="updated">即時更新 · NAND 控制器全球 No.1 · AI 儲存題材</div>
     </a>
 
+  </div>
+
+  <!-- AI 每日評語 -->
+  <div class="ai-section-wrap">
+    <div class="sec-ttl">🤖 AI 每日台股觀點 · <span style="font-weight:400;letter-spacing:0;text-transform:none;color:var(--cy)">2026-05-18</span></div>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-name"><span class="dot" style="background:#4285f4"></span><span style="color:#4285f4">Gemini — 台積電 2330</span></div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(66,133,244,.1);border-radius:4px;display:inline-block">⭐⭐⭐⭐⭐ 強烈看多</div>
+        <div class="ai-text">N2 良率超越 N3 同期，CoWoS 月產能擴至 6 萬片。NVIDIA GB300 全鎖定 TSMC N2，AI Capex 超級週期訂單能見度延伸至 2027。亞利桑那廠 2026 Q3 試產，地緣折價將系統性收窄。目標 NT$2,800（+26%）。</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name"><span class="dot" style="background:#10a37f"></span><span style="color:#10a37f">ChatGPT — 聯電 2303</span></div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(16,163,127,.1);border-radius:4px;display:inline-block">⭐⭐⭐ 中性偏多</div>
+        <div class="ai-text">殖利率 5–6% 提供強力下檔支撐，車用與嵌入式 NVM 是長期收益護城河。但中國成熟製程擴產壓力持續，22/28nm 競爭加劇，毛利率改善空間有限。適合配息型持有人。目標 NT$128（+16%）。</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name"><span class="dot" style="background:#e11d48"></span><span style="color:#e11d48">Grok — 聯發科 2454</span></div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(225,29,72,.1);border-radius:4px;display:inline-block">⭐⭐⭐⭐ 看多</div>
+        <div class="ai-text">Dimensity 9400+ 旗艦週期高峰，AI PC（Copilot+）成長曲線啟動，衛星通訊（NTN）選擇權幾乎未被計入。本益比 14× vs Qualcomm 28×，折價難以基本面解釋。目標 NT$3,800（+16%），下半年有本益比修復機會。</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name"><span class="dot" style="background:#ffa657"></span><span style="color:var(--o)">Claude — 廣達 2382</span></div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(255,166,87,.1);border-radius:4px;display:inline-block">⭐⭐⭐⭐ 中性偏多</div>
+        <div class="ai-text">GB200 NVL72 出貨高峰期，Meta/Google/Microsoft 訂單能見度延伸至 Q4。最大風險是 GB300 訂單分配——鴻海/緯穎積極搶單。持有廣達本質是做多全球 AI 基礎設施建設持續性。目標 NT$380（+27%）。</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-name"><span class="dot" style="background:#00d4ff"></span><span style="color:var(--cy)">Gemini — 群聯 8299</span></div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(0,212,255,.1);border-radius:4px;display:inline-block">⭐⭐⭐⭐ 看多</div>
+        <div class="ai-text">E28 PCIe Gen5 ASP 較 E26 高出 40–50%，毛利率改善空間尚未被市場充分計入。三星/SK 海力士/美光/Kioxia 客戶黏著度極高。NAND 景氣回升週期支撐出貨量。目標 NT$3,200（+21%），E28 比例是核心觀察指標。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 前5排行 -->
+  <div class="ai-section-wrap">
+    <div class="sec-ttl">🏆 AI 推薦排行 · 上漲空間綜合評分</div>
+    <div class="top5-list">
+      <div class="top5-item">
+        <div class="rank" style="color:var(--y)">①</div>
+        <div style="width:9px;height:9px;border-radius:50%;background:var(--bl);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">台積電 <span style="color:var(--m);font-weight:400;font-size:12px">2330 · TSMC</span></div>
+          <div style="font-size:12px;color:var(--m);margin-top:2px">技術護城河無可替代 · N2 + CoWoS 雙引擎 · AI 晶片命脈 · 地緣折價收窄機會</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:16px;font-weight:800;color:var(--g)">+26%</div><div style="font-size:11px;color:var(--m)">目標 NT$2,800</div></div>
+      </div>
+      <div class="top5-item">
+        <div class="rank" style="color:var(--m)">②</div>
+        <div style="width:9px;height:9px;border-radius:50%;background:var(--p);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">廣達電腦 <span style="color:var(--m);font-weight:400;font-size:12px">2382 · Quanta</span></div>
+          <div style="font-size:12px;color:var(--m);margin-top:2px">GB200 NVL72 出貨高峰 · 三大雲端客戶長約 · AI 伺服器 ODM 龍頭</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:16px;font-weight:800;color:var(--g)">+27%</div><div style="font-size:11px;color:var(--m)">目標 NT$380</div></div>
+      </div>
+      <div class="top5-item">
+        <div class="rank" style="color:var(--m)">③</div>
+        <div style="width:9px;height:9px;border-radius:50%;background:var(--cy);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">群聯電子 <span style="color:var(--m);font-weight:400;font-size:12px">8299 · Phison</span></div>
+          <div style="font-size:12px;color:var(--m);margin-top:2px">E28 PCIe Gen5 ASP 溢價 · NAND 控制器護城河 · AI 儲存結構性需求</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:16px;font-weight:800;color:var(--g)">+21%</div><div style="font-size:11px;color:var(--m)">目標 NT$3,200</div></div>
+      </div>
+      <div class="top5-item">
+        <div class="rank" style="color:var(--m)">④</div>
+        <div style="width:9px;height:9px;border-radius:50%;background:var(--o);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">聯發科技 <span style="color:var(--m);font-weight:400;font-size:12px">2454 · MediaTek</span></div>
+          <div style="font-size:12px;color:var(--m);margin-top:2px">AI PC + 衛星通訊選擇權 · P/E 折價修復機會 · Dimensity 旗艦週期</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:16px;font-weight:800;color:var(--g)">+16%</div><div style="font-size:11px;color:var(--m)">目標 NT$3,800</div></div>
+      </div>
+      <div class="top5-item">
+        <div class="rank" style="color:var(--m)">⑤</div>
+        <div style="width:9px;height:9px;border-radius:50%;background:var(--g);flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">聯華電子 <span style="color:var(--m);font-weight:400;font-size:12px">2303 · UMC</span></div>
+          <div style="font-size:12px;color:var(--m);margin-top:2px">5–6% 殖利率防禦 · 車用/AIoT 利基 · 配息型投資人首選</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:16px;font-weight:800;color:var(--g)">+16%</div><div style="font-size:11px;color:var(--m)">目標 NT$128</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 辯論 -->
+  <div class="ai-section-wrap">
+    <div class="sec-ttl">⚔️ AI 辯論 · 今日台股爭議焦點</div>
+    <div class="debate-topic">
+      <div style="font-size:13px;font-weight:700;color:var(--cy);margin-bottom:6px">辯題：2026 下半年新資金進台股 AI 供應鏈，哪一檔最值得布局？</div>
+      <div style="font-size:12px;color:var(--m)">台積電的確定性 vs 廣達的彈性 vs 聯發科的低估值——三家 AI 在配置邏輯上存在根本分歧。</div>
+    </div>
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:4px">🤖 Gemini — 台積電最優</div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(66,133,244,.1);border-radius:4px;display:inline-block">確定性最高</div>
+        <div style="font-size:12px;color:var(--m);line-height:1.7">沒有任何競爭者能在 3 年內複製 N2 良率。NVIDIA GB300、Apple A20、Qualcomm Snapdragon 8 Elite 2 全鎖定 TSMC。訂單能見度延伸至 2027，P/E 22× 對應成長率完全合理。新資金首選台積電，輸的機率最低。</div>
+      </div>
+      <div class="debate-card">
+        <div style="font-size:12px;font-weight:700;color:#10a37f;margin-bottom:4px">🤖 ChatGPT — 廣達彈性更大</div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(16,163,127,.1);border-radius:4px;display:inline-block">高 Beta 受惠</div>
+        <div style="font-size:12px;color:var(--m);line-height:1.7">若 AI Capex 超預期，廣達是最直接的 high-beta 受惠股——每增加 $100 億美元 AI 伺服器採購，廣達 EPS 提升幅度比台積電更顯著。GB300 訂單若保持 40%+ 市佔，P/E 可從 15× 提升至 20×，彈性遠超台積電。</div>
+      </div>
+      <div class="debate-card">
+        <div style="font-size:12px;font-weight:700;color:#e11d48;margin-bottom:4px">🤖 Grok — 聯發科低估值</div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(225,29,72,.1);border-radius:4px;display:inline-block">折價修復機會</div>
+        <div style="font-size:12px;color:var(--m);line-height:1.7">聯發科 P/E 14× vs Qualcomm 28× 的折價在所有大型 IC 設計公司中最難用基本面解釋。AI PC + 衛星通訊兩個選擇權幾乎免費。若 2026 H2 AI PC 滲透率數據確認，本益比修復到 18× 的空間有 +28% 以上，是非線性回報最高的標的。</div>
+      </div>
+      <div class="debate-card">
+        <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:4px">🤖 Claude — 依風險偏好分配</div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(255,166,87,.1);border-radius:4px;display:inline-block">組合最優解</div>
+        <div style="font-size:12px;color:var(--m);line-height:1.7">三者不互斥。保守型：台積電 60% + 聯電 20% + 群聯 20%（防禦配息）。積極型：廣達 40% + 聯發科 40% + 群聯 20%（高彈性）。均衡型：台積電 50% + 廣達 30% + 聯發科 20%。沒有單一最優解，視乎 AI Capex 持續性的信念強度。</div>
+      </div>
+    </div>
+    <div class="debate-conclusion">
+      <div style="font-size:12px;font-weight:700;color:var(--y);margin-bottom:6px">📊 AI 共識結論</div>
+      <div style="font-size:13px;color:var(--m);line-height:1.7">三大 AI 均同意台股 AI 供應鏈仍處上升週期，但對個股優先順序存在分歧。<strong style="color:var(--t)">共識最高的觀點：台積電技術護城河無可置疑（5 AI 全同意）；廣達是 AI Capex 最直接的 Beta 受惠（4 AI 同意）；聯發科低估值是現階段台股最大的 alpha 機會（3 AI 同意）。</strong></div>
+    </div>
   </div>
 
   <!-- 說明 -->

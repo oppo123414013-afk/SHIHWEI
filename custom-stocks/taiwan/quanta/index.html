@@ -111,7 +111,7 @@ html{scroll-behavior:smooth}
   <div class="tagline">🖥️ 全球最大 AI 伺服器 ODM · GB200 NVL72 · Meta/Google/Microsoft</div>
   <div class="live-row">
     <span class="live-badge"><span class="ldot"></span>LIVE</span>
-    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--t)">NT$310</span>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--t)">NT$300</span>
     <span id="hdr-chg" style="padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;border:1px solid rgba(188,140,255,.4);background:rgba(188,140,255,.15);color:var(--p)">── ──</span>
     <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
   </div>
@@ -257,7 +257,7 @@ html{scroll-behavior:smooth}
       <div class="rseg" style="width:22%;background:var(--y)">中立 22%</div>
       <div class="rseg" style="width:3%;background:var(--r);border-radius:0 6px 6px 0">賣</div>
     </div>
-    <div style="font-size:12px;color:var(--m);margin-top:8px">法人目標價區間：<span class="hg">NT$330 ~ NT$450</span>，均值約 <span class="hg">NT$390</span></div>
+    <div style="font-size:12px;color:var(--m);margin-top:8px">法人目標價區間：<span class="hg">NT$300 ~ NT$420</span>，均值約 <span class="hg">NT$380</span></div>
   </div>
 </div>
 
@@ -415,7 +415,7 @@ html{scroll-behavior:smooth}
 </script>
 
 <script>
-var TICKER='2382.TW';var AVG_TARGET=390;var CURRENCY='NT$';
+var TICKER='2382.TW';var AVG_TARGET=380;var CURRENCY='NT$';
 function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
 function isTWMarketOpen(){try{var tw=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));var d=tw.getDay();var m=tw.getHours()*60+tw.getMinutes();return d>0&&d<6&&m>=540&&m<810;}catch(e){return false;}}
 function fmt(n){if(n==null||isNaN(n))return'─';if(n>=100)return Math.round(n).toLocaleString();if(n>=10)return n.toFixed(1);return n.toFixed(2);}

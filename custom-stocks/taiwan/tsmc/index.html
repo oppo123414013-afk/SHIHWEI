@@ -127,7 +127,7 @@ html{scroll-behavior:smooth}
   <div class="tagline">⚙️ 全球最大晶圓代工廠 · AI 晶片核心製造商 · N3/N2 先進製程</div>
   <div class="live-row">
     <span class="live-badge"><span class="ldot"></span>LIVE</span>
-    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">NT$1,080</span>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">NT$2,220</span>
     <span id="hdr-chg" style="padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;border:1px solid rgba(88,166,255,.4);background:rgba(88,166,255,.15);color:var(--bl)">── ──</span>
     <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
   </div>
@@ -287,7 +287,7 @@ html{scroll-behavior:smooth}
       <div class="rseg" style="width:18%;background:var(--y)">中立 18%</div>
       <div class="rseg" style="width:2%;background:var(--r);border-radius:0 6px 6px 0">賣</div>
     </div>
-    <div style="font-size:12px;color:var(--m);margin-top:8px">外資法人目標價區間：<span class="hg">NT$1,100 ~ NT$1,500</span>，均值約 <span class="hg">NT$1,300</span></div>
+    <div style="font-size:12px;color:var(--m);margin-top:8px">外資法人目標價區間：<span class="hg">NT$2,200 ~ NT$3,000</span>，均值約 <span class="hg">NT$2,800</span></div>
   </div>
 </div>
 
@@ -304,10 +304,10 @@ html{scroll-behavior:smooth}
     <div class="card">
       <div class="ctitle" style="margin-bottom:10px">關鍵價位</div>
       <table>
-        <tr><td>52週高點</td><td style="text-align:right;color:var(--g);font-weight:600">NT$1,165</td></tr>
-        <tr><td>52週低點</td><td style="text-align:right;color:var(--r);font-weight:600">NT$780</td></tr>
-        <tr><td>強支撐</td><td style="text-align:right;color:var(--bl);font-weight:600">NT$950 / NT$880</td></tr>
-        <tr><td>強壓力</td><td style="text-align:right;color:var(--o);font-weight:600">NT$1,100 / NT$1,165</td></tr>
+        <tr><td>52週高點</td><td style="text-align:right;color:var(--g);font-weight:600">NT$2,460</td></tr>
+        <tr><td>52週低點</td><td style="text-align:right;color:var(--r);font-weight:600">NT$1,200</td></tr>
+        <tr><td>強支撐</td><td style="text-align:right;color:var(--bl);font-weight:600">NT$1,980 / NT$1,800</td></tr>
+        <tr><td>強壓力</td><td style="text-align:right;color:var(--o);font-weight:600">NT$2,350 / NT$2,460</td></tr>
       </table>
     </div>
   </div>
@@ -525,7 +525,7 @@ html{scroll-behavior:smooth}
 <!-- ── 即時股價 JS ── -->
 <script>
 var TICKER     = '2330.TW';
-var AVG_TARGET = 1300;
+var AVG_TARGET = 2800;
 var CURRENCY   = 'NT$';
 
 function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}

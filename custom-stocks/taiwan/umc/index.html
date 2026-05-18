@@ -113,7 +113,7 @@ html{scroll-behavior:smooth}
   <div class="tagline">⚙️ 全球第三大晶圓代工廠 · 成熟製程利基 · 高股息</div>
   <div class="live-row">
     <span class="live-badge"><span class="ldot"></span>LIVE</span>
-    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--t)">NT$47</span>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--t)">NT$110</span>
     <span id="hdr-chg" style="padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;border:1px solid rgba(63,185,80,.4);background:rgba(63,185,80,.15);color:var(--g)">── ──</span>
     <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
   </div>
@@ -260,7 +260,7 @@ html{scroll-behavior:smooth}
       <div class="rseg" style="width:45%;background:var(--y)">中立 45%</div>
       <div class="rseg" style="width:15%;background:var(--r);border-radius:0 6px 6px 0">賣出 15%</div>
     </div>
-    <div style="font-size:12px;color:var(--m);margin-top:8px">法人目標價區間：<span class="hg">NT$52 ~ NT$72</span>，均值約 <span class="hg">NT$62</span>（殖利率支撐下檔）</div>
+    <div style="font-size:12px;color:var(--m);margin-top:8px">法人目標價區間：<span class="hg">NT$115 ~ NT$145</span>，均值約 <span class="hg">NT$128</span>（殖利率支撐下檔）</div>
   </div>
 </div>
 
@@ -276,10 +276,10 @@ html{scroll-behavior:smooth}
     <div class="card">
       <div class="ctitle" style="margin-bottom:10px">關鍵價位</div>
       <table>
-        <tr><td>52週高點</td><td style="text-align:right;color:var(--g);font-weight:600">NT$65</td></tr>
-        <tr><td>52週低點</td><td style="text-align:right;color:var(--r);font-weight:600">NT$38</td></tr>
-        <tr><td>強支撐</td><td style="text-align:right;color:var(--bl);font-weight:600">NT$44 / NT$40</td></tr>
-        <tr><td>強壓力</td><td style="text-align:right;color:var(--o);font-weight:600">NT$52 / NT$58</td></tr>
+        <tr><td>52週高點</td><td style="text-align:right;color:var(--g);font-weight:600">NT$130</td></tr>
+        <tr><td>52週低點</td><td style="text-align:right;color:var(--r);font-weight:600">NT$72</td></tr>
+        <tr><td>強支撐</td><td style="text-align:right;color:var(--bl);font-weight:600">NT$100 / NT$92</td></tr>
+        <tr><td>強壓力</td><td style="text-align:right;color:var(--o);font-weight:600">NT$118 / NT$130</td></tr>
       </table>
     </div>
   </div>
@@ -419,7 +419,7 @@ html{scroll-behavior:smooth}
 </script>
 
 <script>
-var TICKER='2303.TW';var AVG_TARGET=62;var CURRENCY='NT$';
+var TICKER='2303.TW';var AVG_TARGET=128;var CURRENCY='NT$';
 function fetchTimeout(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);return fetch(url,{signal:c.signal}).then(function(r){clearTimeout(t);return r;}).catch(function(e){clearTimeout(t);throw e;});}
 function isTWMarketOpen(){try{var tw=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));var d=tw.getDay();var m=tw.getHours()*60+tw.getMinutes();return d>0&&d<6&&m>=540&&m<810;}catch(e){return false;}}
 function fmt(n){if(n==null||isNaN(n))return'─';if(n>=100)return Math.round(n).toLocaleString();if(n>=10)return n.toFixed(1);return n.toFixed(2);}
