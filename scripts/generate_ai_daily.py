@@ -25,6 +25,7 @@ STOCKS = {
     "UI":   {"name": "Ubiquiti Inc.",          "sector": "企業網路設備",   "target": 826.00,"color": "#d29922"},
     "KITT": {"name": "Nauticus Robotics",      "sector": "水下機器人",     "target": 2.55,  "color": "#58a6ff"},
     "INMB": {"name": "INmune Bio",             "sector": "神經炎症生技",   "target": 5.40,  "color": "#f85149"},
+    "TTWO": {"name": "Take-Two Interactive",   "sector": "AAA電玩遊戲",    "target": 295.00,"color": "#bc8cff"},
 }
 
 # ── 取得即時股價 ──────────────────────────────────────────────
@@ -69,7 +70,7 @@ def build_prompt(prices):
 
     return f"""你是一個專業股票分析AI，今天是 {date_str}（美股盤後）。
 
-以下是我追蹤的10支股票今日數據：
+以下是我追蹤的11支股票今日數據：
 {stock_block}
 
 請以繁體中文，生成一份嚴格符合以下 JSON 格式的每日報告。
@@ -134,10 +135,11 @@ JSON 格式要求：
 # ── 呼叫 Gemini 生成 ──────────────────────────────────────────
 def generate_with_gemini(prompt):
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(
         prompt,
-        generation_config=genai.GenerationConfig(temperature=0.7)
+        generation_config=genai.GenerationConfig(temperature=0.7),
+        request_options={"timeout": 120},
     )
     return response.text.strip()
 
