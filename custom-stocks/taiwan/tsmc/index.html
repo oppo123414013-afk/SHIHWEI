@@ -421,10 +421,11 @@ function fetchIntradayChart(){
     fetchTimeout(proxies[idx],10000)
       .then(function(r){return r.json();})
       .then(function(data){
-        var res=data&&data.chart&&data.chart.result&&data.chart.result[0];
+        var inner=data;try{if(typeof data==='string')inner=JSON.parse(data);}catch(e){}
+        var res=inner&&inner.chart&&inner.chart.result&&inner.chart.result[0];
         if(!res){tryProxy(idx+1);return;}
         var q2=res.meta&&res.meta.regularMarketPrice?res.meta:null;
-        if(q2&&!_quoteApplied){applyQuote({regularMarketPrice:res.meta.regularMarketPrice,regularMarketChange:res.meta.regularMarketPrice-(res.meta.previousClose||res.meta.chartPreviousClose||res.meta.regularMarketPrice),regularMarketChangePercent:((res.meta.regularMarketPrice-(res.meta.previousClose||res.meta.chartPreviousClose||res.meta.regularMarketPrice))/(res.meta.previousClose||res.meta.chartPreviousClose||1))*100,regularMarketPreviousClose:res.meta.previousClose||res.meta.chartPreviousClose,regularMarketVolume:res.meta.regularMarketVolume,fiftyTwoWeekHigh:res.meta.fiftyTwoWeekHigh,fiftyTwoWeekLow:res.meta.fiftyTwoWeekLow});}
+        if(q2&&!_quoteApplied){applyQuote({regularMarketPrice:res.meta.regularMarketPrice,regularMarketChange:res.meta.regularMarketPrice-(res.meta.previousClose||res.meta.chartPreviousClose||res.meta.regularMarketPrice),regularMarketChangePercent:((res.meta.regularMarketPrice-(res.meta.previousClose||res.meta.chartPreviousClose||res.meta.regularMarketPrice))/(res.meta.previousClose||res.meta.chartPreviousClose||1))*100,regularMarketPreviousClose:res.meta.previousClose||res.meta.chartPreviousClose,regularMarketVolume:res.meta.regularMarketVolume,regularMarketDayHigh:res.meta.regularMarketDayHigh,regularMarketDayLow:res.meta.regularMarketDayLow,fiftyTwoWeekHigh:res.meta.fiftyTwoWeekHigh,fiftyTwoWeekLow:res.meta.fiftyTwoWeekLow});}
         var timestamps=res.timestamp||[];
         var closes=(res.indicators&&res.indicators.quote&&res.indicators.quote[0]&&res.indicators.quote[0].close)||[];
         var labels=[],prices=[];
