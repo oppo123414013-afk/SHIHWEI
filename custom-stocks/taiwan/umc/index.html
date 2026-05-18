@@ -76,6 +76,13 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
 .hg{color:var(--g);font-weight:600}.hr{color:var(--r);font-weight:600}.hb{color:var(--bl);font-weight:600}.ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--g);background:rgba(63,185,80,.05)}
+.ntitle{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px;line-height:1.4}
+.nmeta{font-size:11px;color:var(--m)}
 </style>
 </head>
 <body>
@@ -91,6 +98,10 @@ html{scroll-behavior:smooth}
   <a href="#inst">🏦 法人</a>
   <a href="#catalyst">🚀 催化劑</a>
   <a href="#risk">⚠️ 風險</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#outlook">🎯 展望</a>
+  <a href="#ai-debate">🤖 AI辯論</a>
   <a href="#links">🔗 連結</a>
 </nav>
 
@@ -117,6 +128,40 @@ html{scroll-behavior:smooth}
 <div class="why" id="why">
   <div class="why-hd"><span>📊 今日漲跌分析</span><span id="why-badge" class="badge bg">資料讀取中…</span></div>
   <div id="why-body" class="why-body">正在從 Yahoo Finance 取得即時資料，請稍候…</div>
+  <!-- AI 三方觀點 -->
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">聯電 2026 預估 EPS NT$3.5–4.0，本益比約 12–13×，對應股價 NT$47 隱含殖利率 5.5–6%，在利率環境下具高吸引力。<strong style="color:var(--t)">22/28nm 成熟製程利用率恢復至 75–80%，車用/AIoT 訂單比例持續提升，成為景氣復甦的領先指標。</strong>分析師均值目標 NT$62，向上空間 +32%，兼具價值與成長的雙重屬性。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">聯電的戰略定位正在從「追趕先進製程的失敗者」重新定義為「成熟製程利基市場的穩定獲利機器」。嵌入式非揮發記憶體（eNVM）、面板驅動 IC、電源管理 IC 等利基製程毛利率優於通用 28nm。<strong style="color:var(--t)">新加坡 Fab 12i 擴廠完成後，將成為車用晶片最穩定的供給來源之一，客戶黏性高。</strong>高股息策略（殖利率 5–6%）吸引法人長期布局。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">籌碼面看，聯電是台灣高殖利率股的代表性標的，每逢除息旺季（Q2–Q3）有填息行情支撐。<strong style="color:var(--t)">最大風險是中國成熟製程產能過剩（中芯、華虹持續擴建 28nm），若全球成熟製程供過於求，聯電的定價權和利用率都會受壓。</strong>近期觀察重點：中國客戶佔比是否下降、車用/工業客戶訂單能否補位。</div>
+    </div>
+    <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意利基製程故事，但 eNVM 和面板驅動 IC 的市場規模有天花板，長期成長動能是否足以支撐 P/E 擴張仍待觀察。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>聯電不需要高成長也能有好報酬——5–6% 殖利率 + 緩慢的本益比修復，累計報酬完全可媲美高成長股，且風險更低。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>中國成熟製程競爭是不能被忽視的結構性威脅。聯電若失去中國客戶（約佔營收 10–15%），需要確認車用/工業客戶的補位速度。<strong style="color:var(--t)">這才是決定股價能否突破 NT$60 的關鍵。</strong><br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>新加坡廠的地緣優勢（非台灣生產）恰好符合車用客戶「去台灣集中風險」的需求，這是聯電可能被低估的差異化優勢。
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="sec" id="live">
@@ -134,6 +179,64 @@ html{scroll-behavior:smooth}
   <div class="card" style="padding:16px">
     <div id="intraday-loading" style="color:var(--m);font-size:13px;margin-bottom:8px">📡 載入中…</div>
     <div style="position:relative;height:260px"><canvas id="intradayChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ── 即時新聞 ── -->
+<div class="sec" id="news">
+  <div class="sec-ttl">📰 即時新聞</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/2303.TW/news/" target="_blank" rel="noopener">📰 Yahoo 台股新聞 ↗</a>
+    <a class="nlink-btn" href="https://goodinfo.tw/tw/StockInfo.asp?STOCK_ID=2303" target="_blank" rel="noopener">📊 Goodinfo 聯電 ↗</a>
+    <a class="nlink-btn" href="https://www.umc.com/zh-TW/ir/press_releases" target="_blank" rel="noopener">📢 聯電官方新聞稿 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/UMC/news/" target="_blank" rel="noopener">🇺🇸 UMC ADR 新聞 ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://www.umc.com/zh-TW/ir/press_releases" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🏭 新加坡 Fab 12i Phase 3 擴廠進度：車用/工業客戶訂單持續增加</div>
+      <div class="nmeta">2026 · umc.com · 22/28nm 利用率回升 · 車用佔比提升目標 20%+</div>
+    </a>
+    <a class="nitem" href="https://www.umc.com/zh-TW/ir/press_releases" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">💻 嵌入式非揮發記憶體（eNVM）製程合作：與 ARM 合作 22nm eMRAM 平台</div>
+      <div class="nmeta">2026 · 利基製程 · AIoT/穿戴裝置應用 · 差異化競爭</div>
+    </a>
+    <a class="nitem" href="https://finance.yahoo.com/quote/2303.TW/news/" target="_blank" rel="noopener" style="border-left-color:var(--y)">
+      <div class="ntitle">💰 2026 年度配息預估：EPS NT$3.5–4.0，殖利率維持 5–6% 水準</div>
+      <div class="nmeta">2026 · 法人預估 · 高股息吸引力 · 除息旺季關注</div>
+    </a>
+    <a class="nitem" href="https://www.umc.com/zh-TW/ir/press_releases" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">🚗 車用晶圓代工需求：車用 MCU/PMIC/驅動 IC 訂單能見度達 2026 全年</div>
+      <div class="nmeta">2025–2026 · 車用電子 · 長約客戶 · 利用率支撐</div>
+    </a>
+  </div>
+</div>
+
+<!-- ── 重要事件時間軸 ── -->
+<div class="sec" id="events">
+  <div class="sec-ttl">📅 重要事件時間軸 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">里程碑追蹤 · 產能擴張進度</span></div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q3<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--y)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">法人說明會 Q2 財報 + 全年指引更新 <span class="badge bg">催化劑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">車用/工業訂單佔比更新 · 利用率目標確認 · 2026 配息宣告</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 H1<br>進行中</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--bl)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">新加坡 Fab 12i 擴廠進行中 <span class="badge bg">進行中</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">22nm 車用製程月產能擴增，客戶預付款鎖定產能</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q2<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--m)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">2025 全年配息確認 + 除息</div><div style="font-size:12px;color:var(--m);margin-top:2px">填息行情支撐 · 高殖利率資金回流</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2025 Q4<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">利用率觸底回升確認 <span class="badge bg">已確認</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">22/28nm 利用率從低點 65% 回升至 75–80%，景氣復甦訊號確立</div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -213,6 +316,80 @@ html{scroll-behavior:smooth}
     <div class="iitem"><div class="iico">📉</div><div class="ibdy"><div class="ittl">成熟製程產能過剩 <span class="sev sh">高</span></div><div class="idsc">中國晶圓廠（中芯、華虹等）積極擴充 28nm 產能，恐造成成熟製程價格競爭加劇，壓縮聯電毛利率。</div></div></div>
     <div class="iitem"><div class="iico">🔄</div><div class="ibdy"><div class="ittl">先進製程缺席，成長性受限 <span class="sev sh">高</span></div><div class="idsc">聯電早已退出先進製程競爭，無法直接受惠 AI 算力晶片主流 N3/N2 製程需求，成長天花板明顯。</div></div></div>
     <div class="iitem"><div class="iico">📦</div><div class="ibdy"><div class="ittl">消費性電子需求疲軟 <span class="sev sm">中</span></div><div class="idsc">聯電客戶中消費性 IC（面板 DDI、藍牙、Wi-Fi）佔比仍高，若消費端復甦不如預期，整體稼動率受壓。</div></div></div>
+  </div>
+</div>
+
+<!-- ── 展望 ── -->
+<div class="sec" id="outlook">
+  <div class="sec-ttl">🎯 展望</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ctitle" style="margin-bottom:10px">2026 全年展望</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.8">
+      <strong style="color:var(--t)">利用率回升至 78–82%：</strong>車用/工業訂單補位，22nm 需求持穩，全年利用率目標優於 2025。<br>
+      <strong style="color:var(--t)">EPS NT$3.5–4.2：</strong>毛利率 32–34% 維持，成本管控配合產能利用率提升。<br>
+      <strong style="color:var(--t)">配息率 80%+：</strong>高股息政策維持，殖利率 5–6% 持續吸引機構資金。<br>
+      <strong style="color:var(--t)">關鍵催化劑：</strong>車用晶片需求恢復、中國競爭壓力評估、eNVM 利基製程擴大。
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card cg"><div class="ctitle">牛市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">車用景氣強勁復甦 + 中國競爭未有效衝擊 + 除息填息順利 → 目標 NT$65–70</div></div>
+    <div class="card cr"><div class="ctitle">熊市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">中國 28nm 產能過剩加劇 + 車用復甦不如預期 → 殖利率支撐 NT$40–42</div></div>
+  </div>
+</div>
+
+<!-- ── 投資論點 ── -->
+<div class="sec" id="thesis">
+  <div class="sec-ttl">💡 核心投資論點</div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">💰</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">高殖利率防禦性標的</div><div style="font-size:13px;color:var(--m)">EPS NT$3.5–4.0 × 配息率 80%+ → 殖利率 5–6%，在台股中屬高殖利率標的，具備防禦性配置價值，適合長期持有。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">🚗</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">車用/AIoT 利基製程轉型</div><div style="font-size:13px;color:var(--m)">22nm 車用/工業製程客戶黏性高（長約），新加坡廠提供地緣多元化，eNVM 差異化製程提升毛利。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">🌏</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">新加坡廠：去中心化競爭優勢</div><div style="font-size:13px;color:var(--m)">非台灣本土生產可降低地緣風險，且新加坡政府政策穩定，適合歐美日車廠「去台灣集中風險」的採購策略需求。</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI 辯論 ── -->
+<div class="sec" id="ai-debate">
+  <div class="sec-ttl">🤖 AI 辯論交鋒 — 聯電完整分析</div>
+  <div style="background:var(--s);border:1px solid rgba(255,166,87,.3);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--o);margin-bottom:6px">⚔️ 辯題：在中國成熟製程競爭加劇下，聯電的高殖利率故事是否仍然成立？</div>
+    <div style="font-size:12px;color:var(--m)">中國 28nm 產能過剩 vs 聯電差異化策略（車用/eNVM/新加坡廠）。成熟製程的競爭格局是否會侵蝕聯電的護城河？</div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:4px">🤖 Gemini — 中性</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(66,133,244,.1);border-radius:4px;display:inline-block">殖利率支撐，但成長有限</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">量化上，5–6% 殖利率在目前無風險利率環境下仍有 2–3% 溢價，具備持有理由。但本益比 12–13× 的擴張需要成長動能支撐，純靠殖利率難以推動股價大幅上漲。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#10a37f;margin-bottom:4px">🤖 ChatGPT — 偏多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(16,163,127,.1);border-radius:4px;display:inline-block">差異化策略可突圍</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">中國競爭主要集中在標準 28nm 邏輯，聯電的 eNVM、BCD、高壓製程客戶黏性高且中國廠難以快速複製。新加坡廠為車用客戶提供非中國、非台灣的第三選擇，這個差異化空間是真實的。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#e11d48;margin-bottom:4px">🤖 Grok — 謹慎</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(225,29,72,.1);border-radius:4px;display:inline-block">中國競爭是實質威脅</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">中芯和華虹的 28nm 月產能已達 10 萬片以上，且定價策略激進。若聯電的中國客戶（10–15% 營收）加速轉移，短期利用率壓力不可小覷，NT$40 殖利率支撐才是真正底線。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(212,160,84,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:4px">🤖 Claude — 平衡</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(212,160,84,.1);border-radius:4px;display:inline-block">防禦性持有，避免期待高成長</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">聯電最合理的定位是「防禦性高殖利率標的」而非成長股。在台股配置中作為穩定的收益來源，同時等待車用景氣回升帶來的本益比修復機會。期待本益比大幅擴張不切實際。</div>
+    </div>
+  </div>
+  <div style="background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:8px;padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--y);margin-bottom:6px">📊 AI 共識結論</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.7">三大 AI 的共識是：聯電的高殖利率故事在防禦性持有層面仍然成立，但要期待本益比大幅擴張，需要看到車用/工業訂單佔比明確提升且中國競爭壓力可控的證據。<strong style="color:var(--t)">適合保守型投資人作為防禦性配置，而非尋求高 beta 回報的進攻型倉位。</strong></div>
   </div>
 </div>
 

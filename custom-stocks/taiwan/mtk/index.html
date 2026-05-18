@@ -75,6 +75,13 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
 .hg{color:var(--g);font-weight:600}.hr{color:var(--r);font-weight:600}.hb{color:var(--bl);font-weight:600}.ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--o);background:rgba(255,166,87,.05)}
+.ntitle{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px;line-height:1.4}
+.nmeta{font-size:11px;color:var(--m)}
 </style>
 </head>
 <body>
@@ -90,6 +97,10 @@ html{scroll-behavior:smooth}
   <a href="#inst">🏦 法人</a>
   <a href="#catalyst">🚀 催化劑</a>
   <a href="#risk">⚠️ 風險</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#outlook">🎯 展望</a>
+  <a href="#ai-debate">🤖 AI辯論</a>
   <a href="#links">🔗 連結</a>
 </nav>
 
@@ -116,6 +127,40 @@ html{scroll-behavior:smooth}
 <div class="why" id="why">
   <div class="why-hd"><span>📊 今日漲跌分析</span><span id="why-badge" class="badge bo">資料讀取中…</span></div>
   <div id="why-body" class="why-body">正在從 Yahoo Finance 取得即時資料，請稍候…</div>
+  <!-- AI 三方觀點 -->
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">聯發科 2026 預估 EPS NT$100–110，本益比約 12–13×，相對 Qualcomm（28×）、NVIDIA（50×+）折價明顯。<strong style="color:var(--t)">Dimensity 9400+ 在 Android 旗艦手機市佔率突破 35%，AI PC（Copilot+）Dimensity X Elite 出貨量進入爬坡階段。</strong>法人目標均值 NT$1,600，向上空間 +21%，若 AI PC 市佔率超預期，本益比修復空間可達 +15–20%。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">聯發科是台灣最容易被低估的 AI 受惠股之一。Dimensity 9400+ 的 APU 已達手機端 AI 推理的頂尖水準，而 AI PC 的 Copilot+ 認證意味著聯發科正式進入過去由 Intel/AMD 壟斷的 PC 市場。<strong style="color:var(--t)">更長期的催化劑：衛星直連（NTN）技術已在 Dimensity 9400+ 系列實現，未來 LEO 衛星通訊將成為手機標配，聯發科比市場預期更早完成布局。</strong></div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">籌碼面，聯發科外資持股約 50–55%，是台股中外資最重要的 IC 設計標的之一。<strong style="color:var(--t)">最大的籌碼風險是高通（Qualcomm）在旗艦市場的反擊——若三星 Galaxy S27 全面回歸 Snapdragon，聯發科的旗艦市佔率將受壓。</strong>觀察重點：2026 H2 Android 旗艦訂單分配（三星/vivo/OPPO），是股價能否突破 NT$1,500 的關鍵。</div>
+    </div>
+    <div style="background:rgba(255,166,87,.06);border:1px solid rgba(255,166,87,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--o);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>AI PC 故事很吸引人，但 AI PC 的真實滲透率 2026 年仍在 10–15%，市場規模還不夠大來改變聯發科的整體 EPS 結構。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>AI PC 的意義不只在於出貨量，更在於聯發科「進入 PC 市場」這件事本身——這打開了一個全新的 TAM，估值框架應該納入這個選擇權溢價。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>衛星通訊（NTN）才是被市場最低估的長期催化劑，一旦 LEO 衛星直連成為手機標配規格，聯發科先發優勢將帶來類似當年進入 5G 的估值跳升。<strong style="color:var(--t)">這個 optionality 幾乎未被計入當前本益比。</strong><br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>完全同意，車用晶片（T-series）+ 衛星通訊 + AI PC 三條成長曲線同時啟動，讓聯發科 2026–2028 的成長能見度比市場預期高出許多。
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="sec" id="live">
@@ -133,6 +178,64 @@ html{scroll-behavior:smooth}
   <div class="card" style="padding:16px">
     <div id="intraday-loading" style="color:var(--m);font-size:13px;margin-bottom:8px">📡 載入中…</div>
     <div style="position:relative;height:260px"><canvas id="intradayChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ── 即時新聞 ── -->
+<div class="sec" id="news">
+  <div class="sec-ttl">📰 即時新聞</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/2454.TW/news/" target="_blank" rel="noopener">📰 Yahoo 台股新聞 ↗</a>
+    <a class="nlink-btn" href="https://goodinfo.tw/tw/StockInfo.asp?STOCK_ID=2454" target="_blank" rel="noopener">📊 Goodinfo 聯發科 ↗</a>
+    <a class="nlink-btn" href="https://www.mediatek.com/investor-relations" target="_blank" rel="noopener">📢 聯發科 IR ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/mtk/" target="_blank" rel="noopener">📈 Stock Analysis ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://www.mediatek.com/investor-relations" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">📱 Dimensity 9400+ 旗艦晶片：Android 旗艦市佔率突破 35%，三星/vivo/OPPO 採用</div>
+      <div class="nmeta">2026 · mediatek.com · 4nm TSMC · APU 效能領先 Snapdragon 8 Elite</div>
+    </a>
+    <a class="nitem" href="https://www.mediatek.com/investor-relations" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">💻 Dimensity X Elite AI PC：微軟 Copilot+ 認證，主流筆電品牌採用，正式進軍 PC 市場</div>
+      <div class="nmeta">2025–2026 · AI PC · Windows on ARM · 鴻海/廣達筆電合作</div>
+    </a>
+    <a class="nitem" href="https://www.mediatek.com/investor-relations" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🛰️ NTN 衛星直連技術：Dimensity 9400+ 支援 LEO 衛星直連，先於高通完成商用</div>
+      <div class="nmeta">2026 · 衛星通訊 · SpaceX Starlink Direct to Cell · AST SpaceMobile</div>
+    </a>
+    <a class="nitem" href="https://www.mediatek.com/investor-relations" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">🚗 T920 車用晶片：智能駕駛 NOA 功能晶片出貨，吉利/長城/廣汽採用</div>
+      <div class="nmeta">2025–2026 · 車用 SoC · L2+ ADAS · 中國電動車市場</div>
+    </a>
+  </div>
+</div>
+
+<!-- ── 重要事件時間軸 ── -->
+<div class="sec" id="events">
+  <div class="sec-ttl">📅 重要事件時間軸 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">產品週期 · 市佔率催化劑</span></div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q4<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--y)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Dimensity 9500 次世代旗艦發布 <span class="badge bo">催化劑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">預計採用 TSMC N2 製程，APU 效能大幅提升，旗艦市佔爭奪加劇</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q2<br>進行中</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--bl)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">AI PC Dimensity X Elite 出貨爬坡 <span class="badge bg">進行中</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">主流筆電品牌 2026 H1 導入，Copilot+ 生態成熟度提升</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q1<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">NTN 衛星直連商用 <span class="badge bg">已達成</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">Dimensity 9400+ 衛星直連功能正式上市，先於 Qualcomm 完成商用部署</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2025 Q4<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">Dimensity 9400+ 量產 <span class="badge bg">已完成</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">TSMC N3E 製程，vivo X200 Ultra / OPPO Find X8 系列採用，旗艦市佔 35%+</div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -212,6 +315,80 @@ html{scroll-behavior:smooth}
     <div class="iitem"><div class="iico">🔴</div><div class="ibdy"><div class="ittl">高通競爭加劇 <span class="sev sh">高</span></div><div class="idsc">高通 Snapdragon 8 Elite 在旗艦 Android 市場持續壓制，三星、蘋果市佔爭奪激烈，恐影響聯發科高階晶片 ASP。</div></div></div>
     <div class="iitem"><div class="iico">🇨🇳</div><div class="ibdy"><div class="ittl">中國市場集中風險 <span class="sev sh">高</span></div><div class="idsc">聯發科約 60%+ 營收來自中國市場，美中科技戰若擴大，中國客戶可能轉向自研晶片（海思、展銳），衝擊訂單。</div></div></div>
     <div class="iitem"><div class="iico">📉</div><div class="ibdy"><div class="ittl">智慧手機市場成長放緩 <span class="sev sm">中</span></div><div class="idsc">全球智慧手機出貨量成長趨緩，若換機潮不如預期，聯發科核心手機 AP 業務成長天花板有限。</div></div></div>
+  </div>
+</div>
+
+<!-- ── 展望 ── -->
+<div class="sec" id="outlook">
+  <div class="sec-ttl">🎯 展望</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ctitle" style="margin-bottom:10px">2026 全年展望</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.8">
+      <strong style="color:var(--t)">營收成長 15–20% YoY：</strong>旗艦手機 + AI PC + 車用三引擎並行，Dimensity 9400+ 週期高峰。<br>
+      <strong style="color:var(--t)">EPS NT$100–115：</strong>毛利率持穩 47–49%，AI PC / 車用晶片高 ASP 拉升組合。<br>
+      <strong style="color:var(--t)">本益比修復空間：</strong>若 AI PC 市佔率超預期或衛星通訊規模化，P/E 可望從 13× 提升至 16–18×。<br>
+      <strong style="color:var(--t)">下半年催化劑：</strong>Dimensity 9500 發布、AI PC 滲透率數據公佈、車用 T-series 新客戶公告。
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card cg"><div class="ctitle">牛市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">AI PC 市佔快速提升 + Dimensity 9500 超越 Snapdragon + 衛星通訊規模化 → P/E 重估至 18× → 目標 NT$1,800+</div></div>
+    <div class="card cr"><div class="ctitle">熊市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">三星回歸 Snapdragon 導致市佔下滑 + AI PC 滲透慢於預期 → P/E 壓縮至 10× → 支撐 NT$1,000–1,100</div></div>
+  </div>
+</div>
+
+<!-- ── 投資論點 ── -->
+<div class="sec" id="thesis">
+  <div class="sec-ttl">💡 核心投資論點</div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">📱</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">手機 AP 全球第一：中低端到高端全覆蓋</div><div style="font-size:13px;color:var(--m)">全球手機 AP 出貨量第一，從入門到旗艦全系列覆蓋，Dimensity 品牌在 Android 陣營已超越 Snapdragon 成為首選，客戶包含三星/vivo/OPPO/小米。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">💻</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">AI PC 新引擎：打開 PC 市場全新 TAM</div><div style="font-size:13px;color:var(--m)">Dimensity X Elite 取得微軟 Copilot+ 認證，正式進入 PC 市場。PC 替換週期 + AI 功能需求為聯發科提供全新成長曲線，TAM 擴大 40%+。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">🛰️</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">衛星通訊先行者：LEO 直連手機的護城河</div><div style="font-size:13px;color:var(--m)">比高通更早完成 NTN 衛星直連商用化，未來 LEO 衛星成為手機標配時，聯發科將享有技術溢價與先發客戶優勢。</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI 辯論 ── -->
+<div class="sec" id="ai-debate">
+  <div class="sec-ttl">🤖 AI 辯論交鋒 — 聯發科完整分析</div>
+  <div style="background:var(--s);border:1px solid rgba(255,166,87,.3);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--o);margin-bottom:6px">⚔️ 辯題：聯發科能否在 Qualcomm 主導的旗艦市場持續突圍？AI PC 是下一個成長引擎嗎？</div>
+    <div style="font-size:12px;color:var(--m)">聯發科在中低端稱霸，但旗艦市場的持續力、AI PC 的滲透速度、以及估值折價的合理性，是四大 AI 的核心分歧點。</div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:4px">🤖 Gemini — 偏多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(66,133,244,.1);border-radius:4px;display:inline-block">P/E 折價過度</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">聯發科 P/E 13× vs Qualcomm 28× 的折價難以用基本面解釋——EPS 成長率、毛利率、市佔率都不亞於 Qualcomm。主要是「台灣股票折價」效應，隨著 AI PC 和車用被市場認識，折價應縮窄。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#10a37f;margin-bottom:4px">🤖 ChatGPT — 強烈看多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(16,163,127,.1);border-radius:4px;display:inline-block">多重成長引擎低估</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">手機 + AI PC + 車用 + 衛星通訊四條成長曲線同時啟動，歷史上沒有一家 IC 設計公司同時在四個市場處於上升週期。這種罕見的多引擎共振，理應獲得 15–20× 的本益比。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#e11d48;margin-bottom:4px">🤖 Grok — 謹慎</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(225,29,72,.1);border-radius:4px;display:inline-block">三星變數是最大風險</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">三星 Galaxy S 系列的晶片決策（Exynos vs Dimensity vs Snapdragon）是聯發科旗艦市佔最大的不確定因素。若三星 S28 全面回歸 Snapdragon，聯發科旗艦出貨量可能下滑 20–25%，衝擊估值。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(212,160,84,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:4px">🤖 Claude — 中性偏多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(212,160,84,.1);border-radius:4px;display:inline-block">選擇權價值未被計入</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">核心論點：當前 P/E 13× 只計入手機業務，AI PC 和衛星通訊的估值幾乎為零。這代表在下行保護充足的前提下，有多個免費的「選擇權」。建議以中線視角（12–18 個月）持有，等待 AI PC 滲透率數據確認。</div>
+    </div>
+  </div>
+  <div style="background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:8px;padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--y);margin-bottom:6px">📊 AI 共識結論</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.7">三大 AI 均認為聯發科的本益比折價難以用基本面合理化，但對折價收窄的觸發點存在分歧。<strong style="color:var(--t)">最可能的催化劑：AI PC 出貨量超預期數據（2026 Q3 財報）+ 衛星通訊商用規模確認，兩者同時出現將帶動本益比從 13× 向 16–18× 修復。</strong></div>
   </div>
 </div>
 

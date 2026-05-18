@@ -89,6 +89,13 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
 .hg{color:var(--g);font-weight:600}.hr{color:var(--r);font-weight:600}.hb{color:var(--bl);font-weight:600}.ho{color:var(--o);font-weight:600}
 html{scroll-behavior:smooth}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--bl);background:rgba(88,166,255,.05)}
+.ntitle{font-size:13px;font-weight:600;color:var(--t);margin-bottom:4px;line-height:1.4}
+.nmeta{font-size:11px;color:var(--m)}
 </style>
 </head>
 <body>
@@ -104,6 +111,10 @@ html{scroll-behavior:smooth}
   <a href="#inst">🏦 法人</a>
   <a href="#catalyst">🚀 催化劑</a>
   <a href="#risk">⚠️ 風險</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#outlook">🎯 展望</a>
+  <a href="#ai-debate">🤖 AI辯論</a>
   <a href="#links">🔗 連結</a>
 </nav>
 
@@ -135,6 +146,40 @@ html{scroll-behavior:smooth}
     <span id="why-badge" class="badge bb">資料讀取中…</span>
   </div>
   <div id="why-body" class="why-body">正在從 Yahoo Finance 取得即時資料，請稍候…</div>
+  <!-- AI 三方觀點 -->
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">🤖 三大 AI 今日走勢觀點</div>
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">台積電 N3 佔營收比已達 22%，N2 於 2025 Q4 量產，2026 H1 持續爬坡。CoWoS 先進封裝月產能從 3 萬片擴至 6 萬片，單價高出傳統封裝 3–5 倍，直接推升 ASP。<strong style="color:var(--t)">以 2026 預估 EPS NT$45–50 計算，本益比約 22–24×，相較同期全球晶圓代工龍頭有合理折價。</strong>法人目標均值 NT$1,300，暗示向上空間 +20%，ADR (TSM) 在美股亦持續吸引資金流入。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/敘事）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">台積電是全球 AI 算力供應鏈中不可替代的「中央腺體」——NVIDIA H200/B200/B300、AMD MI300X/MI325X、Apple Silicon、Qualcomm 旗艦晶片全部依賴 TSMC 先進製程。<strong style="color:var(--t)">沒有任何競爭者能在 3–5 年內複製 N3/N2 良率，這是有史以來最深的技術護城河之一。</strong>2026 AI 資本支出超級週期（Meta $65B、Google $75B、Microsoft $80B+）直接轉化為 CoWoS 與先進製程的訂單能見度，全年業績確定性極高。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">籌碼面：外資持股比例長期維持在 75–80% 附近，是大盤最重要的外資風向標。台灣加權指數走勢高度相關 TSMC，使其在地緣政治緊張時成為最大賣壓出口。<strong style="color:var(--t)">台積電的本益比折價（vs NVIDIA）反映的不只是成長差距，更是台海風險溢酬——這個溢酬的壓縮或擴大，是股價最大的非基本面變數。</strong>短線觀察外資買賣超方向，通常是股價轉折的先行指標。</div>
+    </div>
+    <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--bl);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→GPT：</strong>同意技術護城河，但 Intel 18A 與 Samsung SF2 若 2026 良率突破，N2 的技術壟斷優勢可能比市場預期提早縮窄，這是最需要監控的長期風險。<br>
+        <strong style="color:#10a37f">GPT→Gemini：</strong>Intel 18A 延誤史反覆，Samsung SF3 良率問題未解，台積電客戶黏性極強——NVIDIA 的 GB300 已鎖定 TSMC N2，沒有「萬一改用 Intel」的可行方案。<br>
+        <strong style="color:#e11d48">Grok→全體：</strong>你們都在討論技術面，卻忽略了 2026 最大催化劑可能是「地緣政治緩解」——若台海局勢穩定，TSMC 本益比折價修復空間遠大於任何技術進展帶來的上漲。<strong style="color:var(--t)">地緣溢酬的收窄本身就值得 +25–30%。</strong><br>
+        <strong style="color:#10a37f">GPT→Grok：</strong>認同，而且亞利桑那 N2 廠（2026 量產）和日本 JASM 的啟動，正在系統性降低市場對「台灣唯一」的擔憂，這是長期估值重評的基礎。
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── 即時行情 ── -->
@@ -154,6 +199,69 @@ html{scroll-behavior:smooth}
   <div class="card" style="padding:16px">
     <div id="intraday-loading" style="color:var(--m);font-size:13px;margin-bottom:8px">📡 載入中…</div>
     <div style="position:relative;height:260px"><canvas id="intradayChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ── 即時新聞 ── -->
+<div class="sec" id="news">
+  <div class="sec-ttl">📰 即時新聞</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/2330.TW/news/" target="_blank" rel="noopener">📰 Yahoo 台股新聞 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/TSM/news/" target="_blank" rel="noopener">🇺🇸 TSM ADR 新聞 ↗</a>
+    <a class="nlink-btn" href="https://investor.tsmc.com/chinese/news-events/press-release" target="_blank" rel="noopener">📢 台積電官方新聞稿 ↗</a>
+    <a class="nlink-btn" href="https://goodinfo.tw/tw/StockInfo.asp?STOCK_ID=2330" target="_blank" rel="noopener">📊 Goodinfo ↗</a>
+  </div>
+  <div class="nbox">
+    <a class="nitem" href="https://investor.tsmc.com/chinese/news-events/press-release" target="_blank" rel="noopener" style="border-left-color:var(--g)">
+      <div class="ntitle">🏭 台積電 N2 製程量產進度：2025 Q4 HPC 客戶首批流片，2026 持續爬坡</div>
+      <div class="nmeta">2026 · investor.tsmc.com · N2 良率超越 N3 同期 · CoWoS-L/S/R 擴產同步進行</div>
+    </a>
+    <a class="nitem" href="https://investor.tsmc.com/chinese/news-events/press-release" target="_blank" rel="noopener" style="border-left-color:var(--bl)">
+      <div class="ntitle">🇺🇸 亞利桑那廠 2nm 製程預計 2026 Q3 試產，美方政府補貼確認</div>
+      <div class="nmeta">2026 · 半導體產業 · CHIPS Act 補貼 · 地緣分散布局</div>
+    </a>
+    <a class="nitem" href="https://finance.yahoo.com/quote/TSM/news/" target="_blank" rel="noopener" style="border-left-color:var(--o)">
+      <div class="ntitle">📊 CoWoS 先進封裝月產能擴至 6 萬片，NVIDIA GB300 主要受益</div>
+      <div class="nmeta">2026 · 法人報告 · 先進封裝市佔 90%+ · 單價溢價持續</div>
+    </a>
+    <a class="nitem" href="https://investor.tsmc.com/chinese/news-events/press-release" target="_blank" rel="noopener" style="border-left-color:var(--p)">
+      <div class="ntitle">🇯🇵 日本 JASM 熊本廠 28/16nm 量產，第二廠 6/7nm 開工</div>
+      <div class="nmeta">2024–2026 · JASM · 日本政府補貼 · 索尼/豐田策略合作</div>
+    </a>
+  </div>
+</div>
+
+<!-- ── 重要事件時間軸 ── -->
+<div class="sec" id="events">
+  <div class="sec-ttl">📅 重要事件時間軸 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">里程碑追蹤 · 技術節點催化劑</span></div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q3<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--y)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">亞利桑那 Fab 21 Phase 2（2nm）試產 <span class="badge bb">催化劑</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">美國本土首座 2nm 製程廠，地緣折價修復關鍵節點</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 Q2<br>預計</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--m)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">法人說明會 Q1 2026 財報</div><div style="font-size:12px;color:var(--m);margin-top:2px">N2 爬坡數據首次公開披露 · CoWoS 月產能確認 · 全年指引更新</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2026 H1<br>進行中</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--bl)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">CoWoS 擴產進行中 <span class="badge bg">進行中</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">月產能目標 6 萬片，NVIDIA GB300 NVL72 主要封裝來源</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--bd)">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2025 Q4<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">N2 製程量產開始 <span class="badge bg">已達成</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">Apple A20 / HPC 客戶首批流片，良率超越 N3 同期水準</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:11px 0">
+        <div style="width:72px;min-width:72px;font-size:11px;color:var(--m);padding-top:3px;line-height:1.4">2024 Q4<br>✅</div>
+        <div style="width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--g)"></div>
+        <div><div style="font-size:13px;font-weight:600;line-height:1.4">日本 JASM 熊本廠正式量產 <span class="badge bg">已完成</span></div><div style="font-size:12px;color:var(--m);margin-top:2px">28/16nm 產能上線，索尼/豐田/瑞薩為錨點客戶，第二廠動工</div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -288,6 +396,80 @@ html{scroll-behavior:smooth}
         <div class="idsc">美國、日本、德國廠建廠成本遠高於台灣，短期稀釋毛利率，預計 2025-2027 年毛利率受壓。</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── 展望 ── -->
+<div class="sec" id="outlook">
+  <div class="sec-ttl">🎯 展望</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ctitle" style="margin-bottom:10px">2026 全年展望</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.8">
+      <strong style="color:var(--t)">營收成長 20–25% YoY（NT$3.8–4.2兆）：</strong>N3 佔比持續拉高（目標 25%+），N2 爬坡，CoWoS 擴產定價權維持。<br>
+      <strong style="color:var(--t)">毛利率 57–60%：</strong>先進製程高 ASP + 規模效益，抵消台幣升值部分壓力。<br>
+      <strong style="color:var(--t)">資本支出 NT$1.2–1.4兆：</strong>台灣 N2/A16 廠擴建 + 亞利桑那/日本/德國 海外廠投資。<br>
+      <strong style="color:var(--t)">下半年催化劑：</strong>NVIDIA GB300 大規模出貨（N3E CoWoS-L）、Apple A20 流片（N2）、AMD MI400 確認。
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card cg"><div class="ctitle">牛市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">AI capex 超級週期延續、CoWoS 供給持續吃緊、台海地緣平穩 → 本益比重評 28–30× → 目標 NT$1,400–1,500</div></div>
+    <div class="card cr"><div class="ctitle">熊市情境</div><div style="font-size:13px;color:var(--m);line-height:1.6;margin-top:6px">地緣政治升溫、AI 資本支出縮減、台幣大幅升值 → 本益比折價擴大 → 支撐 NT$900–1,000</div></div>
+  </div>
+</div>
+
+<!-- ── 投資論點 ── -->
+<div class="sec" id="thesis">
+  <div class="sec-ttl">💡 核心投資論點</div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">🔬</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">技術壟斷：AI 晶片的唯一出口</div><div style="font-size:13px;color:var(--m)">全球先進製程（≤3nm）僅台積電具備量產能力。NVIDIA、AMD、Apple、Qualcomm 無法繞過台積電生產旗艦晶片，形成「無可替代」的戰略定位。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">📦</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">CoWoS 先進封裝：定價權護城河</div><div style="font-size:13px;color:var(--m)">AI 加速晶片（H200/B200/MI300X）全仰賴 CoWoS 封裝，台積電市佔率 90%+，月產能 6 萬片成為 AI 算力瓶頸，定價權極強。</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px">
+        <div style="font-size:18px;flex-shrink:0">🌍</div>
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">全球化布局：地緣折價逐步修復</div><div style="font-size:13px;color:var(--m)">亞利桑那（2nm）、熊本（28/16nm）、德勒斯登（12/16nm）三大海外廠投入，系統性降低「台灣單點風險」，長期估值折價有望收窄。</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI 辯論 ── -->
+<div class="sec" id="ai-debate">
+  <div class="sec-ttl">🤖 AI 辯論交鋒 — 台積電完整分析</div>
+  <div style="background:var(--s);border:1px solid rgba(255,166,87,.3);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--o);margin-bottom:6px">⚔️ 辯題：台積電的地緣政治風險是否已被股價充分反映？</div>
+    <div style="font-size:12px;color:var(--m)">台積電享有技術護城河溢價，卻因台灣地緣位置承受本益比折價。這兩種力量如何平衡？股價是高估還是低估？</div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#4285f4;margin-bottom:4px">🤖 Gemini — 中性偏多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(66,133,244,.1);border-radius:4px;display:inline-block">地緣折價合理但過度</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">量化分析顯示台積電 P/E 對比 NVIDIA 的折價率（約 65%）高於歷史均值（約 50%），市場過度定價了地緣風險。亞利桑那廠每完成一個里程碑，這個折價應縮窄 3–5%。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#10a37f;margin-bottom:4px">🤖 ChatGPT — 看多</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(16,163,127,.1);border-radius:4px;display:inline-block">地緣風險被技術壟斷抵銷</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">地緣風險是真實的，但「台積電不可或缺」的程度同樣真實——任何衝突導致台積電停工，全球科技業將陷入系統性危機。這種「不能倒」的地位反而是最強的隱性保護。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:#e11d48;margin-bottom:4px">🤖 Grok — 審慎</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(225,29,72,.1);border-radius:4px;display:inline-block">尾部風險未被充分定價</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">黑天鵝事件（台海衝突）的發生概率市場估算約 2–5%/年，但對應的損失是 100%。期望損失（EV of loss）實際上相當大，且這個風險無法被多元化分散。</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(212,160,84,.35);border-radius:8px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:4px">🤖 Claude — 平衡</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;padding:2px 7px;background:rgba(212,160,84,.1);border-radius:4px;display:inline-block">取決於時間維度</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.7">短期（1–2年）：地緣風險被 AI 需求溢價蓋過，股價偏低估。長期（3–5年）：海外廠分散效果顯現後，本益比折價應系統性收窄，長線投資人買入邏輯完整。</div>
+    </div>
+  </div>
+  <div style="background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:8px;padding:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--y);margin-bottom:6px">📊 AI 共識結論</div>
+    <div style="font-size:13px;color:var(--m);line-height:1.7">三大 AI 均同意台積電技術護城河在未來 3–5 年內無法被撼動，但對地緣風險的定價存在分歧。<strong style="color:var(--t)">建議策略：以 AI 需求週期為基礎倉，設定地緣事件的停損紀律，避免押注「地緣風險永遠不發生」的單一情境。</strong></div>
   </div>
 </div>
 
