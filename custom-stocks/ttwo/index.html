@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TTWO 監控中心 — Take-Two Interactive</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--s:#161b22;--s2:#1c2128;--bd:#30363d;--t:#e6edf3;--m:#8b949e;--bl:#58a6ff;--g:#3fb950;--r:#f85149;--y:#d29922;--p:#bc8cff;--o:#ffa657;--cy:#00d4ff;--tl:#39d353}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.nav{position:sticky;top:0;background:rgba(13,17,23,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);z-index:100;padding:10px 20px;display:flex;gap:18px;overflow-x:auto}
+.nav a{color:var(--m);text-decoration:none;font-size:13px;white-space:nowrap;padding:4px 0;transition:color .2s}
+.nav a:hover{color:var(--t)}
+
+.hdr{background:linear-gradient(135deg,#1a0d2e,#0d1117);border:1px solid var(--bd);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(188,140,255,.14),transparent 70%)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(188,140,255,.07),transparent 70%)}
+.ticker{font-size:13px;color:var(--p);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.co-name{font-size:26px;font-weight:700;margin-bottom:3px}
+.tagline{color:var(--m);font-size:14px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(188,140,255,.15);border:1px solid rgba(188,140,255,.4);color:var(--p);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:1px}
+.ldot{width:7px;height:7px;background:var(--p);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hdr-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.bg{background:rgba(63,185,80,.15);color:var(--g);border:1px solid rgba(63,185,80,.3)}
+.bb{background:rgba(88,166,255,.15);color:var(--bl);border:1px solid rgba(88,166,255,.3)}
+.bo{background:rgba(255,166,87,.15);color:var(--o);border:1px solid rgba(255,166,87,.3)}
+.bp{background:rgba(188,140,255,.15);color:var(--p);border:1px solid rgba(188,140,255,.3)}
+.br{background:rgba(248,81,73,.15);color:var(--r);border:1px solid rgba(248,81,73,.3)}
+.by{background:rgba(210,153,34,.15);color:var(--y);border:1px solid rgba(210,153,34,.3)}
+
+.why{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px}
+.why-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700;font-size:15px}
+.why-badge{padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.why-body{font-size:13px;color:var(--m);line-height:1.8}
+.why-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);font-size:12px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap}
+.why-foot span{color:var(--t)}
+
+.nbox{display:flex;flex-direction:column;gap:8px}
+.nitem{background:var(--s2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--bd);text-decoration:none;display:block;transition:border-color .2s,background .2s}
+.nitem:hover{border-left-color:var(--p);background:rgba(188,140,255,.05)}
+.ntitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.nmeta{font-size:11px;color:var(--m)}
+.nlink-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);color:var(--p);padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:background .2s,border-color .2s}
+.nlink-btn:hover{background:rgba(188,140,255,.1);border-color:var(--p)}
+
+.sec{margin-bottom:24px}
+.sec-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.ctitle{font-size:12px;color:var(--m);margin-bottom:6px;font-weight:500}
+.cval{font-size:26px;font-weight:700}
+.csub{font-size:12px;color:var(--m);margin-top:4px}
+.cg{border-left:3px solid var(--g)}
+.cb{border-left:3px solid var(--bl)}
+.co{border-left:3px solid var(--o)}
+.cp{border-left:3px solid var(--p)}
+.cr{border-left:3px solid var(--r)}
+
+.pw{margin:10px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.pb{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px}
+.fg{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.fb{background:linear-gradient(90deg,#388bfd,#58a6ff)}
+.fo{background:linear-gradient(90deg,#d18616,#ffa657)}
+.fr2{background:linear-gradient(90deg,#cf222e,#f85149)}
+.fp{background:linear-gradient(90deg,#8957e5,#bc8cff)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--m);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--bd)}
+td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tn{background:rgba(63,185,80,.2);color:var(--g)}
+.ta{background:rgba(88,166,255,.2);color:var(--bl)}
+.tp{background:rgba(188,140,255,.2);color:var(--p)}
+.tb{background:rgba(255,166,87,.2);color:var(--o)}
+.tr2{background:rgba(248,81,73,.2);color:var(--r)}
+.ty{background:rgba(210,153,34,.2);color:var(--y)}
+
+.flow{display:flex;flex-direction:column}
+.fstep{display:flex;gap:16px;padding:14px 0;border-left:2px solid var(--bd);margin-left:10px;padding-left:20px;position:relative}
+.fstep::before{content:'';position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--p);border:2px solid var(--bg)}
+.fstep:last-child{border-left:2px solid transparent}
+.ft{font-weight:600;margin-bottom:3px}
+.fd{font-size:13px;color:var(--m)}
+
+.trange{background:var(--s2);border-radius:8px;padding:16px;margin:12px 0}
+.rtrack{position:relative;height:6px;background:var(--bd);border-radius:3px;margin:22px 8px}
+.rfill{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--r),var(--g))}
+.rmark{position:absolute;top:-20px;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-weight:600}
+.rmark::after{content:'';position:absolute;left:50%;bottom:-10px;width:2px;height:10px;background:currentColor}
+.rlbl{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10px;color:var(--m)}
+
+.ilist{display:flex;flex-direction:column;gap:10px}
+.iitem{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:8px}
+.iico{font-size:18px;flex-shrink:0;margin-top:2px}
+.ibdy{flex:1}
+.ittl{font-weight:600;font-size:14px;margin-bottom:2px}
+.idsc{font-size:13px;color:var(--m)}
+.sev{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.sh{background:rgba(248,81,73,.2);color:var(--r)}
+.sm{background:rgba(210,153,34,.2);color:var(--y)}
+.sl{background:rgba(88,166,255,.2);color:var(--bl)}
+
+.bchart{display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 4px;margin:12px 0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.blbl{font-size:10px;color:var(--m);text-align:center}
+.bval{font-size:11px;font-weight:600;text-align:center}
+
+.rbar{display:flex;height:28px;border-radius:6px;overflow:hidden;gap:2px;margin:10px 0}
+.rseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+.ubox{background:linear-gradient(135deg,rgba(188,140,255,.1),rgba(63,185,80,.05));border:1px solid rgba(188,140,255,.25);border-radius:10px;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.unum{font-size:42px;font-weight:800;color:var(--p)}
+.ulbl{font-size:13px;color:var(--m)}
+
+.footer{text-align:center;color:var(--m);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--bd)}
+.hg{color:var(--g);font-weight:600}
+.hr{color:var(--r);font-weight:600}
+.hb{color:var(--bl);font-weight:600}
+.ho{color:var(--o);font-weight:600}
+.hp{color:var(--p);font-weight:600}
+html{scroll-behavior:smooth}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(188,140,255,.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(188,140,255,.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(63,185,80,.02) 0%, transparent 60%);
+  background-size:100% 100%}
+.wrap{position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../" style="font-weight:700;color:var(--t);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);padding:5px 14px;border-radius:20px;font-size:13px;margin-right:12px;letter-spacing:.3px">← 返回客製化股票</a>
+  <a href="#metrics">📊 核心指標</a>
+  <a href="#live">📡 即時行情</a>
+  <a href="#why">📊 漲跌分析</a>
+  <a href="#ai">🤖 AI觀點</a>
+  <a href="#news">📰 新聞</a>
+  <a href="#events">📅 事件軸</a>
+  <a href="#fin">財務</a>
+  <a href="#analyst">分析師</a>
+  <a href="#catalyst">催化劑</a>
+  <a href="#risk">風險</a>
+  <a href="#thesis">投資論點</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="ticker">NASDAQ: TTWO</div>
+  <div class="co-name">Take-Two Interactive Software</div>
+  <div class="tagline">AAA 電玩遊戲 · Rockstar Games · 2K Games · GTA VI · 紐約</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="live-badge"><span class="ldot"></span>LIVE · Yahoo Finance</div>
+    <span id="hdr-price" style="font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--t)">$284</span>
+    <span id="hdr-chg" style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:14px;font-weight:700;background:rgba(188,140,255,.15);border:1px solid rgba(188,140,255,.4);color:var(--p)">🎮 GTA VI 催化劑</span>
+  </div>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span id="mkt-status" style="font-size:12px;color:var(--m)">讀取中...</span>
+    <span id="hdr-upd" style="font-size:11px;color:var(--m)"></span>
+  </div>
+  <div class="hdr-badges" style="margin-top:14px">
+    <span class="badge bp">🎮 GTA VI 近十年最大催化劑</span>
+    <span class="badge bg">📈 4/5 Buy 共識</span>
+    <span class="badge bp">🚀 Rockstar Games 金字招牌</span>
+    <span class="badge bo">💡 2K / NBA 2K 長青 IP</span>
+  </div>
+</div>
+
+<!-- ══ 核心指標卡片 ════════════════════════════════════════════════ -->
+<div id="metrics" class="g4" style="margin-bottom:20px">
+  <div class="card cp">
+    <div class="ctitle">市值（約）</div>
+    <div class="cval" style="color:var(--p)">~$35B</div>
+    <div class="csub">NASDAQ 上市</div>
+  </div>
+  <div class="card cg">
+    <div class="ctitle">分析師目標均值</div>
+    <div class="cval" style="color:var(--g)">$295</div>
+    <div class="csub">隱含空間 <span class="hg">+4%</span></div>
+  </div>
+  <div class="card co">
+    <div class="ctitle">旗艦IP數</div>
+    <div class="cval" style="color:var(--o)">10+</div>
+    <div class="csub">GTA / RDR / NBA 2K / Civ</div>
+  </div>
+  <div class="card cb">
+    <div class="ctitle">GTA Online MAU（估）</div>
+    <div class="cval" style="color:var(--bl)">1.2億+</div>
+    <div class="csub">持續線上生態現金流</div>
+  </div>
+</div>
+
+<!-- ══ 即時走勢 ════════════════════════════════════════════════════ -->
+<div id="live" class="sec">
+  <div class="sec-ttl">今日走勢 <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--m)">Yahoo Finance · 自動更新</span></div>
+  <div class="card" style="padding:20px">
+    <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--m);margin-bottom:12px">TTWO 今日走勢圖 · Yahoo Finance 1 分鐘線</div>
+    <div style="border-radius:8px;overflow:hidden;background:var(--s2);height:300px;position:relative">
+      <canvas id="intradayChart" style="width:100%;height:100%"></canvas>
+      <div id="intraday-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px">⏳ 載入走勢中…</div>
+    </div>
+    <div id="intraday-info" style="margin-top:10px;font-size:11px;color:var(--m);display:flex;gap:20px;flex-wrap:wrap">
+      <span>Yahoo Finance 1m · 自動更新</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 今日漲跌分析（即時）════════════════════════════════════════ -->
+<div id="why" class="why">
+  <div class="why-hd">
+    📊 今日漲跌分析
+    <span id="why-badge" class="why-badge" style="background:rgba(139,148,158,.2);color:var(--m)">連線中...</span>
+  </div>
+  <div id="why-body" class="why-body">正在連接 Yahoo Finance 取得即時資料...</div>
+  <div class="why-foot">
+    <div>前收：<span id="w-prev">─</span></div>
+    <div>今日振幅：<span id="w-range">─</span></div>
+    <div>量能：<span id="w-vol">─</span></div>
+    <div>即時更新：<span id="w-time">─</span></div>
+  </div>
+</div>
+
+<!-- ══ AI 三方觀點 + 辯論 ════════════════════════════════════════ -->
+<div id="ai" class="why">
+  <div class="why-hd">
+    🤖 AI 三方觀點
+    <span class="why-badge" style="background:rgba(188,140,255,.2);color:var(--p)">GTA VI 發售催化 · Buy 共識</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">背景：</strong>Take-Two Interactive 旗下 Rockstar Games 與 2K Games 持有全球頂尖 AAA IP 組合。GTA VI 為近十年最受期待的遊戲，預計發售後將成為娛樂史上最大單日營收事件之一。公司同時深耕 GTA Online 線上生態（1.2億+ 月活），NBA 2K、Civilization、Borderlands 等 2K IP 提供穩定年金型現金流。
+  </div>
+  <div class="why-foot">
+    <div>股價：<span>$284</span></div>
+    <div>市值：<span class="hp">~$35B</span></div>
+    <div>目標均值：<span class="hg">$295</span></div>
+    <div>分析師共識：<span class="hg">Buy</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">三大 AI 今日觀點</div>
+
+    <div style="background:var(--bg);border:1px solid rgba(66,133,244,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#4285f4;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#4285f4">Gemini（數量分析）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">GTA V 自 2013 年累計銷售超過 2 億套，GTA Online 十多年來仍是 PS5/Xbox Series X 熱門榜單常客。以 GTA V 首週 8 億美元記錄為基準，GTA VI 同期估算保守目標超過 10 億美元。<strong style="color:var(--t)">對 Take-Two 而言，GTA VI 發售後 12 個月的營收貢獻可能相當於目前全年營收的 40–60%。</strong>此外，GTA VI Online 一旦啟動，Shark Card 微交易與 DLC 可創造未來 5–7 年的長尾現金流，這是市場估值長期被低估的核心原因。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(16,163,127,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#10a37f;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#10a37f">ChatGPT（基本面/護城河）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">Take-Two 的護城河是雙重的：品牌 IP 壁壘（Rockstar 的 GTA 無論玩家世代更替都保持吸引力）與開放世界技術壁壘（RAGE 引擎在開放世界模擬細節上仍遙遙領先競爭對手）。2K Games 方面，NBA 2K 是籃球遊戲實質上的壟斷者，Civilization 系列在策略遊戲細分市場地位類似。<strong style="color:var(--t)">這種多 IP、多平台、跨世代的組合，使 Take-Two 對單一遊戲失敗的抗風險能力遠高於純 AAA 單作公司。</strong>訂閱制（EA Play、Game Pass）的擴張也有利於長尾 IP 貨幣化。</div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid rgba(225,29,72,.35);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="width:9px;height:9px;border-radius:50%;background:#e11d48;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:#e11d48">Grok（市場結構/籌碼）</span>
+      </div>
+      <div style="font-size:12px;color:var(--m);line-height:1.75">GTA VI 的最大風險不是品質，而是時間表。Rockstar 以「何時準備好就何時發售」聞名，若再次延期，市場將重複 2023–2024 年「等待催化劑」的折磨期，股價將明顯承壓。另一個市場結構風險是：<strong style="color:var(--t)">發售前夕往往是 TTWO 股價的「高點區域」——利多兌現後機構獲利了結的動作可能比 GTA VI 的實際銷售數字更快影響股價。</strong>建議關注 Rockstar 官方首播日期確認的時機，這才是進出場的真正指標，而非財報本身。</div>
+    </div>
+
+    <div style="background:rgba(188,140,255,.06);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--p);margin-bottom:8px">💬 AI 辯論交鋒</div>
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini→Grok：</strong>「利多兌現賣出」的框架適用於小型催化劑。GTA VI 規模不同——它啟動的是一個 5–7 年線上生態，機構不會在發售後短暫獲利了結就清倉，而是等待 GTA Online 的 MAU 與微交易數據確認長期現金流。<br>
+        <strong style="color:#e11d48">Grok→Gemini：</strong>GTA V Online 在 2013 年啟動時也被如此預期，但 TTWO 股價在發售後的 6 個月確實出現顯著回落。歷史記錄顯示，「超預期首週銷售」後的持倉行為比想像中短視。<br>
+        <strong style="color:#10a37f">GPT→全體：</strong>兩個觀點都成立，但忽略了一點：<strong style="color:var(--t)">GTA VI 是首款原生設計於「訂閱 + 線上生態系」時代的 GTA。</strong>若 Take-Two 在 GTA VI 中引入季票、訂閱綁定，對長期 ARR 的估值邏輯將根本改變，市場需要重新定價——這是 Grok 的短線框架所忽略的結構性轉變。<br>
+        <strong style="color:#4285f4">Gemini→GPT：</strong>認同。訂閱化是關鍵觀察點，也是 TTWO 能否從「大作公司」轉型為「平台公司」的核心指標，值得密切追蹤 GTA VI 發售後的商業模式細節。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 新聞連結 ════════════════════════════════════════════════════ -->
+<div id="news" class="sec">
+  <div class="sec-ttl">📰 即時新聞與資源</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/TTWO/news/" target="_blank" rel="noopener">📰 Yahoo Finance TTWO 新聞 ↗</a>
+    <a class="nlink-btn" href="https://stockanalysis.com/stocks/ttwo/" target="_blank" rel="noopener">📊 StockAnalysis TTWO ↗</a>
+    <a class="nlink-btn" href="https://ir.take2games.com" target="_blank" rel="noopener">📢 Take-Two 投資人關係 ↗</a>
+    <a class="nlink-btn" href="https://finance.yahoo.com/quote/TTWO/" target="_blank" rel="noopener">📈 Yahoo Finance 行情 ↗</a>
+  </div>
+  <div class="nbox">
+    <div class="nitem" style="border-left-color:var(--p)">
+      <div class="ntitle">🎮 GTA VI 確認發售日 — Rockstar Games 公告近十年最大 AAA 作品上線時間表</div>
+      <div class="nmeta">2025–2026 · Rockstar Games · Take-Two Q4 指引重大催化劑 · 預售創紀錄</div>
+    </div>
+    <div class="nitem" style="border-left-color:var(--g)">
+      <div class="ntitle">📈 分析師上調 TTWO 目標價：GTA VI 發售+線上生態推升未來 3 年 ARR 預測</div>
+      <div class="nmeta">2026-05 · Buy 共識 · 目標 $295–$300 · UBS / Benchmark 領銜</div>
+    </div>
+    <div class="nitem" style="border-left-color:var(--bl)">
+      <div class="ntitle">🏀 NBA 2K 系列連續創下年度銷售紀錄，2K Games 訂閱制擴張推升長期 ARR</div>
+      <div class="nmeta">2026 · 2K Games · NBA 2K · 訂閱制 + 微交易雙引擎 · 籃球遊戲壟斷地位</div>
+    </div>
+    <div class="nitem" style="border-left-color:var(--o)">
+      <div class="ntitle">🌐 GTA Online 月活躍玩家突破 1.2 億 — GTA V 十年後線上生態仍持續成長</div>
+      <div class="nmeta">2026 · Rockstar Online · Shark Card 微交易 · 長尾現金流穩定貢獻</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 事件時間軸 ════════════════════════════════════════════════ -->
+<div id="events" class="sec">
+  <div class="sec-ttl">📅 關鍵事件時間軸</div>
+  <div class="card">
+    <div class="flow">
+      <div class="fstep">
+        <div>
+          <div class="ft">🎮 GTA VI 發售 <span class="tag tp">核心催化劑</span></div>
+          <div class="fd">Rockstar Games 近十年旗艦大作，預計首週銷售突破 GTA V 記錄（$8億），GTA VI Online 啟動後開啟下一個 5–7 年微交易週期。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">📊 FY2026 Q4 財報 <span class="tag tn">最新</span></div>
+          <div class="fd">市場關注 GTA VI 發售後首份含線上數據的財報，GTA Online MAU 與 Shark Card 收入是估值重定價的關鍵指標。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🏀 NBA 2K 新年度發售（每年 9 月）</div>
+          <div class="fd">2K Games 每年 9 月定期發售，VC 虛擬貨幣與 MyTeam 模式維持穩定微交易收入，訂閱制滲透率持續上升。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🌐 Civilization VII 發售（2025）</div>
+          <div class="fd">Firaxis Games 旗艦策略系列第七代，PC + 主機多平台，策略遊戲細分市場壟斷地位強化。</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div>
+          <div class="ft">🤝 Zynga 收購整合完成（$12.7B）</div>
+          <div class="fd">2022 年完成收購，Zynga 手機遊戲業務（FarmVille、Poker 等）為 Take-Two 手遊佈局打下基礎，整合效益持續顯現。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 財務表格 ════════════════════════════════════════════════════ -->
+<div id="fin" class="sec">
+  <div class="sec-ttl">財務數據</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">年度收入趨勢（估）</div>
+      <table>
+        <thead><tr><th>財年</th><th>淨書面訂單</th><th>YoY</th><th>GTA 貢獻</th></tr></thead>
+        <tbody>
+          <tr><td>FY2026E</td><td style="color:var(--p)">~$6.0B</td><td class="hg">+15%</td><td style="color:var(--g)">高（GTA VI）</td></tr>
+          <tr><td>FY2025</td><td>~$5.2B</td><td class="hg">+12%</td><td>中（GTA Online）</td></tr>
+          <tr><td>FY2024</td><td>~$4.6B</td><td class="hg">+8%</td><td>中（GTA Online）</td></tr>
+          <tr><td>FY2023</td><td>~$4.2B</td><td>+5%</td><td>中</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;font-size:13px;font-weight:600;color:var(--t)">關鍵業務指標</div>
+      <table>
+        <thead><tr><th>指標</th><th>數值</th><th>評估</th></tr></thead>
+        <tbody>
+          <tr><td>GTA Online MAU（估）</td><td style="color:var(--g)">1.2億+</td><td><span class="tag tn">壟斷級</span></td></tr>
+          <tr><td>NBA 2K 年銷量</td><td>~900萬套</td><td><span class="tag tp">壟斷</span></td></tr>
+          <tr><td>GTA V 累計銷量</td><td style="color:var(--p)">2億+套</td><td><span class="tag tn">史上前三</span></td></tr>
+          <tr><td>分析師目標均值</td><td style="color:var(--g)">$295</td><td><span class="tag ta">Buy 共識</span></td></tr>
+          <tr><td>Zynga 手游 DAU</td><td>~1.4億</td><td><span class="tag tb">手游滲透</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 分析師目標價區間 -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle" style="margin-bottom:4px;font-size:13px;font-weight:600;color:var(--t)">分析師目標價區間</div>
+    <div class="trange">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--m);margin-bottom:6px">
+        <span>低估 $260</span><span>目標均值 <strong style="color:var(--p)">$295</strong></span><span>高估 $340</span>
+      </div>
+      <div class="rtrack">
+        <div class="rfill" style="left:0%;width:100%"></div>
+        <div class="rmark" style="left:0%;color:var(--r)">$260<div class="rlbl">低</div></div>
+        <div class="rmark" style="left:50%;color:var(--p)">$295 ★<div class="rlbl">均值</div></div>
+        <div class="rmark" style="left:100%;color:var(--g)">$340<div class="rlbl">高</div></div>
+      </div>
+      <div style="height:20px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--m);margin-top:8px">
+        <span>現價 <strong style="color:var(--t)">$284</strong></span>
+        <span>vs 均值空間 <strong style="color:var(--g)">+4%</strong></span>
+        <span>vs 高目標 <strong style="color:var(--g)">+20%</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 分析師評級 ══════════════════════════════════════════════════ -->
+<div id="analyst" class="sec">
+  <div class="sec-ttl">分析師評級</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">評級分佈（~25 位分析師）</div>
+      <div class="rbar">
+        <div class="rseg" style="width:47%;background:var(--g)">強買 ~47%</div>
+        <div class="rseg" style="width:36%;background:#388bfd">買入 ~36%</div>
+        <div class="rseg" style="width:17%;background:var(--y)">持有 ~17%</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:12px">
+        <span style="color:var(--g)">● Strong Buy ~47%</span>
+        <span style="color:#388bfd">● Buy ~36%</span>
+        <span style="color:var(--y)">● Hold ~17%</span>
+      </div>
+      <div style="margin-top:14px">
+        <div class="pw">
+          <div class="pl"><span>Strong Buy</span><span class="hg">~47%</span></div>
+          <div class="pb"><div class="pf fg" style="width:47%"></div></div>
+        </div>
+        <div class="pw">
+          <div class="pl"><span>Buy</span><span class="hb">~36%</span></div>
+          <div class="pb"><div class="pf fb" style="width:36%"></div></div>
+        </div>
+        <div class="pw">
+          <div class="pl"><span>Hold</span><span style="color:var(--y)">~17%</span></div>
+          <div class="pb"><div class="pf fo" style="width:17%"></div></div>
+        </div>
+        <div class="pw">
+          <div class="pl"><span>Sell / Strong Sell</span><span style="color:var(--m)">0%</span></div>
+          <div class="pb"><div class="pf fr2" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">主要分析師觀點</div>
+      <table>
+        <thead><tr><th>機構</th><th>評級</th><th>目標</th></tr></thead>
+        <tbody>
+          <tr><td>UBS</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g)">$300</td></tr>
+          <tr><td>Benchmark</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g)">$300</td></tr>
+          <tr><td>Goldman Sachs</td><td><span class="tag ta">Buy</span></td><td style="color:var(--bl)">$295</td></tr>
+          <tr><td>Morgan Stanley</td><td><span class="tag tp">Buy</span></td><td style="color:var(--p)">$290</td></tr>
+          <tr><td>均值</td><td><span class="tag tn">Buy</span></td><td style="color:var(--g)">$295</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 催化劑 ══════════════════════════════════════════════════════ -->
+<div id="catalyst" class="sec">
+  <div class="sec-ttl">🚀 主要催化劑</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">🎮</div>
+      <div class="ibdy">
+        <div class="ittl">GTA VI 發售 <span class="sev sh">高影響</span></div>
+        <div class="idsc">近十年最大 AAA 催化劑。首週銷售預估 $10億+，GTA VI Online 開啟後的 Shark Card 微交易可創造 5–7 年長尾現金流，是估值重定價的核心驅動力。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🌐</div>
+      <div class="ibdy">
+        <div class="ittl">GTA Online 持續擴張 <span class="sev sm">中影響</span></div>
+        <div class="idsc">GTA V 發售逾十年，GTA Online 仍保持 1.2 億+ 月活。每次重大更新（新 DLC、活動週）均推升 Shark Card 收入，是公司最穩定的現金流來源。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🏀</div>
+      <div class="ibdy">
+        <div class="ittl">NBA 2K 系列與訂閱制滲透 <span class="sev sl">低-中影響</span></div>
+        <div class="idsc">籃球遊戲市場近乎壟斷，VC 虛擬貨幣與 MyTeam 生態形成年金型收入。Game Pass / PS Plus 訂閱綁定推升長尾貨幣化。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📱</div>
+      <div class="ibdy">
+        <div class="ittl">Zynga 手遊整合效益 <span class="sev sl">低影響</span></div>
+        <div class="idsc">$12.7B 收購 Zynga 帶來手遊管道（FarmVille、Poker 等），IP 跨平台授權與手游改編是潛在增量，整合效益持續兌現中。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 風險 ══════════════════════════════════════════════════════ -->
+<div id="risk" class="sec">
+  <div class="sec-ttl">⚠️ 主要風險</div>
+  <div class="ilist">
+    <div class="iitem">
+      <div class="iico">⏳</div>
+      <div class="ibdy">
+        <div class="ittl">GTA VI 再度延期風險 <span class="sev sh">高</span></div>
+        <div class="idsc">Rockstar 以「準備好才上」著稱，若再次延期將重演 2023–2024 年「等待催化劑」的折磨期，股價短期承壓明顯。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">📉</div>
+      <div class="ibdy">
+        <div class="ittl">「利多兌現賣出」短線風險 <span class="sev sm">中</span></div>
+        <div class="idsc">GTA VI 發售後，機構在首週銷售數字確認後的獲利了結可能造成短期波動，GTA V 發售後 6 個月的歷史數據顯示類似走勢。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">💸</div>
+      <div class="ibdy">
+        <div class="ittl">高開發成本與 GAAP 持續虧損 <span class="sev sm">中</span></div>
+        <div class="idsc">Take-Two 長期 GAAP 虧損，Zynga 收購溢價攤銷形成持續壓力。高利率環境下，高研發支出的成長股估值邏輯面臨挑戰。</div>
+      </div>
+    </div>
+    <div class="iitem">
+      <div class="iico">🎯</div>
+      <div class="ibdy">
+        <div class="ittl">監管與微交易爭議 <span class="sev sl">低</span></div>
+        <div class="idsc">多國對遊戲微交易（特別是盲盒/賭博性質機制）的監管趨緊，可能影響 GTA Online 與 2K 微交易商業模式的部分市場收入。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 投資論點 ══════════════════════════════════════════════════ -->
+<div id="thesis" class="why">
+  <div class="why-hd">
+    💡 投資論點摘要
+    <span class="why-badge" style="background:rgba(188,140,255,.2);color:var(--p)">GTA VI 催化 + IP 護城河</span>
+  </div>
+  <div class="why-body">
+    <strong style="color:var(--t)">核心命題：</strong>Take-Two 是「IP 平台公司」而非「單一遊戲公司」。GTA VI 是近期最大催化劑，但真正的長期價值在於：
+    <br><br>
+    <strong style="color:var(--p)">① GTA 線上生態體系</strong>——GTA VI Online 一旦啟動，複製 GTA V Online 十年現金流的概率極高，且規模更大。<br>
+    <strong style="color:var(--p)">② 多 IP 年金組合</strong>——NBA 2K（籃球遊戲壟斷）、Civilization（策略遊戲標桿）、Red Dead Online，每年提供穩定訂閱+微交易收入。<br>
+    <strong style="color:var(--p)">③ 訂閱制轉型潛力</strong>——若 GTA VI 整合 Game Pass / 自有訂閱，Take-Two 可從「大作公司」轉型為「ARR 平台」，估值邏輯將根本重評。<br>
+    <br>
+    <strong style="color:var(--t)">主要風險：</strong>GTA VI 延期 / 利多兌現賣出 / 高 GAAP 虧損。<br>
+    <strong style="color:var(--t)">進場邏輯：</strong>GTA VI 發售日確認時，或發售後首份含 Online 數據財報超預期時，是重新評估持倉的最佳窗口。
+  </div>
+  <div class="why-foot">
+    <div>類別：<span>AAA 遊戲 / IP 平台</span></div>
+    <div>核心催化：<span>GTA VI 發售</span></div>
+    <div>長期護城河：<span class="hp">IP 品牌 + 線上生態</span></div>
+    <div>關注指標：<span class="hg">GTA VI Online MAU · Shark Card ARR</span></div>
+  </div>
+
+  <div style="margin-top:16px;border-top:1px solid var(--bd);padding-top:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:12px">AI 辯論：GTA VI Online 能否複製 GTA V 十年現金流？</div>
+    <div style="background:rgba(188,140,255,.06);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:12px">
+      <div style="font-size:12px;color:var(--m);line-height:1.9">
+        <strong style="color:#4285f4">Gemini（多方）：</strong>GTA V Online 在 PS3/360 時代發售，技術限制明顯。GTA VI 原生設計於次世代+PC，開放世界規模、即時服務基礎設施、變現工具鏈均更成熟。歷史數據（GTA V Online 十年 $60億+ 估計微交易收入）是最強的預測基礎。<br>
+        <strong style="color:#e11d48">Grok（空方）：</strong>Fortnite、GTA Online 同時存在。當前玩家注意力比 2013 年更分散，開放世界競品（Red Dead Online 本身就失敗了）顯示「同一公司第二個線上世界」不必然複製成功。GTA VI Online 能否在 Fortnite/《原神》等常青服務遊戲的夾擊下維持玩家黏性，是最大不確定性。<br>
+        <strong style="color:#10a37f">GPT（結論）：</strong>GTA Online 的護城河不是「開放世界」，而是<strong style="color:var(--t)「犯罪幻想 + 無規則自由度」的文化 IP</strong>。Fortnite 是卡通射擊，原神是 JRPG，沒有任何遊戲在相同定位上與 GTA 正面競爭。GTA VI Online 的成功概率高，風險在於 Rockstar 的即時服務運營能力是否跟上——這是真正的執行風險，而非市場競爭風險。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 技術面支撐壓力 ══════════════════════════════════════════════ -->
+<div class="sec">
+  <div class="sec-ttl">📐 技術面參考</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">關鍵價位（靜態參考）</div>
+      <table>
+        <thead><tr><th>類型</th><th>價位</th><th>意義</th></tr></thead>
+        <tbody>
+          <tr><td>強支撐 1</td><td style="color:var(--g)">$265</td><td>前低支撐區間</td></tr>
+          <tr><td>強支撐 2</td><td style="color:var(--g)">$250</td><td>季線支撐</td></tr>
+          <tr><td>強壓力 1</td><td style="color:var(--r)">$295</td><td>目標均值 / 分析師集中區</td></tr>
+          <tr><td>強壓力 2</td><td style="color:var(--r)">$320</td><td>前高壓力帶</td></tr>
+          <tr><td>52W 高</td><td style="color:var(--y)">$224→$320</td><td>波動區間</td></tr>
+          <tr><td>現價</td><td style="color:var(--p)">$284</td><td>介於支撐與壓力之間</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--t)">估值上行空間</div>
+      <div class="ubox">
+        <div>
+          <div class="unum">+4%</div>
+          <div class="ulbl">至分析師目標均值 $295</div>
+        </div>
+        <div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:800;color:var(--g)">+20%</div>
+            <div style="font-size:12px;color:var(--m)">至高端目標 $340</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--m);line-height:1.7">
+        GTA VI Online 超預期情境（MAU 破 1.5 億 + 微交易 ARR 超 $30億），部分機構上看 $380–$420 長線目標。
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  TTWO 監控中心 · Take-Two Interactive · 由 Claude AI 協助建立 · 2026-05-18<br>
+  <span style="margin-top:4px;display:block">僅供個人參考，不構成投資建議</span>
+</div>
+
+<script>
+const AVG_TARGET = 295;
+const PROXY = 'https://corsproxy.io/?url=';
+const YF = 'https://query2.finance.yahoo.com/v8/finance/chart/TTWO';
+
+function fmt(n,d=2){return n==null?'─':n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmtVol(n){if(n==null)return'─';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n;}
+
+async function fetchQuote(){
+  const params='?interval=1m&range=1d';
+  let data;
+  try{const r=await fetch(YF+params);data=await r.json();}
+  catch{try{const r=await fetch(PROXY+encodeURIComponent(YF+params));data=await r.json();}catch{return null;}}
+  return data?.chart?.result?.[0]??null;
+}
+
+function isMarketOpen(){
+  const now=new Date();
+  const et=new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const d=et.getDay();if(d===0||d===6)return false;
+  const h=et.getHours(),m=et.getMinutes(),t=h*60+m;
+  return t>=570&&t<960;
+}
+
+function buildWhy(price,prev,lo,hi,vol){
+  const chg=price-prev,pct=(chg/prev)*100;
+  const upside=((AVG_TARGET-price)/price*100).toFixed(1);
+  let dir=chg>=0?'▲ 上漲':'▼ 下跌';
+  let color=chg>=0?'var(--g)':'var(--r)';
+  let reason='';
+  if(Math.abs(pct)>3)reason='大幅波動，留意 GTA VI 相關消息或財報事件。';
+  else if(Math.abs(pct)>1)reason='中度波動，可能受大盤科技股情緒影響。';
+  else reason='震盪整理，等待 GTA VI 發售日確認或財報催化劑。';
+  document.getElementById('why-body').innerHTML=`
+    <strong style="color:${color}">${dir} ${Math.abs(pct).toFixed(2)}%</strong>（${chg>=0?'+':''}${fmt(chg)}）· 現價 <strong style="color:var(--t)">$${fmt(price)}</strong><br>
+    <span style="font-size:12px">${reason}</span><br>
+    <span style="font-size:12px;color:var(--m)">分析師目標均值 <strong style="color:var(--p)">$${AVG_TARGET}</strong> · 上行空間 <strong style="color:var(--g)">+${upside}%</strong></span>`;
+  const badge=document.getElementById('why-badge');
+  badge.textContent=chg>=0?`▲ +${pct.toFixed(2)}%`:`▼ ${pct.toFixed(2)}%`;
+  badge.style.background=chg>=0?'rgba(63,185,80,.2)':'rgba(248,81,73,.2)';
+  badge.style.color=color;
+  document.getElementById('w-prev').textContent='$'+fmt(prev);
+  document.getElementById('w-range').textContent='$'+fmt(lo)+' – $'+fmt(hi);
+  document.getElementById('w-vol').textContent=fmtVol(vol);
+  document.getElementById('w-time').textContent=new Date().toLocaleTimeString('zh-TW');
+}
+
+function applyQuote(result){
+  const meta=result.meta;
+  const price=meta.regularMarketPrice??meta.chartPreviousClose;
+  const prev=meta.chartPreviousClose??meta.previousClose;
+  const lo=meta.regularMarketDayLow??prev;
+  const hi=meta.regularMarketDayHigh??prev;
+  const vol=meta.regularMarketVolume;
+  const chg=price-prev,pct=(chg/prev)*100;
+  const color=chg>=0?'var(--g)':'var(--r)';
+  const arrow=chg>=0?'▲':'▼';
+  document.getElementById('hdr-price').textContent='$'+fmt(price);
+  const hc=document.getElementById('hdr-chg');
+  hc.textContent=`${arrow} ${chg>=0?'+':''}${fmt(chg)} (${pct>=0?'+':''}${pct.toFixed(2)}%)`;
+  hc.style.background=chg>=0?'rgba(63,185,80,.15)':'rgba(248,81,73,.15)';
+  hc.style.borderColor=chg>=0?'rgba(63,185,80,.4)':'rgba(248,81,73,.4)';
+  hc.style.color=color;
+  const ms=document.getElementById('mkt-status');
+  ms.textContent=isMarketOpen()?'🟢 美股盤中':'⚪ 美股盤後';
+  document.getElementById('hdr-upd').textContent='更新：'+new Date().toLocaleTimeString('zh-TW');
+  buildWhy(price,prev,lo,hi,vol);
+  return result;
+}
+
+function drawChart(result){
+  const ts=result.timestamp;
+  const closes=result.indicators?.quote?.[0]?.close;
+  if(!ts||!closes)return;
+  const labels=[],data=[];
+  for(let i=0;i<ts.length;i++){
+    if(closes[i]==null)continue;
+    labels.push(new Date(ts[i]*1000).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}));
+    data.push(closes[i]);
+  }
+  document.getElementById('intraday-loading').style.display='none';
+  const ctx=document.getElementById('intradayChart').getContext('2d');
+  const first=data[0]??0;
+  const color=data[data.length-1]>=first?'#bc8cff':'#f85149';
+  new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:color.replace(')',', 0.1)').replace('rgb','rgba'),tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>'$'+fmt(ctx.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'#8b949e',font:{size:10}},grid:{color:'rgba(48,54,61,.5)'}},y:{ticks:{color:'#8b949e',font:{size:10},callback:v=>'$'+fmt(v)},grid:{color:'rgba(48,54,61,.5)'}}}}});
+}
+
+(async()=>{
+  const result=await fetchQuote();
+  if(result){applyQuote(result);drawChart(result);}
+  else{
+    document.getElementById('why-body').textContent='無法取得即時數據，請稍後重試。';
+    document.getElementById('mkt-status').textContent='⚠️ 數據連線失敗';
+    document.getElementById('intraday-loading').textContent='⚠️ 走勢圖載入失敗';
+  }
+  setInterval(async()=>{const r=await fetchQuote();if(r)applyQuote(r);},60000);
+})();
+</script>
+</body>
+</html>
