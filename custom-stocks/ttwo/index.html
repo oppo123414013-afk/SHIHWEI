@@ -701,8 +701,10 @@ function drawChart(result){
   document.getElementById('intraday-loading').style.display='none';
   const ctx=document.getElementById('intradayChart').getContext('2d');
   const first=data[0]??0;
-  const color=data[data.length-1]>=first?'#bc8cff':'#f85149';
-  new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:color.replace(')',', 0.1)').replace('rgb','rgba'),tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>'$'+fmt(ctx.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'#8b949e',font:{size:10}},grid:{color:'rgba(48,54,61,.5)'}},y:{ticks:{color:'#8b949e',font:{size:10},callback:v=>'$'+fmt(v)},grid:{color:'rgba(48,54,61,.5)'}}}}});
+  const isUp=data[data.length-1]>=first;
+  const color=isUp?'#bc8cff':'#f85149';
+  const fillColor=isUp?'rgba(188,140,255,0.12)':'rgba(248,81,73,0.12)';
+  new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,fill:true,backgroundColor:fillColor,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>'$'+fmt(ctx.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'#8b949e',font:{size:10}},grid:{color:'rgba(48,54,61,.5)'}},y:{ticks:{color:'#8b949e',font:{size:10},callback:v=>'$'+fmt(v)},grid:{color:'rgba(48,54,61,.5)'}}}}});
 }
 
 (async()=>{
