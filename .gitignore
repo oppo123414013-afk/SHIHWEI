@@ -1,8 +1,12 @@
 
-# Claude Code �u�@�ؿ�
+# Claude Code 工作目錄
 .claude/
 
-# �ӷP���
+# 敏感資料
 threads_bot/.env
 *.env
 *.bak
+
+# PDF 檔案（體積過大，無法透過代理推送）
+reports/trump/pdf/*.pdf
+reports/pagaya/pdf/*.pdf
